@@ -1,7 +1,7 @@
 <template>
 <div id=frame>
 	<h1 id=top>TOP</h1>
-<div id=viewer>
+<div id=viewer data-count=3>
 	<div id=red class=slide></div>
 	<div id=blue class=slide></div>
 	<div id=lime class=slide></div>
@@ -52,6 +52,7 @@ export default {
 	width: 100vw;
 	height: 100vh;
 	flex-shrink: 0;
+	transition: all 0.5s ease;
 }
 #lime {
 	background: lime;

@@ -33,16 +33,31 @@ function throttle(func, wait, options) {
 
 document.addEventListener('wheel',throttle(function(e){
 	var view = document.querySelector('#viewer');
-	console.log(view.scrollLeft);
+	var count = view.dataset.count;
 	if (e.deltaY > 0) {
-		console.log('up')
+		var slide = document.querySelector('.slide');
+		var curMarg = Number(slide.style.marginRight.slice(0,-2));
+		console.log(curMarg);
+		console.log(count);
+		if(curMarg < 0) {
+			curMarg += 100;
+			slide.style.marginRight = curMarg+'vw';
+		}
+
 		//view.scrollBy({
 		//	left: -window.innerWidth,
 		//	behavior: 'smooth'
 		//})
 		//view.scrollLeft -= window.innerWidth
 	} else if (e.deltaY < 0) {
-		console.log('down')
+		var slide = document.querySelector('.slide');
+		var curMarg = Number(slide.style.marginRight.slice(0,-2));
+		console.log(curMarg);
+		console.log(count);
+		if(curMarg/100 * -1 < count - 1) {
+			curMarg -= 100;
+			slide.style.marginRight = curMarg+'vw';
+		}
 		//view.scrollBy({
 		//	left: window.innerWidth,
 		//	behavior: 'smooth'
