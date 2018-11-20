@@ -12,8 +12,11 @@
 
 <script>
 export default {
-  methods: {
-  }
+	head: {
+		script: [
+			{ src: '/run.js' }
+		]
+	}
 }
 </script>
 <style>
@@ -26,10 +29,10 @@ export default {
 	align-items: center;
 }
 #viewer {
-	width: 100vh;
-	height: 100vw;
-	overflow: scroll;
-	transform: rotate(-90deg);
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+	display: flex;
 }
 #top {
 	position: absolute;
@@ -46,8 +49,9 @@ export default {
 	z-index: 99;
 }
 .slide {
-	width: 100vh;
-	height: 100vw;
+	width: 100vw;
+	height: 100vh;
+	flex-shrink: 0;
 }
 #lime {
 	background: lime;
