@@ -22,15 +22,23 @@ export default {
 			slides: [
 				{
 					img: 'one.jpg',
-					text: 'first slide'
+					text: 'dummy slide'
 				},
 				{
 					img: 'two.jpg',
-					text: 'second slide'
+					text: 'first slide'
 				},
 				{
 					img: 'three.jpg',
 					text: 'third slide'
+				},
+				{
+					img: 'four.jpg',
+					text: 'fourth slide'
+				},
+				{
+					img: 'five.jpg',
+					text: 'fifth slide'
 				}
 			]
 		}

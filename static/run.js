@@ -12,13 +12,15 @@ var throttle = function (func, limit) {
 }
 
 document.addEventListener('wheel',throttle(function(e){
+	console.log('X');
+	console.log(e.deltaX);
+	console.log('Y');
+	console.log(e.deltaY);
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
 	if (e.deltaY > 0) {
 		var curMarg = Number(slide.style.marginRight.slice(0,-2));
-		console.log(curMarg);
-		console.log(count);
 		if(curMarg < -100) {
 			curMarg += 100;
 			slide.style.marginRight = curMarg+'vw';
@@ -27,16 +29,9 @@ document.addEventListener('wheel',throttle(function(e){
 	} else if (e.deltaY < 0) {
 		var slide = document.querySelector('.slide');
 		var curMarg = Number(slide.style.marginRight.slice(0,-2));
-		console.log(curMarg);
-		console.log(count);
 		if(curMarg/100 * -1 < count - 1) {
 			curMarg -= 100;
 			slide.style.marginRight = curMarg+'vw';
 		}
-		//view.scrollBy({
-		//	left: window.innerWidth,
-		//	behavior: 'smooth'
-		//})
-		//view.scrollLeft += window.innerWidth
 	}
 },5000));
