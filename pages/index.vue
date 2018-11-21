@@ -2,9 +2,9 @@
 <div id=frame>
 	<h1 id=top>TOP</h1>
 <div id=viewer data-count=3>
-	<div id=red class=slide></div>
-	<div id=blue class=slide></div>
-	<div id=lime class=slide></div>
+	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'url(' +slide.img+ ')' }">
+	{{ slide.text }}
+	</div>
 </div>
 	<h1 id=bot>BOT</h1>
 </div>
@@ -16,6 +16,24 @@ export default {
 		script: [
 			{ src: '/run.js' }
 		]
+	},
+	asyncData() {
+		return {
+			slides: [
+				{
+					img: 'one.png',
+					text: 'first slide'
+				},
+				{
+					img: 'two.png',
+					text: 'second slide'
+				},
+				{
+					img: 'three.png',
+					text: 'third slide'
+				}
+			]
+		}
 	}
 }
 </script>
@@ -53,6 +71,9 @@ export default {
 	height: 100vh;
 	flex-shrink: 0;
 	transition: all 0.5s ease;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 #lime {
 	background: lime;

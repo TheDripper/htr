@@ -1,0 +1,4 @@
+
+	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'url(' +slide.img+ ')' }">
+	{{ slide.text }}
+	</div>
