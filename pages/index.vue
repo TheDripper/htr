@@ -1,7 +1,7 @@
 <template>
 <div id=frame>
 	<h1 id=top>TOP</h1>
-<div id=viewer data-count=3>
+<div id=viewer :data-count="slides.length">
 	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'url(' +slide.img+ ')' }">
 	{{ slide.text }}
 	</div>
@@ -21,15 +21,15 @@ export default {
 		return {
 			slides: [
 				{
-					img: 'one.png',
+					img: 'one.jpg',
 					text: 'first slide'
 				},
 				{
-					img: 'two.png',
+					img: 'two.jpg',
 					text: 'second slide'
 				},
 				{
-					img: 'three.png',
+					img: 'three.jpg',
 					text: 'third slide'
 				}
 			]
@@ -74,6 +74,10 @@ export default {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	background-size: cover;
+}
+.slide:first-child {
+	margin-right: -100vw;
 }
 #lime {
 	background: lime;
