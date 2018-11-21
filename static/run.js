@@ -1,23 +1,11 @@
-var throttle = function (func, limit) {
-  var inThrottle
-  return function() {
-    var args = arguments
-    var context = this
-    if (!inThrottle) {
-      func.apply(context, args)
-      inThrottle = true
-      setTimeout(function(){ return inThrottle = false, limit })
-    }
-  }
-}
-
-document.addEventListener('wheel',throttle(function(e){
-	console.log('X');
-	console.log(e.deltaX);
-	console.log('Y');
-	console.log(e.deltaY);
+document.addEventListener('wheel',function(e){
+	//console.log('X');
+	//console.log(e.deltaX);
+	//console.log('Y');
+	//console.log(e.deltaY);
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
+	console.log(slide);
 	var count = view.dataset.count;
 	if (e.deltaY > 0) {
 		var curMarg = Number(slide.style.marginRight.slice(0,-2));
@@ -27,11 +15,14 @@ document.addEventListener('wheel',throttle(function(e){
 		}
 
 	} else if (e.deltaY < 0) {
-		var slide = document.querySelector('.slide');
+		console.log(slide.style.marginRight);
 		var curMarg = Number(slide.style.marginRight.slice(0,-2));
+		if(!curMarg)
+			curMarg = -100
+		console.log(curMarg);
 		if(curMarg/100 * -1 < count - 1) {
 			curMarg -= 100;
 			slide.style.marginRight = curMarg+'vw';
 		}
 	}
-},5000));
+});
