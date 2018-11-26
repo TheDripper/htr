@@ -43,20 +43,20 @@ export default {
 				var slide = view.firstChild;
 				var count = view.dataset.count;
 				if (e.deltaY > 0) {
-					var curMarg = Number(slide.style.marginRight.slice(0,-2));
-					if(curMarg < -100) {
+					var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+					if(curMarg < 0) {
 						curMarg += 100;
-						slide.style.marginRight = curMarg+'vw';
+						slide.style.marginLeft = curMarg+'vw';
 						vuestance.$store.commit('prev')
 					}
 			
 				} else if (e.deltaY < 0) {
-					var curMarg = Number(slide.style.marginRight.slice(0,-2));
-					if(!curMarg)
-						curMarg = -100
+					var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+					//if(!curMarg)
+					//	curMarg = -100
 					if(curMarg/100 * -1 < count - 1) {
 						curMarg -= 100;
-						slide.style.marginRight = curMarg+'vw';
+						slide.style.marginLeft = curMarg+'vw';
 						vuestance.$store.commit('next')
 					}
 				}
@@ -132,7 +132,6 @@ export default {
 	background-size: cover;
 }
 .slide:first-child {
-	margin-right: -100vw;
 }
 #lime {
 	background: lime;
