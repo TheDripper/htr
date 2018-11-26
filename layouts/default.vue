@@ -7,14 +7,13 @@
 <style>
 html
 {
-  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 16px;
-  word-spacing: 1px;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
+	color: #ECE5C9;
+	font-family: "argentReg", serif;
+}
+p, a {
+	font-family: "argentReg", serif;
+	color: #ECE5C9;
+	font-size: 18px;
 }
 *, *:before, *:after
 {
@@ -58,6 +57,10 @@ html
 	font-family: "argentBold";
 	src: url('/ArgentCF-Bold.ttf');
 }
+@font-face {
+	font-family: "flamaSemi";
+	src: url('/FlamaSemicondensed-Medium.otf');
+}
 h1 {
 	font-family: "argentBold", serif;
 	font-size: 76px;
@@ -65,5 +68,9 @@ h1 {
 }
 h2 {
 	font-family: "argentBold", serif;
+}
+h4 {
+	color: #ECE5C9;
+	font-size: 15px;
 }
 </style>

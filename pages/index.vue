@@ -1,8 +1,10 @@
 <template>
 <div id=frame>
 <div id=viewer :data-count="slides.length">
-	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'url(' +slide.img+ ')' }">
+	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'url(' +slide.img+ ')' }" :id="slide.id">
+	<h4>{{ slide.tag }}</h4>
 	<h1>{{ slide.text }}</h1>
+	<p>{{ slide.copy }}</p>
 	<div class=shade></div>
 	</div>
 </div>
@@ -67,19 +69,30 @@ export default {
 			slides: [
 				{
 					img: 'one.png',
-					text: 'The Battle Against Deforestation Takes a Village.',
+					text: 'Change Starts Here. Introducing Haiti Takes Root.',
+					id: 'home',
+					copy: 'LOREM IPSUM DOLOR SIT AMET, CONSECTETUER ADIPISCING ELIAM NONUMMY NIBH EUISMOD TINCIDUNT UT LAOREET DOLORE MAGNA ALIQUAM ERAT VOLUTPAT. UT WISI ENIM AD MINIM VENIAM, QUIS NOSTRUD EXERCI TATION LOBORTIS NISLUT.'
+
 				},
 				{
 					img: 'two.png',
-					text: 'first slide'
+					text: 'The Battle Against Deforestation Takes a Village.',
+					id: 'mission',
+					copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.',
+					tag: 'Our Mission'
 				},
 				{
 					img: 'three.png',
-					text: 'third slide'
+					text: 'Together We Can',
+					id: 'about',
+					copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.'
 				},
 				{
 					img: 'four.png',
-					text: 'fourth slide'
+					text: 'Change Starts Here.',
+					id: 'approach',
+					copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.',
+					tag: 'Our Approach'
 				}
 			],
 			current: 0
@@ -108,10 +121,12 @@ export default {
 	flex-shrink: 0;
 	transition: all 0.5s ease;
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	background-size: cover;
 	position: relative;
+	padding: 0 10vw;
 }
 .slide:first-child {
 }
@@ -161,6 +176,46 @@ nav{
 }
 .slide h1 {
 	z-index: 99;
+	text-align: center;
+	max-width: 80%;
+	line-height: 1;
+	margin-bottom: 40px;
 }
+.slide p {
+	z-index: 99;
+	max-width: 80%;
+	text-align: center;
+}
+#home p {
+	font-family: "flamaSemi";
+	text-transform: uppercase;
+	max-width: 60%;
+	text-align: center;
+	font-size: 18px;
+}
+#mission {
+	color: white;
+	text-align: left;
+	align-items: flex-start;
+}
+#mission h1 {
+	text-align: left;
+	color: white;
+}
+#mission p {
+	text-align: left;
+	color: white;
+}
+#about p {
+	max-width: 60%;
+}
+#approach {
+	align-items: flex-start;
+}
+.slide h4 {
+	z-index: 99;
+	text-transform: uppercase;
+	font-family: "flamaSemi";
+} 
 
 </style>
