@@ -6,6 +6,11 @@
 	{{ slide.text }}
 	</div>
 </div>
+<nav>
+<ul id=dots>
+<li v-for="(slide,index) in slides" :class="{'active':index===$store.state.current}"></li>
+</ul>
+</nav>
 	<h1 id=bot>BOT</h1>
 </div>
 </template>
@@ -29,36 +34,33 @@ export default {
 			//{ src: '/run.js' }
 		]
 	},
-	created() {
+	mounted() {
 		if(process.browser) {
-			console.log('test')
+			console.log(this.$store.state.current);
+			let vuestance = this
 			document.addEventListener('wheel',throttle(function(e){
-				//console.log('X');
-				//console.log(e.deltaX);
-				//console.log('Y');
-				//console.log(e.deltaY);
 				var view = document.querySelector('#viewer');
 				var slide = view.firstChild;
 				var count = view.dataset.count;
 				if (e.deltaY > 0) {
 					var curMarg = Number(slide.style.marginRight.slice(0,-2));
-					console.log(curMarg);
 					if(curMarg < -100) {
 						curMarg += 100;
 						slide.style.marginRight = curMarg+'vw';
+						vuestance.$store.commit('prev')
 					}
 			
 				} else if (e.deltaY < 0) {
 					var curMarg = Number(slide.style.marginRight.slice(0,-2));
-					console.log(curMarg);
 					if(!curMarg)
 						curMarg = -100
 					if(curMarg/100 * -1 < count - 1) {
 						curMarg -= 100;
 						slide.style.marginRight = curMarg+'vw';
+						vuestance.$store.commit('next')
 					}
 				}
-			},2000));
+			},1100));
 		}
 	},
 	asyncData() {
@@ -84,7 +86,8 @@ export default {
 					img: 'five.jpg',
 					text: 'fifth slide'
 				}
-			]
+			],
+			current: 0
 		}
 	}
 }
@@ -140,4 +143,31 @@ export default {
 #blue {
 	background: blue;
 }
+#dots {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	height: 85vh;
+	justify-content: space-between;
+}
+#dots li {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: transparent;
+	border: 1px solid white;
+	transition: all 0.5s ease;
+}
+#dots li.active {
+	background: white;
+	width: 20px;
+	height: 20px;
+}
+nav{
+	position: fixed;
+	right: 20px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
 </style>
