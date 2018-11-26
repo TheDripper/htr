@@ -50,4 +50,20 @@ html
   color: #fff;
   background-color: #35495e;
 }
+@font-face {
+	font-family: "argentReg";
+	src: url('/ArgentCF-Regular.ttf');
+}
+@font-face {
+	font-family: "argentBold";
+	src: url('/ArgentCF-Bold.ttf');
+}
+h1 {
+	font-family: "argentBold", serif;
+	font-size: 76px;
+	color: #ECE5C9;
+}
+h2 {
+	font-family: "argentBold", serif;
+}
 </style>

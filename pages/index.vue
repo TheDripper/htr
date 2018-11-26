@@ -1,9 +1,9 @@
 <template>
 <div id=frame>
-	<h1 id=top>TOP</h1>
 <div id=viewer :data-count="slides.length">
 	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'url(' +slide.img+ ')' }">
-	{{ slide.text }}
+	<h1>{{ slide.text }}</h1>
+	<div class=shade></div>
 	</div>
 </div>
 <nav>
@@ -11,7 +11,6 @@
 <li v-for="(slide,index) in slides" :class="{'active':index===$store.state.current}"></li>
 </ul>
 </nav>
-	<h1 id=bot>BOT</h1>
 </div>
 </template>
 
@@ -67,24 +66,20 @@ export default {
 		return {
 			slides: [
 				{
-					img: 'one.jpg',
-					text: 'dummy slide'
+					img: 'one.png',
+					text: 'The Battle Against Deforestation Takes a Village.',
 				},
 				{
-					img: 'two.jpg',
+					img: 'two.png',
 					text: 'first slide'
 				},
 				{
-					img: 'three.jpg',
+					img: 'three.png',
 					text: 'third slide'
 				},
 				{
-					img: 'four.jpg',
+					img: 'four.png',
 					text: 'fourth slide'
-				},
-				{
-					img: 'five.jpg',
-					text: 'fifth slide'
 				}
 			],
 			current: 0
@@ -107,20 +102,6 @@ export default {
 	overflow: hidden;
 	display: flex;
 }
-#top {
-	position: absolute;
-	top: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 99;
-}
-#bot {
-	position: absolute;
-	bottom: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 99;
-}
 .slide {
 	width: 100vw;
 	height: 100vh;
@@ -130,8 +111,18 @@ export default {
 	justify-content: center;
 	align-items: center;
 	background-size: cover;
+	position: relative;
 }
 .slide:first-child {
+}
+.shade {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: black;
+	opacity: 0.5;
+	width: 100%;
+	height: 100%;
 }
 #lime {
 	background: lime;
@@ -167,6 +158,9 @@ nav{
 	right: 20px;
 	top: 50%;
 	transform: translateY(-50%);
+}
+.slide h1 {
+	z-index: 99;
 }
 
 </style>
