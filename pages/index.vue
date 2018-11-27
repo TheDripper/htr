@@ -2,10 +2,18 @@
 <div id=frame>
 <div id=viewer :data-count="slides.length">
 	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'url(' +slide.img+ ')' }" :id="slide.id">
-	<h4>{{ slide.tag }}</h4>
-	<h1>{{ slide.text }}</h1>
-	<p>{{ slide.copy }}</p>
-	<div class=shade></div>
+		<div class=shade></div>
+		<h4>{{ slide.tag }}</h4>
+		<h1>{{ slide.text }}</h1>
+		<p>{{ slide.copy }}</p>
+		<button @click='vert'>{{ slide.butt }}</button>
+		<div class=subs>
+		<div class=sub v-for="(sub,index) in slide.subs" :style="{ backgroundImage: 'url(' +sub.img+ ')' }" :id="sub.id">
+			<h4>{{ sub.tag }}</h4>
+			<h1>{{ sub.text }}</h1>
+			<p>{{ sub.copy }}</p>
+		</div>
+		</div>
 	</div>
 </div>
 <nav>
@@ -40,28 +48,37 @@ export default {
 			console.log(this.$store.state.current);
 			let vuestance = this
 			document.addEventListener('wheel',throttle(function(e){
-				var view = document.querySelector('#viewer');
-				var slide = view.firstChild;
-				var count = view.dataset.count;
-				if (e.deltaY > 0) {
-					var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-					if(curMarg < 0) {
-						curMarg += 100;
-						slide.style.marginLeft = curMarg+'vw';
-						vuestance.$store.commit('prev')
-					}
-			
-				} else if (e.deltaY < 0) {
-					var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-					//if(!curMarg)
-					//	curMarg = -100
-					if(curMarg/100 * -1 < count - 1) {
-						curMarg -= 100;
-						slide.style.marginLeft = curMarg+'vw';
-						vuestance.$store.commit('next')
+				if(!vuestance.$store.state.vert) {
+					var view = document.querySelector('#viewer');
+					var slide = view.firstChild;
+					var count = view.dataset.count;
+					if (e.deltaY > 0) {
+						var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+						if(curMarg < 0) {
+							curMarg += 100;
+							slide.style.marginLeft = curMarg+'vw';
+							vuestance.$store.commit('prev')
+						}
+				
+					} else if (e.deltaY < 0) {
+						var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+						if(curMarg/100 * -1 < count - 1) {
+							curMarg -= 100;
+							slide.style.marginLeft = curMarg+'vw';
+							vuestance.$store.commit('next')
+						}
 					}
 				}
 			},1100));
+			document.addEventListener('wheel',throttle(function(e){
+				if(vuestance.$store.state.vert) {
+					let open = document.querySelector('.open')
+					console.log(open.clientHeight)
+					console.log(open.scrollTop)
+					if(open.clientHeight == open.scrollTop) {
+					}
+				}
+			},150));
 		}
 	},
 	asyncData() {
@@ -79,23 +96,40 @@ export default {
 					text: 'The Battle Against Deforestation Takes a Village.',
 					id: 'mission',
 					copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.',
-					tag: 'Our Mission'
+					tag: 'Our Mission',
+					butt: 'Explore',
+					subs: [
+						{
+							img: 'three.png',
+							text: 'Together We Can',
+							id: 'about',
+							copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.'
+						},
+						{
+							img: 'four.png',
+							text: 'Change Starts Here.',
+							id: 'approach',
+							copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.',
+							tag: 'Our Approach'
+						}
+					]
 				},
 				{
-					img: 'three.png',
-					text: 'Together We Can',
-					id: 'about',
-					copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.'
-				},
-				{
-					img: 'four.png',
-					text: 'Change Starts Here.',
-					id: 'approach',
+					img: 'coalition.png',
+					text: 'Positive Change Starts with Helping Hands.',
 					copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.',
-					tag: 'Our Approach'
+					tag: 'OUR COALITION'
+
 				}
 			],
-			current: 0
+		}
+	},
+	methods: {
+		vert: function(e) {
+			e.target.parentNode.querySelector('.subs').classList.add('open')
+			e.target.parentNode.querySelector('.subs').style.transform = "translateY(0%)"
+			this.$store.commit('vert')
+			console.log(this.$store.state.vert)
 		}
 	}
 }
@@ -138,6 +172,7 @@ export default {
 	opacity: 0.5;
 	width: 100%;
 	height: 100%;
+	pointer-events: none;
 }
 #lime {
 	background: lime;
@@ -217,5 +252,29 @@ nav{
 	text-transform: uppercase;
 	font-family: "flamaSemi";
 } 
+.slide button {
+	z-index: 99;
+}
+.subs {
+	position: absolute;
+	top: 0;
+	left: 0;
+	transform: translateY(100%);
+	transition: all 0.3s ease;
+	width: 100vw;
+	height: 100vh;
+	z-index: 999;
+	overflow: hidden;
+	overflow-y: scroll;
+}
+.sub {
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	padding: 0 10vw;
+}
 
 </style>

@@ -3,7 +3,8 @@ import Vuex from 'vuex'
 const createStore = () => {
   return new Vuex.Store({
     state: () => ({
-      current: 0
+      current: 0,
+      vert: false
     }),
     mutations: {
       next (state) {
@@ -11,6 +12,9 @@ const createStore = () => {
       },
       prev (state) {
         state.current--
+      },
+      vert (state) {
+        state.vert ? state.vert = false : state.vert = true
       }
     }
   })
