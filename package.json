@@ -17,7 +17,8 @@
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
     "nodemon": "^1.18.7",
-    "nuxt": "^1.0.0"
+    "nuxt": "^1.0.0",
+    "vue2-touch-events": "^1.1.1"
   },
   "devDependencies": {
     "cross-env": "^5.0.1"

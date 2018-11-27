@@ -1,6 +1,6 @@
 <template>
 <div id=frame>
-<div id=viewer :data-count="slides.length">
+<div id=viewer :data-count="slides.length" v-touch:swipe="swiper">
 	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +slide.img+ ')' }" :id="slide.id">
 		<h4 class=name>{{ slide.name }}</h4>
 		<h1>{{ slide.text }}</h1>
@@ -153,6 +153,29 @@ export default {
 		nomob: function(e) {
 			document.querySelector('#explore').style.opacity='0';
 			document.querySelector('#explore').style.pointerEvents='none';
+		},
+		swiper: function(e) {
+			console.log(e)
+			if(!this.$store.state.vert) {
+				var view = document.querySelector('#viewer');
+				var slide = view.firstChild;
+				var count = view.dataset.count;
+				if(e=='left') {
+					var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+					if(curMarg/100 * -1 < count - 1) {
+						curMarg -= 100;
+						slide.style.marginLeft = curMarg+'vw';
+						this.$store.commit('next')
+					}
+				} else if(e=='right') {
+					var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+					if(curMarg < 0) {
+						curMarg += 100;
+						slide.style.marginLeft = curMarg+'vw';
+						this.$store.commit('prev')
+					}
+				}
+			}
 		}
 
 	}
