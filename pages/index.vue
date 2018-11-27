@@ -15,6 +15,7 @@
 		</div>
 		</div>
 	</div>
+	<h2 id=back>Back</h2>
 </div>
 <nav>
 <ul id=dots>
@@ -129,7 +130,8 @@ export default {
 			e.target.parentNode.querySelector('.subs').classList.add('open')
 			e.target.parentNode.querySelector('.subs').style.transform = "translateY(0%)"
 			this.$store.commit('vert')
-			console.log(this.$store.state.vert)
+			document.querySelector('#back').style.opacity='1'
+			document.querySelector('#back').style.pointerEvents='auto'
 		}
 	}
 }
@@ -275,6 +277,25 @@ nav{
 	align-items: center;
 	flex-direction: column;
 	padding: 0 10vw;
+}
+#back {
+	font-size: 43px;
+	text-transform: uppercase;
+	color: white;
+	position: fixed;
+	bottom: 10px;
+	left: 10px;
+	opacity: 0;
+	transition: all 0.3s ease;
+	font-family: "flamaSemi";
+	pointer-events: none;
+	z-index: 999;
+	cursor: pointer;
+
+}
+.open .back {
+	opacity: 1;
+	pointer-events: auto;
 }
 
 </style>
