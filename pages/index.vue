@@ -2,26 +2,39 @@
 <div id=frame>
 <div id=viewer :data-count="slides.length">
 	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +slide.img+ ')' }" :id="slide.id">
-		<h4>{{ slide.tag }}</h4>
+		<h4 class=name>{{ slide.name }}</h4>
 		<h1>{{ slide.text }}</h1>
 		<p>{{ slide.copy }}</p>
-		<a v-if="slide.butt" class=opener @click='vert'>{{ slide.tag }}<img src=/down.png /></a>
+		<a v-if="slide.butt" class=opener @click='vert'>{{ slide.name }}<img src=/down.png /></a>
 		<div class=subs>
 		<div class=sub v-for="(sub,index) in slide.subs" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +sub.img+ ')' }" :id="sub.id">
-			<h4>{{ sub.tag }}</h4>
+			<h4>{{ sub.name }}</h4>
 			<h1>{{ sub.text }}</h1>
 			<p>{{ sub.copy }}</p>
 		</div>
 		</div>
 	</div>
+	<img src=/logo.svg id=logo />
 	<h2 id=back @click="novert">Back</h2>
 </div>
 <nav>
-<h4 id=ex>Explore <img id=burger src=/burger.svg /></h4>
+<h4 id=ex @click="mob">Explore <img id=burger src=/burger.svg /></h4>
 <ul id=dots>
 <li v-for="(slide,index) in slides" :class="{'active':index===$store.state.current}">{{ slide.id }}<span class=dot></span></li>
 </ul>
 </nav>
+
+<div id=explore>
+<ul id=menu>
+<li v-for="(slide,index) in slides" :class="{'active':index===$store.state.current}">{{ slide.name }}</li>
+</ul>
+<img id=flower src=/flower.svg />
+<img id=close src=/close.svg @click="nomob" />
+</div>
+
+
+
+
 </div>
 </template>
 
@@ -80,7 +93,8 @@ export default {
 					img: 'one.png',
 					text: 'Change Starts Here. Introducing Haiti Takes Root.',
 					id: 'home',
-					copy: 'LOREM IPSUM DOLOR SIT AMET, CONSECTETUER ADIPISCING ELIAM NONUMMY NIBH EUISMOD TINCIDUNT UT LAOREET DOLORE MAGNA ALIQUAM ERAT VOLUTPAT. UT WISI ENIM AD MINIM VENIAM, QUIS NOSTRUD EXERCI TATION LOBORTIS NISLUT.'
+					copy: 'LOREM IPSUM DOLOR SIT AMET, CONSECTETUER ADIPISCING ELIAM NONUMMY NIBH EUISMOD TINCIDUNT UT LAOREET DOLORE MAGNA ALIQUAM ERAT VOLUTPAT. UT WISI ENIM AD MINIM VENIAM, QUIS NOSTRUD EXERCI TATION LOBORTIS NISLUT.',
+					name: "Home",
 
 				},
 				{
@@ -88,7 +102,7 @@ export default {
 					text: 'The Battle Against Deforestation Takes a Village.',
 					id: 'mission',
 					copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.',
-					tag: 'Our Mission',
+					name: 'Our Mission',
 					butt: 'Explore',
 					subs: [
 						{
@@ -102,7 +116,7 @@ export default {
 							text: 'Change Starts Here.',
 							id: 'approach',
 							copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.',
-							tag: 'Our Approach'
+							name: 'Our Approach'
 						}
 					]
 				},
@@ -110,7 +124,7 @@ export default {
 					img: 'coalition.png',
 					text: 'Positive Change Starts with Helping Hands.',
 					copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.',
-					tag: 'OUR COALITION',
+					name: 'Our Coalition',
 					id: 'coalition'
 
 				}
@@ -131,6 +145,14 @@ export default {
 			this.$store.commit('vert')
 			document.querySelector('#back').style.opacity='0'
 			document.querySelector('#back').style.pointerEvents='none'
+		},
+		mob: function(e) {
+			document.querySelector('#explore').style.opacity='1';
+			document.querySelector('#explore').style.pointerEvents='auto';
+		},
+		nomob: function(e) {
+			document.querySelector('#explore').style.opacity='0';
+			document.querySelector('#explore').style.pointerEvents='none';
 		}
 
 	}
@@ -221,7 +243,7 @@ nav{
 	right: 20px;
 	top: 50%;
 	transform: translateY(-50%);
-	z-index: 999;
+	z-index: 40;
 }
 .slide h1 {
 	text-align: center;
@@ -273,7 +295,7 @@ h4 {
 	transition: all 0.3s ease;
 	width: 100vw;
 	height: 100vh;
-	z-index: 999;
+	z-index: 10;
 	overflow: hidden;
 	overflow-y: scroll;
 }
@@ -297,7 +319,7 @@ h4 {
 	transition: all 0.3s ease;
 	font-family: "flamaSemi";
 	pointer-events: none;
-	z-index: 999;
+	z-index: 15;
 	cursor: pointer;
 
 }
@@ -330,12 +352,64 @@ h4 {
 	width: 27px;
 	height: 19px;
 	margin-left: 20px;
+	cursor: pointer;
 }
 #ex {
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
 	padding-right: 40px;
+	cursor: pointer;
+}
+#explore {
+	width: 100vw;
+	height: 100vh;
+	background-size: cover;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('/explore.png');
+	position: fixed;
+	opacity: 0;
+	z-index: 50;
+	pointer-events: none;
+	transition: all 0.3s ease;
+}
+#flower {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	width: 40vmax;
+}
+#menu {
+	font-family: "argentReg";
+	font-size: 47px;
+	color: #ECE5C9;
+	text-align: center;
+}
+#menu .active {
+	font-family: "argentBold";
+}
+#close {
+	position: absolute;
+	top: 30px;
+	right: 40px;
+	width: 61px;
+	height: 61px;
+	cursor: pointer;
+}
+#home .name {
+	display: none;
+}
+#logo {
+	position: fixed;
+	top: 40px;
+	left: 40px;
+	z-index: 50;
+	width: 150px;
 }
 
 </style>
