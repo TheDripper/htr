@@ -76,4 +76,30 @@ h4 {
 	color: #ECE5C9;
 	font-size: 15px;
 }
+#logo {
+	position: fixed;
+	top: 40px;
+	left: 40px;
+	z-index: 50;
+	width: 150px;
+}
+@media(max-width:1100px) {
+	h1 {
+		font-size: 48px;
+	}
+	.slide p {
+		font-size: 18px;
+	}
+	#logo {
+		width: 100px;
+	}
+}
+@media(max-width:600px) {
+	h1 {
+		font-size: 32px;
+	}
+	#home p {
+		max-width: 80%;
+	}
+}
 </style>

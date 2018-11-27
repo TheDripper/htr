@@ -14,7 +14,7 @@
 		</div>
 		</div>
 	</div>
-	<img src=/logo.svg id=logo />
+	<a href=/><img src=/logo.svg id=logo /></a>
 	<h2 id=back @click="novert">Back</h2>
 </div>
 <nav>
@@ -404,12 +404,22 @@ h4 {
 #home .name {
 	display: none;
 }
-#logo {
-	position: fixed;
-	top: 40px;
-	left: 40px;
-	z-index: 50;
-	width: 150px;
+@media(max-width:1100px) {
+	#dots {
+		padding: 10px;
+	}
+	#ex {
+		padding: 10px;
+	}
 }
+@media(max-width:600px) {
+	.slide {
+		padding: 0 5vw;
+	}
+	#home p {
+		max-width: 80%;
+	}
+}
+
 
 </style>
