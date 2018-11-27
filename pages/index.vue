@@ -1,25 +1,25 @@
 <template>
 <div id=frame>
 <div id=viewer :data-count="slides.length">
-	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'url(' +slide.img+ ')' }" :id="slide.id">
-		<div class=shade></div>
+	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +slide.img+ ')' }" :id="slide.id">
 		<h4>{{ slide.tag }}</h4>
 		<h1>{{ slide.text }}</h1>
 		<p>{{ slide.copy }}</p>
-		<button @click='vert'>{{ slide.butt }}</button>
+		<a v-if="slide.butt" class=opener @click='vert'>{{ slide.tag }}<img src=/down.png /></a>
 		<div class=subs>
-		<div class=sub v-for="(sub,index) in slide.subs" :style="{ backgroundImage: 'url(' +sub.img+ ')' }" :id="sub.id">
+		<div class=sub v-for="(sub,index) in slide.subs" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +sub.img+ ')' }" :id="sub.id">
 			<h4>{{ sub.tag }}</h4>
 			<h1>{{ sub.text }}</h1>
 			<p>{{ sub.copy }}</p>
 		</div>
 		</div>
 	</div>
-	<h2 id=back>Back</h2>
+	<h2 id=back @click="novert">Back</h2>
 </div>
 <nav>
+<h4 id=ex>Explore <img id=burger src=/burger.svg /></h4>
 <ul id=dots>
-<li v-for="(slide,index) in slides" :class="{'active':index===$store.state.current}"></li>
+<li v-for="(slide,index) in slides" :class="{'active':index===$store.state.current}">{{ slide.id }}<span class=dot></span></li>
 </ul>
 </nav>
 </div>
@@ -70,16 +70,7 @@ export default {
 						}
 					}
 				}
-			},1100));
-			document.addEventListener('wheel',throttle(function(e){
-				if(vuestance.$store.state.vert) {
-					let open = document.querySelector('.open')
-					console.log(open.clientHeight)
-					console.log(open.scrollTop)
-					if(open.clientHeight == open.scrollTop) {
-					}
-				}
-			},150));
+			},1000));
 		}
 	},
 	asyncData() {
@@ -119,7 +110,8 @@ export default {
 					img: 'coalition.png',
 					text: 'Positive Change Starts with Helping Hands.',
 					copy: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure.',
-					tag: 'OUR COALITION'
+					tag: 'OUR COALITION',
+					id: 'coalition'
 
 				}
 			],
@@ -132,7 +124,15 @@ export default {
 			this.$store.commit('vert')
 			document.querySelector('#back').style.opacity='1'
 			document.querySelector('#back').style.pointerEvents='auto'
+		},
+		novert: function(e) {
+			document.querySelector('.open').style.transform="translateY(100%)"
+			document.querySelector('.open').classList.remove('open')
+			this.$store.commit('vert')
+			document.querySelector('#back').style.opacity='0'
+			document.querySelector('#back').style.pointerEvents='none'
 		}
+
 	}
 }
 </script>
@@ -188,19 +188,30 @@ export default {
 #dots {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: flex-end;
 	height: 85vh;
 	justify-content: space-between;
+	padding: 40px;
 }
 #dots li {
+	color: #ECE5C9;
+	display: flex;
+	align-items: center;
+	font-family: "flamaSemi";
+	text-transform: uppercase;
+	font-size: 12px;
+}
+#dots .dot {
 	width: 14px;
 	height: 14px;
 	border-radius: 50%;
 	background: transparent;
 	border: 1px solid white;
 	transition: all 0.5s ease;
+	display: inline-block;
+	margin-left: 20px;
 }
-#dots li.active {
+#dots li.active .dot {
 	background: white;
 	width: 20px;
 	height: 20px;
@@ -210,16 +221,15 @@ nav{
 	right: 20px;
 	top: 50%;
 	transform: translateY(-50%);
+	z-index: 999;
 }
 .slide h1 {
-	z-index: 99;
 	text-align: center;
 	max-width: 80%;
 	line-height: 1;
 	margin-bottom: 40px;
 }
 .slide p {
-	z-index: 99;
 	max-width: 80%;
 	text-align: center;
 }
@@ -249,13 +259,11 @@ nav{
 #approach {
 	align-items: flex-start;
 }
-.slide h4 {
-	z-index: 99;
+h4 {
 	text-transform: uppercase;
 	font-family: "flamaSemi";
 } 
 .slide button {
-	z-index: 99;
 }
 .subs {
 	position: absolute;
@@ -296,6 +304,38 @@ nav{
 .open .back {
 	opacity: 1;
 	pointer-events: auto;
+}
+.slide a {
+}
+.opener {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 20px auto;
+	font-size: 24px;
+	font-family: "flamaSemi";
+	position: absolute;
+	bottom: 40px;
+	left: 50%;
+	transform: translateX(-50%);
+}
+.opener img {
+	pointer-events: none;
+	transition: all 0.3s ease;
+}
+.opener:hover img {
+	transform: translateY(10px);
+}
+#burger {
+	width: 27px;
+	height: 19px;
+	margin-left: 20px;
+}
+#ex {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	padding-right: 40px;
 }
 
 </style>

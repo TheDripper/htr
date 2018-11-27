@@ -5,6 +5,11 @@
 </template>
 
 <style>
+html, body {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
 html
 {
 	color: #ECE5C9;
@@ -14,6 +19,9 @@ p, a {
 	font-family: "argentReg", serif;
 	color: #ECE5C9;
 	font-size: 18px;
+}
+a:hover {
+	color: white !important;
 }
 *, *:before, *:after
 {
@@ -43,11 +51,6 @@ p, a {
   text-decoration: none;
   padding: 10px 30px;
   margin-left: 15px;
-}
-.button--grey:hover
-{
-  color: #fff;
-  background-color: #35495e;
 }
 @font-face {
 	font-family: "argentReg";
