@@ -5,7 +5,7 @@
 		<h4 class=name>{{ slide.name }}</h4>
 		<h1>{{ slide.text }}</h1>
 		<p>{{ slide.copy }}</p>
-		<a v-if="slide.butt" class=opener @click='vert'>{{ slide.name }}<img src=/down.png /></a>
+		<a v-if="slide.butt" class=opener @click='vert'>{{ slide.name }}<img src=~/assets/down.png /></a>
 		<div class=subs>
 		<div class=sub v-for="(sub,index) in slide.subs" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +sub.img+ ')' }" :id="sub.id">
 			<h4>{{ sub.name }}</h4>
@@ -14,11 +14,11 @@
 		</div>
 		</div>
 	</div>
-	<a href=/><img src=/logo.svg id=logo /></a>
+	<a href=/><img src=~/assets/logo.svg id=logo /></a>
 	<h2 id=back @click="novert">Back</h2>
 </div>
 <nav>
-<h4 id=ex @click="mob">Explore <img id=burger src=/burger.svg /></h4>
+<h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <ul id=dots>
 <li v-for="(slide,index) in slides" :class="{'active':index===$store.state.current}">{{ slide.id }}<span class=dot></span></li>
 </ul>
@@ -28,8 +28,8 @@
 <ul id=menu>
 <li v-for="(slide,index) in slides" :class="{'active':index===$store.state.current}">{{ slide.name }}</li>
 </ul>
-<img id=flower src=/flower.svg />
-<img id=close src=/close.svg @click="nomob" />
+<img id=flower src=~/assets/flower.svg />
+<img id=close src=~/assets/close.svg @click="nomob" />
 </div>
 
 
@@ -393,7 +393,7 @@ h4 {
 	align-items: center;
 	justify-content: center;
 	overflow: hidden;
-	background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('/explore.png');
+	background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('~/assets/explore.png');
 	position: fixed;
 	opacity: 0;
 	z-index: 50;

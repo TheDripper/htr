@@ -54,15 +54,15 @@ a:hover {
 }
 @font-face {
 	font-family: "argentReg";
-	src: url('/ArgentCF-Regular.ttf');
+	src: url('~/assets/ArgentCF-Regular.ttf');
 }
 @font-face {
 	font-family: "argentBold";
-	src: url('/ArgentCF-Bold.ttf');
+	src: url('~/assets/ArgentCF-Bold.ttf');
 }
 @font-face {
 	font-family: "flamaSemi";
-	src: url('/FlamaSemicondensed-Medium.otf');
+	src: url('~/assets/FlamaSemicondensed-Medium.otf');
 }
 h1 {
 	font-family: "argentBold", serif;
