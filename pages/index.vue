@@ -180,7 +180,7 @@ export default {
 				var view = document.querySelector('#viewer');
 				var slide = view.firstChild;
 				var count = view.dataset.count;
-				let curslide = view.childNodes[vuestance.$store.state.current]
+				let curslide = view.childNodes[this.$store.state.current]
 				if(e=='left') {
 					next(curslide,this)
 					//var curMarg = Number(slide.style.marginLeft.slice(0,-2));
