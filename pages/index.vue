@@ -1,7 +1,7 @@
 <template>
 <div id=frame>
 <div id=viewer :data-count="slides.length" v-touch:swipe="swiper">
-	<div class="slide" v-for="slide in slides" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +slide.img+ ')' }" :id="slide.id">
+	<div class="slide" v-for="slide in slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +slide.img+ ')' }">
 		<h4 class=name>{{ slide.name }}</h4>
 		<h1>{{ slide.text }}</h1>
 		<p>{{ slide.copy }}</p>
@@ -14,7 +14,7 @@
 		</div>
 		</div>
 	</div>
-	<a href=/><img src=~/assets/logo.svg id=logo /></a>
+	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
 	<h2 id=back @click="novert">Back</h2>
 </div>
 <nav>
@@ -51,6 +51,38 @@ const throttle = (func, limit) => {
     }
   }
 }
+const prev = (curslide,vuestance) => {
+	var view = document.querySelector('#viewer');
+	var slide = view.firstChild;
+	var count = view.dataset.count;
+	var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+	if(curMarg < 0) {
+		curMarg += 100;
+		slide.style.marginLeft = curMarg+'vw';
+		vuestance.$store.commit('prev')
+		//let curslide = view.childNodes[vuestance.$store.state.current]
+		//if(!curslide.style.backgroundImage) {
+		//	let backimg = curslide.dataset.slide
+		//	curslide.style.backgroundImage="linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('"+backimg+"')"
+		//}
+	}
+}
+
+const next = (curslide,vuestance) => {
+	console.log(this)
+	var view = document.querySelector('#viewer');
+	var slide = view.firstChild;
+	var count = view.dataset.count;
+	var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+	if(curMarg/100 * -1 < count - 1) {
+		curMarg -= 100;
+		slide.style.marginLeft = curMarg+'vw';
+		vuestance.$store.commit('next')
+		//let curslide = view.childNodes[vuestance.$store.state.current]
+		//let backimg = curslide.dataset.slide
+		//curslide.style.backgroundImage="linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('"+backimg+"')"
+	}
+}
 export default {
 	head: {
 		script: [
@@ -59,28 +91,17 @@ export default {
 	},
 	mounted() {
 		if(process.browser) {
-			console.log(this.$store.state.current);
+			//document.querySelector('.slide').style.backgroundImage="linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('one.png')";
+			//document.querySelector('.slide').nextSibling.style.backgroundImage="url('two.png')";
 			let vuestance = this
 			document.addEventListener('wheel',throttle(function(e){
 				if(!vuestance.$store.state.vert) {
 					var view = document.querySelector('#viewer');
-					var slide = view.firstChild;
-					var count = view.dataset.count;
+					let curslide = view.childNodes[vuestance.$store.state.current]
 					if (e.deltaY > 0) {
-						var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-						if(curMarg < 0) {
-							curMarg += 100;
-							slide.style.marginLeft = curMarg+'vw';
-							vuestance.$store.commit('prev')
-						}
-				
+						prev(curslide,vuestance)
 					} else if (e.deltaY < 0) {
-						var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-						if(curMarg/100 * -1 < count - 1) {
-							curMarg -= 100;
-							slide.style.marginLeft = curMarg+'vw';
-							vuestance.$store.commit('next')
-						}
+						next(curslide,vuestance)
 					}
 				}
 			},1000));
@@ -155,25 +176,35 @@ export default {
 			document.querySelector('#explore').style.pointerEvents='none';
 		},
 		swiper: function(e) {
-			console.log(e)
 			if(!this.$store.state.vert) {
 				var view = document.querySelector('#viewer');
 				var slide = view.firstChild;
 				var count = view.dataset.count;
+				let curslide = view.childNodes[vuestance.$store.state.current]
 				if(e=='left') {
-					var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-					if(curMarg/100 * -1 < count - 1) {
-						curMarg -= 100;
-						slide.style.marginLeft = curMarg+'vw';
-						this.$store.commit('next')
-					}
+					next(curslide,this)
+					//var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+					//if(curMarg/100 * -1 < count - 1) {
+					//	curMarg -= 100;
+					//	slide.style.marginLeft = curMarg+'vw';
+					//	this.$store.commit('next')
+					//	//let backimg = curslide.dataset.slide
+					//	//curslide.style.backgroundImage="linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('"+backimg+"')"
+					//}
 				} else if(e=='right') {
-					var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-					if(curMarg < 0) {
-						curMarg += 100;
-						slide.style.marginLeft = curMarg+'vw';
-						this.$store.commit('prev')
-					}
+					prev(curslide,this)
+					//var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+					//if(curMarg < 0) {
+					//	curMarg += 100;
+					//	slide.style.marginLeft = curMarg+'vw';
+					//	this.$store.commit('prev')
+					//	//let curslide = view.childNodes[vuestance.$store.state.current]
+					//	//if(!curslide.style.backgroundImage) {
+					//	//	let backimg = curslide.dataset.slide
+					//	//	curslide.style.backgroundImage="linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('"+backimg+"')"
+					//	//}
+
+					//}
 				}
 			}
 		}
@@ -208,6 +239,7 @@ export default {
 	background-size: cover;
 	position: relative;
 	padding: 0 10vw;
+	background-color: black;
 }
 .slide:first-child {
 }
@@ -436,11 +468,35 @@ h4 {
 	}
 }
 @media(max-width:600px) {
+	nav {
+		display: none;
+	}
 	.slide {
 		padding: 0 5vw;
 	}
 	#home p {
 		max-width: 80%;
+	}
+	.slide * {
+		max-width: 100% !important;
+	}
+	.slide h1 {
+		margin-bottom: 10px;
+	}
+	.slide p {
+		font-size: 12px;
+		margin-bottom: 40px;
+	}
+	#logo {
+		width: 60px;
+		top: 10px;
+		left: 10px;
+	}
+	#home p {
+		font-size: 15px;
+	}
+	.opener img {
+		width: 40px;
 	}
 }
 

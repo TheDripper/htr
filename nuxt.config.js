@@ -2,9 +2,9 @@ const pkg = require('./package')
 
 module.exports = {
   mode: 'universal',
-  router: {
-          base: '/dist/'
-  },
+  //router: {
+  //        base: '/dist/'
+  //},
 
   /*
   ** Headers of the page
