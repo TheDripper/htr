@@ -4,7 +4,9 @@ const createStore = () => {
   return new Vuex.Store({
     state: () => ({
       current: 0,
-      vert: false
+      vert: false,
+      slides: [],
+      mark: ''
     }),
     mutations: {
       next (state) {
@@ -15,6 +17,12 @@ const createStore = () => {
       },
       vert (state) {
         state.vert ? state.vert = false : state.vert = true
+      },
+      loadSlides(state,data) {
+	state.slides = data	
+      },
+      loadMark(state,data) {
+	state.mark = data	
       }
     }
   })

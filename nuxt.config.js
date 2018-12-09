@@ -2,6 +2,9 @@ const pkg = require('./package')
 
 module.exports = {
   mode: 'universal',
+  env: {
+	  baseUrl: 'http://localhost:3000'
+  },
   //router: {
   //        base: '/dist/'
   //},
