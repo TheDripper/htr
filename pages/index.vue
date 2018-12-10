@@ -4,6 +4,8 @@
 		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +slide.img+ ')' }" v-html="slide.mark">
 		</div>
 	</div>
+	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
+	<h2 id=back @click="novert">Back</h2>
 <nav>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <ul id=dots>
@@ -76,6 +78,15 @@ const next = async (curslide,vuestance) => {
 	console.log(nextMark.data)
 	vuestance.$store.commit('addSlide',newSlide)
 }
+
+const vert = function(e,store) {
+	e.target.parentNode.querySelector('.subs').classList.add('open')
+	e.target.parentNode.querySelector('.subs').style.transform = "translateY(0%)"
+	store.commit('vert')
+	document.querySelector('#back').style.opacity='1'
+	document.querySelector('#back').style.pointerEvents='auto'
+}
+
 export default {
 	head: {
 		script: [
@@ -98,6 +109,16 @@ export default {
 					}
 				}
 			},1000));
+		}
+	},
+	updated() {
+		let last = document.querySelector('#bindme')
+		let store = this.$store
+		console.log(store)
+		if(last) {
+			last.addEventListener('click',function(e){
+				vert(e,store)
+			});
 		}
 	},
 	async fetch(context) {
@@ -133,13 +154,7 @@ export default {
 
 	},
 	methods: {
-		vert: function(e) {
-			e.target.parentNode.querySelector('.subs').classList.add('open')
-			e.target.parentNode.querySelector('.subs').style.transform = "translateY(0%)"
-			this.$store.commit('vert')
-			document.querySelector('#back').style.opacity='1'
-			document.querySelector('#back').style.pointerEvents='auto'
-		},
+		
 		novert: function(e) {
 			document.querySelector('.open').style.transform="translateY(100%)"
 			document.querySelector('.open').classList.remove('open')

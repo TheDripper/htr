@@ -1,11 +1,11 @@
 <template>
 <div id=frame>
 <div id=viewer :data-count="slides.length" v-touch:swipe="swiper">
-	<div class="slide" v-for="slide in slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +slide.img+ ')' }">
+	<div class="slide" v-for="slide in slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +slide.id+ '.png)' }">
 		<h4 class=name>{{ slide.name }}</h4>
 		<h1>{{ slide.text }}</h1>
 		<p>{{ slide.copy }}</p>
-		<a v-if="slide.butt" class=opener @click='vert'>{{ slide.name }}<img src=~/assets/down.png /></a>
+		<a v-if="slide.butt" class=opener @click='vert' id=bindme>{{ slide.name }}<img src=~/assets/down.png /></a>
 		<div class=subs>
 		<div class=sub v-for="(sub,index) in slide.subs" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +sub.img+ ')' }" :id="sub.id">
 			<h4>{{ sub.name }}</h4>
@@ -91,12 +91,25 @@ export default {
 		return {
 			slides: [
 				{
-					img: 'one.png',
-					text: 'Change Starts Here. Introducing Haiti Takes Root.',
-					id: 'home',
-					copy: 'LOREM IPSUM DOLOR SIT AMET, CONSECTETUER ADIPISCING ELIAM NONUMMY NIBH EUISMOD TINCIDUNT UT LAOREET DOLORE MAGNA ALIQUAM ERAT VOLUTPAT. UT WISI ENIM AD MINIM VENIAM, QUIS NOSTRUD EXERCI TATION LOBORTIS NISLUT.',
-					name: "Home",
-				},
+					text: 'Responding to Climate Change',
+					id: 'mission',
+					copy: 'Haiti Takes Root strengthens the climate resilience of Haitian communities by building capacity and coordination for reforestation and natural resource management, using an integrated, sustainable, and people-centered approach.',
+					name: 'The Mission',
+					butt: 'Explore',
+					subs: [
+						{
+							text: 'Why Haiti Takes Root?',
+							id: 'mission_why',
+							copy: 'The greatest challenge facing Haiti’s rural population today is the same as it was forty years ago: diminishing harvests and changing weather patterns are leaving Haiti’s farmers more vulnerable year after year. Haiti has been a canary in the coal mine, showing the world what climate change looks like. Haiti Takes Root is a national campaign to support local agricultural production, especially agroforestry – planting trees that are sources of income, including fruit trees and hardwood trees that can help farmers improve their livelihoods and adapt to a changing climate.'
+						},
+						{
+							text: 'If We Want a Different Result, We Need a Different Approach',
+							id: 'approach',
+							name: 'How We Work',
+							copy: 'Haiti Takes Root is a different approach to Haiti’s environmental crisis. In order to break out of the pattern of project cycles and isolated, individual efforts, HTR is focused on uniting actors to embrace approaches grounded in the lessons learned over decades in Haiti and beyond. Instead of creating a new organization, HTR is an initiative to strengthen capacity and coordination amongst existing actors, while putting the Haitian people at the center of all planning, in order to manage Haiti’s natural resources and adapt to the impacts of climate change.'
+						}
+					]
+				}
 			]
 		}
 	},
