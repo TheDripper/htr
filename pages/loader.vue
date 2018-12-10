@@ -1,32 +1,24 @@
 <template>
 <div id=frame>
-	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper">
-		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +slide.img+ ')' }" v-html="slide.mark">
+<div id=viewer :data-count="slides.length" v-touch:swipe="swiper">
+	<div class="slide" v-for="slide in slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +slide.img+ ')' }">
+		<h4 class=name>{{ slide.name }}</h4>
+		<h1>{{ slide.text }}</h1>
+		<p>{{ slide.copy }}</p>
+		<a v-if="slide.butt" class=opener @click='vert'>{{ slide.name }}<img src=~/assets/down.png /></a>
+		<div class=subs>
+		<div class=sub v-for="(sub,index) in slide.subs" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +sub.img+ ')' }" :id="sub.id">
+			<h4>{{ sub.name }}</h4>
+			<h1>{{ sub.text }}</h1>
+			<p>{{ sub.copy }}</p>
+		</div>
 		</div>
 	</div>
-<nav>
-<h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
-<ul id=dots>
-<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">{{ slide.id }}<span class=dot></span></li>
-</ul>
-</nav>
-
-<div id=explore>
-<ul id=menu>
-<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">{{ slide.name }}</li>
-</ul>
-<img id=flower src=~/assets/flower.svg />
-<img id=close src=~/assets/close.svg @click="nomob" />
 </div>
-
-
-
-
 </div>
 </template>
 
 <script>
-const axios = require('axios')
 const throttle = (func, limit) => {
   let inThrottle
   return function() {
@@ -56,25 +48,20 @@ const prev = (curslide,vuestance) => {
 	}
 }
 
-const next = async (curslide,vuestance) => {
+const next = (curslide,vuestance) => {
+	console.log(this)
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
 	var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-	curMarg -= 100;
-	slide.style.marginLeft = curMarg+'vw';
-	vuestance.$store.commit('next')
-	let nextdex = Number(vuestance.$store.state.current)
-	let nextID = vuestance.$store.state.allslides[nextdex].id
-	console.log(nextID)
-	let nextMark = await axios(window.location.origin+'/'+nextID+'.html')
-	let newSlide = {
-		id: nextID,
-		mark: nextMark.data,
-		img: nextID+'.png'
+	if(curMarg/100 * -1 < count - 1) {
+		curMarg -= 100;
+		slide.style.marginLeft = curMarg+'vw';
+		vuestance.$store.commit('next')
+		//let curslide = view.childNodes[vuestance.$store.state.current]
+		//let backimg = curslide.dataset.slide
+		//curslide.style.backgroundImage="linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('"+backimg+"')"
 	}
-	console.log(nextMark.data)
-	vuestance.$store.commit('addSlide',newSlide)
 }
 export default {
 	head: {
@@ -100,37 +87,18 @@ export default {
 			},1000));
 		}
 	},
-	async fetch(context) {
-		let base = context.env.baseUrl
-		let home = await axios(base+'/home.html');
-		let mission = await axios(base+'/mission.html');
-		let allslides = [
-			{
-				id: 'home',
-				name: "Home",
-
-
-			},
-			{
-				id: 'mission',
-				name: "Mission",
-			},
-			{
-				id: 'coalition',
-				name: "Coalition"
-			}
-		]
-		let slides = [
-			{
-				id: 'home',
-				name: 'Home',
-				mark: home.data,
-				img: 'one.png'
-			}
-		]
-		context.store.commit('loadSlides',slides);
-		context.store.commit('loadAll',allslides);
-
+	asyncData() {
+		return {
+			slides: [
+				{
+					img: 'one.png',
+					text: 'Change Starts Here. Introducing Haiti Takes Root.',
+					id: 'home',
+					copy: 'LOREM IPSUM DOLOR SIT AMET, CONSECTETUER ADIPISCING ELIAM NONUMMY NIBH EUISMOD TINCIDUNT UT LAOREET DOLORE MAGNA ALIQUAM ERAT VOLUTPAT. UT WISI ENIM AD MINIM VENIAM, QUIS NOSTRUD EXERCI TATION LOBORTIS NISLUT.',
+					name: "Home",
+				},
+			]
+		}
 	},
 	methods: {
 		vert: function(e) {
@@ -478,9 +446,6 @@ h4 {
 	.opener img {
 		width: 40px;
 	}
-}
-#prevslide {
-	transition: all 0.3s ease;
 }
 
 

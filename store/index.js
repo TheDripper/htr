@@ -6,7 +6,10 @@ const createStore = () => {
       current: 0,
       vert: false,
       slides: [],
-      mark: ''
+      allslides: [],
+      mark: '',
+      nextMark: '',
+      prevMark: ''
     }),
     mutations: {
       next (state) {
@@ -21,8 +24,12 @@ const createStore = () => {
       loadSlides(state,data) {
 	state.slides = data	
       },
-      loadMark(state,data) {
-	state.mark = data	
+      loadAll(state,data) {
+	state.allslides = data	
+      },
+      addSlide(state,data) {
+	      console.log('add')
+	state.slides.push(data)
       }
     }
   })
