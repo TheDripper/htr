@@ -31,6 +31,9 @@ const createStore = () => {
       addSlide(state,data) {
 	state.slides.push(data)
       },
+      addPrev(state,data) {
+	      state.slides.unshift(data)
+      },
       setID(state,data) {
 	state.id=data
       },

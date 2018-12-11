@@ -41,48 +41,52 @@ const throttle = (func, limit) => {
     }
   }
 }
-const prev = (curslide,vuestance) => {
+const prev = (curslide,store) => {
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
 	var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-	if(curMarg < 0) {
-		curMarg += 100;
-		slide.style.marginLeft = curMarg+'vw';
-		vuestance.$store.commit('prev')
-		//let curslide = view.childNodes[vuestance.$store.state.current]
-		//if(!curslide.style.backgroundImage) {
-		//	let backimg = curslide.dataset.slide
-		//	curslide.style.backgroundImage="linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('"+backimg+"')"
-		//}
+	if(store.state.current!=0) {
+		if(curMarg < 0) {
+			curMarg += 100;
+			slide.style.marginLeft = curMarg+'vw';
+		}
+		store.commit('prev')
+		let prevdex = Number(store.state.current)
+		let prevID = store.state.allslides[prevdex].id
+		if(!document.querySelector('#'+prevID))
+			loadSlide(prevID,store,true)
 	}
 }
 
-const next = async (curslide,vuestance) => {
+const next = async (curslide,store) => {
+	console.log(curslide)
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
-	if(vuestance.$store.state.current < vuestance.$store.state.allslides.length - 1) {
+	if(store.state.current < store.state.allslides.length - 1) {
 		var curMarg = Number(slide.style.marginLeft.slice(0,-2));
 		curMarg -= 100;
 		slide.style.marginLeft = curMarg+'vw';
-		vuestance.$store.commit('next')
-		if(vuestance.$store.state.current == count) {
-			let nextdex = Number(vuestance.$store.state.current)
-			let nextID = vuestance.$store.state.allslides[nextdex].id
-			loadSlide(nextID,vuestance.$store)
+		store.commit('next')
+		if(store.state.current == count) {
+			let nextdex = Number(store.state.current)
+			let nextID = store.state.allslides[nextdex].id
+			loadSlide(nextID,store,false)
 		}
 	}
 }
-const loadSlide = async function(id,store) {
+const loadSlide = async function(id,store,isPrev) {
 	let nextMark = await axios(window.location.origin+'/'+id+'.html')
 	let newSlide = {
 		id: id,
 		mark: nextMark.data,
 		img: id+'.png'
 	}
-	console.log(document.querySelector('#'+id))
-	store.commit('addSlide',newSlide)
+	if(isPrev)
+		store.commit('addPrev',newSlide)
+	else 
+		store.commit('addSlide',newSlide)
 }
 
 const vert = function(e,store) {
@@ -99,17 +103,16 @@ export default {
 			//{ src: '/run.js' }
 		]
 	},
-	mounted() {
+	asyncData({store}) {
 		if(process.browser) {
-			let vuestance = this
 			document.addEventListener('wheel',throttle(function(e){
-				if(!vuestance.$store.state.vert) {
+				if(!store.state.vert) {
 					var view = document.querySelector('#viewer');
-					let curslide = view.childNodes[vuestance.$store.state.current]
+					let curslide = view.childNodes[store.state.current]
 					if (e.deltaY > 0) {
-						prev(curslide,vuestance)
+						prev(curslide,store)
 					} else if (e.deltaY < 0) {
-						next(curslide,vuestance)
+						next(curslide,store)
 					}
 				}
 			},1000));
@@ -154,7 +157,7 @@ export default {
 			}
 		]
 		if(context.store.state.id) {
-			loadSlide(context.store.state.id,context.store)
+			loadSlide(context.store.state.id,context.store,false)
 		} else {
 			context.store.commit('loadSlides',slides);
 		}
