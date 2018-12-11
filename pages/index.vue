@@ -15,7 +15,7 @@
 
 <div id=explore>
 <ul id=menu>
-<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/'+slide.id+'/'">{{ slide.name }}</a></li>
+<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/'+slide.id">{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
 <img id=close src=~/assets/close.svg @click="nomob" />
@@ -137,6 +137,8 @@ export default {
 			{
 				id: 'home',
 				name: "Home",
+
+
 			},
 			{
 				id: 'mission',
@@ -501,3 +503,4 @@ h4 {
 
 
 </style>
+
