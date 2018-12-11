@@ -3,8 +3,7 @@ const pkg = require('./package')
 module.exports = {
   mode: 'spa',
   env: {
-          //baseUrl: 'http://haititakesroot.org/dist/'
-          baseUrl: 'http://localhost:3000/dist/'
+          baseUrl: 'https://sleepy-almeida-2e9b00.netlify.com/'
   },
   //router: {
   //        base: '/dist/'
