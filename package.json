@@ -18,7 +18,10 @@
     "lodash.throttle": "^4.1.1",
     "nodemon": "^1.18.7",
     "nuxt": "^1.0.0",
-    "vue2-touch-events": "^1.1.1"
+    "url": "^0.11.0",
+    "url-parse": "^1.4.4",
+    "vue2-touch-events": "^1.1.1",
+    "whatwg-url": "^7.0.0"
   },
   "devDependencies": {
     "cross-env": "^5.0.1"

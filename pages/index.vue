@@ -62,21 +62,27 @@ const next = async (curslide,vuestance) => {
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
-	var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-	curMarg -= 100;
-	slide.style.marginLeft = curMarg+'vw';
-	vuestance.$store.commit('next')
-	let nextdex = Number(vuestance.$store.state.current)
-	let nextID = vuestance.$store.state.allslides[nextdex].id
-	console.log(nextID)
-	let nextMark = await axios(window.location.origin+'/'+nextID+'.html')
-	let newSlide = {
-		id: nextID,
-		mark: nextMark.data,
-		img: nextID+'.png'
+	if(vuestance.$store.state.current < vuestance.$store.state.allslides.length - 1) {
+		var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+		curMarg -= 100;
+		slide.style.marginLeft = curMarg+'vw';
+		vuestance.$store.commit('next')
+		if(vuestance.$store.state.current == count) {
+			let nextdex = Number(vuestance.$store.state.current)
+			let nextID = vuestance.$store.state.allslides[nextdex].id
+			loadSlide(nextID,vuestance.$store)
+		}
 	}
-	console.log(nextMark.data)
-	vuestance.$store.commit('addSlide',newSlide)
+}
+const loadSlide = async function(id,store) {
+	let nextMark = await axios(window.location.origin+'/'+id+'.html')
+	let newSlide = {
+		id: id,
+		mark: nextMark.data,
+		img: id+'.png'
+	}
+	console.log(document.querySelector('#'+id))
+	store.commit('addSlide',newSlide)
 }
 
 const vert = function(e,store) {
@@ -95,8 +101,6 @@ export default {
 	},
 	mounted() {
 		if(process.browser) {
-			//document.querySelector('.slide').style.backgroundImage="linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('one.png')";
-			//document.querySelector('.slide').nextSibling.style.backgroundImage="url('two.png')";
 			let vuestance = this
 			document.addEventListener('wheel',throttle(function(e){
 				if(!vuestance.$store.state.vert) {
@@ -112,13 +116,13 @@ export default {
 		}
 	},
 	updated() {
-		let last = document.querySelector('#bindme')
+		let last = document.querySelector('.bindme')
 		let store = this.$store
-		console.log(store)
 		if(last) {
 			last.addEventListener('click',function(e){
 				vert(e,store)
 			});
+			last.classList.remove('bindme')
 		}
 	},
 	async fetch(context) {
@@ -149,7 +153,11 @@ export default {
 				img: 'one.png'
 			}
 		]
-		context.store.commit('loadSlides',slides);
+		if(context.store.state.id) {
+			loadSlide(context.store.state.id,context.store)
+		} else {
+			context.store.commit('loadSlides',slides);
+		}
 		context.store.commit('loadAll',allslides);
 
 	},
@@ -178,28 +186,8 @@ export default {
 				let curslide = view.childNodes[this.$store.state.current]
 				if(e=='left') {
 					next(curslide,this)
-					//var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-					//if(curMarg/100 * -1 < count - 1) {
-					//	curMarg -= 100;
-					//	slide.style.marginLeft = curMarg+'vw';
-					//	this.$store.commit('next')
-					//	//let backimg = curslide.dataset.slide
-					//	//curslide.style.backgroundImage="linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('"+backimg+"')"
-					//}
 				} else if(e=='right') {
 					prev(curslide,this)
-					//var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-					//if(curMarg < 0) {
-					//	curMarg += 100;
-					//	slide.style.marginLeft = curMarg+'vw';
-					//	this.$store.commit('prev')
-					//	//let curslide = view.childNodes[vuestance.$store.state.current]
-					//	//if(!curslide.style.backgroundImage) {
-					//	//	let backimg = curslide.dataset.slide
-					//	//	curslide.style.backgroundImage="linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('"+backimg+"')"
-					//	//}
-
-					//}
 				}
 			}
 		}

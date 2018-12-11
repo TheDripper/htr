@@ -9,7 +9,8 @@ const createStore = () => {
       allslides: [],
       mark: '',
       nextMark: '',
-      prevMark: ''
+      prevMark: '',
+      id: ''
     }),
     mutations: {
       next (state) {
@@ -28,9 +29,15 @@ const createStore = () => {
 	state.allslides = data	
       },
       addSlide(state,data) {
-	      console.log('add')
 	state.slides.push(data)
+      },
+      setID(state,data) {
+	state.id=data
+      },
+      setCur(state,data) {
+	      state.current=data
       }
+
     }
   })
 }
