@@ -61,6 +61,7 @@ const prev = (curslide,store) => {
 }
 
 const next = async (curslide,store) => {
+	console.log('test')
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
@@ -72,12 +73,15 @@ const next = async (curslide,store) => {
 		let nextdex = Number(store.state.current)
 		let nextID = store.state.allslides[nextdex].id
 		window.history.pushState(null,'','/'+nextID+'/')
+		console.log(store.state.current)
+		console.log(count)
 		if(store.state.current == count) {
 			loadSlide(nextID,store,false)
 		}
 	}
 }
 const loadSlide = async function(id,store,isPrev) {
+	console.log(id)
 	let nextMark = await axios(window.location.origin+'/'+id+'.html')
 	let newSlide = {
 		id: id,
@@ -106,17 +110,6 @@ export default {
 	},
 	asyncData({store}) {
 		if(process.browser) {
-			document.addEventListener('wheel',throttle(function(e){
-				if(!store.state.vert) {
-					var view = document.querySelector('#viewer');
-					let curslide = view.childNodes[store.state.current]
-					if (e.deltaY > 0) {
-						prev(curslide,store)
-					} else if (e.deltaY < 0) {
-						next(curslide,store)
-					}
-				}
-			},1000));
 		}
 	},
 	updated() {
@@ -129,10 +122,19 @@ export default {
 			last.classList.remove('bindme')
 		}
 	},
-	async fetch(context) {
-		let base = context.env.baseUrl
-		let home = await axios(base+'/home.html');
-		let mission = await axios(base+'/mission.html');
+	async created() {
+		let vuestance = this
+		document.addEventListener('wheel',throttle(function(e){
+			if(!vuestance.$store.state.vert) {
+				var view = document.querySelector('#viewer');
+				let curslide = view.childNodes[vuestance.$store.state.current]
+				if (e.deltaY > 0) {
+					prev(curslide,vuestance.$store)
+				} else if (e.deltaY < 0) {
+					next(curslide,vuestance.$store)
+				}
+			}
+		},1000));
 		let allslides = [
 			{
 				id: 'home',
@@ -147,31 +149,58 @@ export default {
 				name: "Coalition"
 			}
 		]
-		//let slides = [
-		//	{
-		//		id: 'home',
-		//		name: 'Home',
-		//		mark: home.data,
-		//		img: 'one.png'
-		//	}
-		//]
-		let id = new URL(window.location).pathname.replace(/\//g, "");
+		let base = 'http://localhost:3000'
+		let home = await axios(base+'/home.html');
+		let index = [
+			{
+				id: 'home',
+				name: 'Home',
+				mark: home.data,
+				img: 'one.png'
+			}
+		]
+		//let id = this.route.name.replace(/\//g, "");
+		let id = 'coalition'
 		let pages = {
 			"home": 0,
 			"mission": 1,
 			"coalition": 2
 		}
 		if(id) {
-			context.store.commit('setID',id)
-			context.store.commit('setCur',pages[id])
-			loadSlide(context.store.state.id,context.store,false)
+			this.$store.commit('setID',id)
+			this.$store.commit('setCur',pages[id])
+			loadSlide(this.$store.state.id,this.$store,false)
 		} else {
-			loadSlide('home',context.store,false)
+			console.log(this.$store.state.current)
+			this.$store.commit('setCur',0)
+			console.log(this.route.name)
+			$store.commit('addSlide',index)
+			//loadSlide('index',this.$store,false)
 		}
-		context.store.commit('loadAll',allslides);
+		this.$store.commit('loadAll',allslides);
 
 	},
 	methods: {
+		//next: async () => {
+		//	console.log('test')
+		//	var view = document.querySelector('#viewer');
+		//	var slide = view.firstChild;
+		//	var count = view.dataset.count;
+		//	if(store.state.current < store.state.allslides.length - 1) {
+		//		var curMarg = Number(slide.style.marginLeft.slice(0,-2));
+		//		curMarg -= 100;
+		//		slide.style.marginLeft = curMarg+'vw';
+		//		store.commit('next')
+		//		let nextdex = Number(store.state.current)
+		//		let nextID = store.state.allslides[nextdex].id
+		//		window.history.pushState(null,'','/'+nextID+'/')
+		//		console.log(store.state.current)
+		//		console.log(count)
+		//		if(store.state.current == count) {
+		//			loadSlide(nextID,store,false)
+		//		}
+		//	}
+		//},
 		novert: function(e) {
 			document.querySelector('.open').style.transform="translateY(100%)"
 			document.querySelector('.open').classList.remove('open')
@@ -527,4 +556,7 @@ h4 {
 
 
 </style>
+
+
+
 

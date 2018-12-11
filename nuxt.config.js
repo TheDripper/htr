@@ -1,9 +1,9 @@
 const pkg = require('./package')
 
 module.exports = {
-  mode: 'spa',
+  mode: 'universal',
   env: {
-          baseUrl: 'https://sleepy-almeida-2e9b00.netlify.com/'
+	baseUrl: 'http://localhost:3000'
   },
   //router: {
   //        base: '/dist/'
