@@ -113,13 +113,15 @@ export default {
 		}
 	},
 	updated() {
-		let last = document.querySelector('.bindme')
-		let store = this.$store
-		if(last) {
-			last.addEventListener('click',function(e){
-				vert(e,store)
-			});
-			last.classList.remove('bindme')
+		if(process.browser) {
+			let last = document.querySelector('.bindme')
+			let store = this.$store
+			if(last) {
+				last.addEventListener('click',function(e){
+					vert(e,store)
+				});
+				last.classList.remove('bindme')
+			}
 		}
 	},
 	async created() {
