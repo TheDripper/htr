@@ -152,7 +152,7 @@ export default {
 				name: "Coalition"
 			}
 		]
-		let home = await axios(/home.html');
+		let home = await axios('/home.html')
 		let index = [
 			{
 				id: 'home',
