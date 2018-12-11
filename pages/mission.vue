@@ -113,16 +113,19 @@ export default {
 		}
 	},
 	updated() {
-		let last = document.querySelector('.bindme')
-		let store = this.$store
-		if(last) {
-			last.addEventListener('click',function(e){
-				vert(e,store)
-			});
-			last.classList.remove('bindme')
+		if(process.browser) {
+			let last = document.querySelector('.bindme')
+			let store = this.$store
+			if(last) {
+				last.addEventListener('click',function(e){
+					vert(e,store)
+				});
+				last.classList.remove('bindme')
+			}
 		}
 	},
 	async created() {
+		if(process.browser) {
 		let vuestance = this
 		document.addEventListener('wheel',throttle(function(e){
 			if(!vuestance.$store.state.vert) {
@@ -178,6 +181,7 @@ export default {
 			//loadSlide('index',this.$store,false)
 		}
 		this.$store.commit('loadAll',allslides);
+		}
 
 	},
 	methods: {

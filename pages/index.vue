@@ -125,6 +125,7 @@ export default {
 		}
 	},
 	async created() {
+		if(process.browser) {
 		let vuestance = this
 		document.addEventListener('wheel',throttle(function(e){
 			if(!vuestance.$store.state.vert) {
@@ -180,6 +181,7 @@ export default {
 			//loadSlide('index',this.$store,false)
 		}
 		this.$store.commit('loadAll',allslides);
+		}
 
 	},
 	methods: {
