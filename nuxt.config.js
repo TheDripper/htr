@@ -3,7 +3,8 @@ const pkg = require('./package')
 module.exports = {
   mode: 'spa',
   env: {
-	  baseUrl: 'http://localhost:3000'
+          //baseUrl: 'http://haititakesroot.org/dist/'
+          baseUrl: 'http://localhost:3000/dist/'
   },
   //router: {
   //        base: '/dist/'

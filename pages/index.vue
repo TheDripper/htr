@@ -15,7 +15,7 @@
 
 <div id=explore>
 <ul id=menu>
-<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/'+slide.id">{{ slide.name }}</a></li>
+<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/'+slide.id+'/'">{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
 <img id=close src=~/assets/close.svg @click="nomob" />
@@ -72,6 +72,8 @@ const next = async (curslide,store) => {
 		let nextdex = Number(store.state.current)
 		let nextID = store.state.allslides[nextdex].id
 		window.history.pushState(null,'','/'+nextID+'/')
+		console.log(store.state.current)
+		console.log(count)
 		if(store.state.current == count) {
 			loadSlide(nextID,store,false)
 		}
@@ -137,8 +139,6 @@ export default {
 			{
 				id: 'home',
 				name: "Home",
-
-
 			},
 			{
 				id: 'mission',
@@ -168,6 +168,8 @@ export default {
 			context.store.commit('setCur',pages[id])
 			loadSlide(context.store.state.id,context.store,false)
 		} else {
+			console.log(context.store.state.current)
+			context.store.commit('setCur',0)
 			loadSlide('home',context.store,false)
 		}
 		context.store.commit('loadAll',allslides);
@@ -455,7 +457,6 @@ h4 {
 	cursor: pointer;
 }
 #home .name {
-	display: none;
 }
 @media(max-width:1100px) {
 	#dots {
@@ -500,7 +501,35 @@ h4 {
 #prevslide {
 	transition: all 0.3s ease;
 }
+#trace {
+	width: 894px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+}
+#tracerow {
+	position: absolute;
+	bottom: -70px;
+	left: 50%;
+	width: 416px;
+}
+#rightrow {
+	position: absolute;
+	bottom: 10vh;
+	left: 50%;
+	transform: translateX(-50%) rotate(270deg);
+
+}
+#photos {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+
+}
 
 
 </style>
+
 
