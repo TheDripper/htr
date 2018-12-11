@@ -152,7 +152,7 @@ export default {
 				name: "Coalition"
 			}
 		]
-		let base = 'http://localhost:3000'
+		let base = 'master--sleepy-almeida-2e9b00.netlify.com'
 		let home = await axios(base+'/home.html');
 		let index = [
 			{
@@ -163,7 +163,7 @@ export default {
 			}
 		]
 		//let id = this.route.name.replace(/\//g, "");
-		let id = 'coalition'
+		let id = 'home'
 		let pages = {
 			"home": 0,
 			"mission": 1,
