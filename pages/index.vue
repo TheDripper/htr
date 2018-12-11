@@ -152,8 +152,7 @@ export default {
 				name: "Coalition"
 			}
 		]
-		let base = 'master--sleepy-almeida-2e9b00.netlify.com'
-		let home = await axios(base+'/home.html');
+		let home = await axios(/home.html');
 		let index = [
 			{
 				id: 'home',
