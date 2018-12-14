@@ -9,15 +9,15 @@
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <nav>
 <ul id=dots>
-<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">
+<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
 <div class=wrap>
-<a @click=tab :href="'/dist/'+slide.id+'/'" :data-slide="slide.id" :data-dex="index">{{ slide.id }}
+<a @click=tab($event,false) :href="'/dist/'+slide.id+'/'" :data-dex="index">{{ slide.id }}
 <span class=dot>
 </span>
 </a>
 </div>
 	<ul class=subdots >
-	<li v-for="sub in slide.subs">+{{ sub.name }}<span class=subdot></span></li>
+	<li v-for="sub in slide.subs" @click=tab($event,true) :data-slide="slide.id" >+{{ sub.name }}<span class=subdot></span></li>
 	</ul>
 </li>
 </ul>
@@ -25,7 +25,7 @@
 
 <div id=explore>
 <ul id=menu>
-<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" @click=tab :data-slide="slide.id">{{ slide.name }}</a></li>
+<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" @click=tab($event,false) :data-slide="slide.id">{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
 <img id=close src=/dist/close.svg @click="nomob" />
@@ -337,23 +337,31 @@ export default {
 		}
 	},
 	methods: {
-		tab: async function(e) {
+		tab: async function(e,sub) {
 			e.preventDefault();
 			let pages = {
 				"home": 0,
 				"mission": 1,
 				"impact": 2
 			}
-			let id = e.target.closest('a').dataset.slide
+			let id = e.target.closest('.tab').dataset.slide
+			console.log(id)
 			this.$store.commit('setID',id)
 			this.$store.commit('setCur',pages[id])
 			if(!document.querySelector('#'+id))
 				await loadSlide(this.$store.state.id,this.$store,false)
-			let dex = e.target.closest('a').dataset.dex
+			let dex = e.target.closest('.tab').dataset.dex
 			let count = document.querySelector('#viewer').dataset.count
 			goto(dex,id,this.$store)
 			document.querySelector('#explore').style.opacity='0';
 			document.querySelector('#explore').style.pointerEvents='none';
+			let subs = document.querySelectorAll('.subs')
+			if(sub) {
+				for(var i=0; i<subs.length; i++) {
+					if(subs[i].parentNode.id==id)
+						subs[i].style.transform='translate(0)'
+				}
+			}
 		},
 		novert: function(e) {
 			document.querySelector('#logo').style.opacity = '1'
@@ -502,14 +510,16 @@ export default {
 			font-size: 12px;
 			display: flex;
 			align-items: center;
+			cursor: pointer;
 		}
 	}
-.subdot {
+	.subdot {
 		width: 8px;
 		height: 8px;
 		border-radius: 50px;
 		border: 1px solid white;
 		margin-left: 5px;
+		cursor: pointer;
 	}
 #dots .dot {
 	width: 14px;
