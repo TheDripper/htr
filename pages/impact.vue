@@ -9,7 +9,7 @@
 <nav>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <ul id=dots>
-<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">{{ slide.id }}<span class=dot></span></li>
+<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}"><a :href="'/dist/'+slide.id+'/'">{{ slide.id }}</a><span class=dot></span></li>
 </ul>
 </nav>
 
@@ -29,6 +29,20 @@
 
 <script>
 const axios = require('axios')
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+}
 const throttle = (func, limit) => {
   let inThrottle
   return function() {
@@ -61,10 +75,12 @@ const prev = (store) => {
 		else
 			window.history.pushState(null,'','/dist/'+prevID+'/')
 	}
+	setTimeout(()=>{
+		store.commit('choke')
+	},800)
 }
 
 const next = async (store) => {
-	console.log('test')
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
@@ -76,15 +92,15 @@ const next = async (store) => {
 		let nextdex = Number(store.state.current)
 		let nextID = store.state.allslides[nextdex].id
 		window.history.pushState(null,'','/dist/'+nextID+'/')
-		console.log(store.state.current)
-		console.log(count)
 		if(store.state.current == count) {
 			loadSlide(nextID,store,false)
 		}
 	}
+	setTimeout(()=>{
+		store.commit('choke')
+	},800)
 }
 const loadSlide = async function(id,store,isPrev) {
-	console.log(id)
 	let nextMark = await axios(window.location.origin+'/dist/'+id+'.html')
 	let newSlide = {
 		id: id,
@@ -136,14 +152,14 @@ export default {
 			if(spin) {
 				spin.forEach(img=>{
 					img.addEventListener('click',function(e){
-						console.log('test')
 						spinner(e)
 					})
 				})
 			}
-			let trace = document.querySelector('#tracerow')
-			if(trace) {
-				trace.addEventListener('click',function(e){
+			let rightrow = document.querySelector('#diff')
+			if(rightrow) {
+				rightrow.addEventListener('click',function(e){
+					store.commit('choke')
 					next(store)
 				})
 			}
@@ -162,16 +178,22 @@ export default {
 	async created() {
 		if(process.browser) {
 		let vuestance = this
-		document.addEventListener('wheel',throttle(function(e){
+		document.addEventListener('wheel',function(e){
+			e.preventDefault();
+			console.log(e.deltaY)
 			if(!vuestance.$store.state.vert) {
 				var view = document.querySelector('#viewer');
-				if (e.deltaY > 0) {
+				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
+					vuestance.$store.commit('choke')
 					prev(vuestance.$store)
-				} else if (e.deltaY < 0) {
+				} else if (e.deltaY < 0 && !vuestance.$store.state.choke) {
+					vuestance.$store.commit('choke')
 					next(vuestance.$store)
+				} else {
+					return;
 				}
 			}
-		},1000));
+		})
 		let allslides = [
 			{
 				id: 'home',
@@ -184,6 +206,22 @@ export default {
 			{
 				id: 'impact',
 				name: "Impact"
+			},
+			{
+				id: 'coalition',
+				name: "Coalition"
+			},
+			{
+				id: 'activities',
+				name: 'Activities'
+			},
+			{
+				id: 'news',
+				name: 'News & Events'
+			},
+			{
+				id: 'contact',
+				name: 'Contact'
 			}
 		]
 		let id = window.location.pathname.split('/').filter(dir=>{
@@ -202,9 +240,7 @@ export default {
 			this.$store.commit('setCur',pages[id])
 			loadSlide(this.$store.state.id,this.$store,false)
 		} else {
-			console.log(this.$store.state.current)
 			this.$store.commit('setCur',0)
-			console.log(this.route.name)
 			$store.commit('addSlide',index)
 			//loadSlide('index',this.$store,false)
 		}
@@ -212,26 +248,6 @@ export default {
 		}
 	},
 	methods: {
-		//next: async () => {
-		//	console.log('test')
-		//	var view = document.querySelector('#viewer');
-		//	var slide = view.firstChild;
-		//	var count = view.dataset.count;
-		//	if(store.state.current < store.state.allslides.length - 1) {
-		//		var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-		//		curMarg -= 100;
-		//		slide.style.marginLeft = curMarg+'vw';
-		//		store.commit('next')
-		//		let nextdex = Number(store.state.current)
-		//		let nextID = store.state.allslides[nextdex].id
-		//		window.history.pushState(null,'','/'+nextID+'/')
-		//		console.log(store.state.current)
-		//		console.log(count)
-		//		if(store.state.current == count) {
-		//			loadSlide(nextID,store,false)
-		//		}
-		//	}
-		//},
 		novert: function(e) {
 			document.querySelector('.open').style.transform="translateY(100%)"
 			document.querySelector('.open').classList.remove('open')
@@ -322,12 +338,22 @@ export default {
 	padding: 40px;
 }
 #dots li {
-	color: #ECE5C9;
 	display: flex;
 	align-items: center;
-	font-family: "flamaSemi";
-	text-transform: uppercase;
-	font-size: 12px;
+	a {
+		color: #ECE5C9;
+		font-family: "flamaSemi";
+		text-transform: uppercase;
+		font-size: 12px;
+	}
+	&:not(.active) {
+		padding-right: 2px;
+	}
+	&:last-child {
+		.dot:after {
+			display: none;
+		}
+	}
 }
 #dots .dot {
 	width: 14px;
@@ -338,6 +364,16 @@ export default {
 	transition: all 0.5s ease;
 	display: inline-block;
 	margin-left: 20px;
+	position: relative;
+	//&:after {
+	//	content: '';
+	//	border-right: 1px solid white;
+	//	height: calc(12vh - 14px);
+	//	position: absolute;
+	//	top: 0;
+	//	left: 50%;
+	//	transform: translate(-50%,14px);
+	//}
 }
 #dots li.active .dot {
 	background: white;
@@ -481,7 +517,7 @@ h4 {
 	background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('~/assets/explore.png');
 	position: fixed;
 	opacity: 0;
-	z-index: 50;
+	z-index: 950;
 	pointer-events: none;
 	transition: all 0.3s ease;
 }
@@ -524,8 +560,12 @@ h4 {
 	}
 }
 @media(max-width:600px) {
-	nav {
+	#dots {
 		display: none;
+	}
+	nav {
+		top: 25px;
+		right: 5px;
 	}
 	.slide {
 		padding: 0 5vw;
@@ -558,12 +598,20 @@ h4 {
 #prevslide {
 	transition: all 0.3s ease;
 }
+#dot {
+	background-image: url('/dist/dot.png');
+	width: 318px;
+	height: 216px;
+	background-size: cover;
+	transform: translate(20px,110px);
+}
 #trace {
-	width: 894px;
+	width: 890px;
 	position: absolute;
-	top: 50%;
+	top: 8vh;
 	left: 50%;
-	transform: translate(-50%,-50%);
+	transform: translateX(-50%);
+	opacity: 0.6;
 }
 #tracerow {
 	position: absolute;
@@ -573,11 +621,30 @@ h4 {
 	cursor: pointer;
 }
 #rightrow {
+	width: 80px;
+	margin-left: 40px;
+	transition: all 0.3s ease;
+	cursor: pointer;
+}
+#diff {
+	display: flex;
 	position: absolute;
-	bottom: 10vh;
-	left: 50%;
-	transform: translateX(-50%) rotate(270deg);
-
+	align-items: center;
+	transform: translateY(22vh);
+	cursor: pointer;
+}
+@media(max-width:800px) {
+	#diff {
+		flex-direction: column;
+		transform: none;
+		bottom: 10vh;
+	}
+	#dot {
+		display: none;
+	}
+	#rightrow {
+		width: 50px;
+	}
 }
 #photos {
 	position: absolute;
@@ -901,6 +968,33 @@ h4 {
 #stories {
 	width: 800px;
 }
+#diff h2 {
+		font-family: "heart" !important;	
+		color: #ECE5C9;
+		font-size: 40px;
+		cursor: pointer;
+}
+@media(max-width:600px) {
+	#diff h2 {
+		font-size: 24px;
+		margin-bottom: 10px;
+	}
+}
+@font-face {
+	font-family: "heart";
+	src: url('/dist/heartone.ttf')
+}
+.slide {
+	h1, h4, p {
+		z-index: 60;
+	}
+}
+#diff:hover {
+	#rightrow {
+		transform: translateX(20px);
+	}
+}
+
 </style>
 
 

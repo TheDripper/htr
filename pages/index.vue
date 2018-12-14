@@ -9,7 +9,7 @@
 <nav>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <ul id=dots>
-<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">{{ slide.id }}<span class=dot></span></li>
+<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}"><a :href="'/dist/'+slide.id+'/'">{{ slide.id }}</a><span class=dot></span></li>
 </ul>
 </nav>
 
@@ -156,9 +156,10 @@ export default {
 					})
 				})
 			}
-			let trace = document.querySelector('#tracerow')
-			if(trace) {
-				trace.addEventListener('click',function(e){
+			let rightrow = document.querySelector('#diff')
+			if(rightrow) {
+				rightrow.addEventListener('click',function(e){
+					store.commit('choke')
 					next(store)
 				})
 			}
@@ -178,9 +179,8 @@ export default {
 		if(process.browser) {
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
-			e.preventDefault();
-			console.log(e.deltaY)
 			if(!vuestance.$store.state.vert) {
+				e.preventDefault();
 				var view = document.querySelector('#viewer');
 				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
 					vuestance.$store.commit('choke')
@@ -205,6 +205,22 @@ export default {
 			{
 				id: 'impact',
 				name: "Impact"
+			},
+			{
+				id: 'coalition',
+				name: "Coalition"
+			},
+			{
+				id: 'activities',
+				name: 'Activities'
+			},
+			{
+				id: 'news',
+				name: 'News & Events'
+			},
+			{
+				id: 'contact',
+				name: 'Contact'
 			}
 		]
 		let id = window.location.pathname.split('/').filter(dir=>{
@@ -321,12 +337,22 @@ export default {
 	padding: 40px;
 }
 #dots li {
-	color: #ECE5C9;
 	display: flex;
 	align-items: center;
-	font-family: "flamaSemi";
-	text-transform: uppercase;
-	font-size: 12px;
+	a {
+		color: #ECE5C9;
+		font-family: "flamaSemi";
+		text-transform: uppercase;
+		font-size: 12px;
+	}
+	&:not(.active) {
+		padding-right: 2px;
+	}
+	&:last-child {
+		.dot:after {
+			display: none;
+		}
+	}
 }
 #dots .dot {
 	width: 14px;
@@ -337,6 +363,16 @@ export default {
 	transition: all 0.5s ease;
 	display: inline-block;
 	margin-left: 20px;
+	position: relative;
+	//&:after {
+	//	content: '';
+	//	border-right: 1px solid white;
+	//	height: calc(12vh - 14px);
+	//	position: absolute;
+	//	top: 0;
+	//	left: 50%;
+	//	transform: translate(-50%,14px);
+	//}
 }
 #dots li.active .dot {
 	background: white;
@@ -400,7 +436,7 @@ h4 {
 	transition: all 0.3s ease;
 	width: 100vw;
 	height: 100vh;
-	z-index: 10;
+	z-index: 20;
 	overflow: hidden;
 	overflow-y: scroll;
 }
@@ -480,7 +516,7 @@ h4 {
 	background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('~/assets/explore.png');
 	position: fixed;
 	opacity: 0;
-	z-index: 50;
+	z-index: 950;
 	pointer-events: none;
 	transition: all 0.3s ease;
 }
@@ -505,12 +541,11 @@ h4 {
 	font-family: "argentBold";
 }
 #close {
-	position: absolute;
-	top: 30px;
-	right: 40px;
-	width: 61px;
-	height: 61px;
 	cursor: pointer;
+	position: absolute;
+	top: 10px;
+	right: 13px;
+	width: 27px;
 }
 #home .name {
 }
@@ -523,8 +558,12 @@ h4 {
 	}
 }
 @media(max-width:600px) {
-	nav {
+	#dots {
 		display: none;
+	}
+	nav {
+		top: 25px;
+		right: 5px;
 	}
 	.slide {
 		padding: 0 5vw;
@@ -582,20 +621,32 @@ h4 {
 #rightrow {
 	width: 80px;
 	margin-left: 40px;
-
+	transition: all 0.3s ease;
+	cursor: pointer;
 }
 #diff {
 	display: flex;
 	position: absolute;
 	align-items: center;
 	transform: translateY(22vh);
+	cursor: pointer;
+}
+@media(max-width:800px) {
+	#diff {
+		flex-direction: column;
+		transform: none;
+		bottom: 10vh;
+	}
+	#dot {
+		display: none;
+	}
+	#rightrow {
+		width: 50px;
+	}
 }
 #photos {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100vw;
-
+}
+@media(max-width:1500px) {
 }
 #circle {
 	z-index: 3000;
@@ -787,18 +838,81 @@ h4 {
 	margin-right: 20px;
 }
 #photos {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
 	width: 100vw;
 	height: 100vh;
 	background-size: cover;
-	background-position: 100% 50%;
+	background-position: 100% 30%;
 }
 #mission_why {
+	.wrap {
+		max-width: 80%;
+		text-align: right;
+		justify-content: flex-end;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		//transform: translateY(30px);
+	}
 	h1, p, h4 {
 		color: #ECE5C9;
 		position: relative;
 		z-index: 55;
+		text-align: center;
+		width: 100%;
+		max-width: 80%;
 	}
 }
+@media(max-width:1540px) {
+	#photos {
+		transform: translateX(-10%);
+	}
+	#mission_why h1, #mission_why p, #mission_why h4 {
+		max-width: none !important;
+	}
+	.wrap {
+		transform: translateY(-40px);
+	}
+}
+@media(max-width:1200px) {
+	#mission_why {
+		align-items: flex-start;
+	}
+	#mission_why h1, #mission_why p, #mission_why h4 {
+		max-width: none !important;
+		text-align: left !important;
+	}
+}
+@media(max-width:900px) {
+	#mission_why {
+		.wrap {
+			padding: 15px;
+			background: rgba(0,0,0,0.6);
+			border: 2px solid white;
+		}
+		p {
+			margin-bottom: 0;
+		}
+	}
+}
+@media(max-width:600px) {
+	#photos {
+		transform: none;
+	}
+	#mission_why h1, #mission_why p, #mission_why h4 {
+		transform: none;
+	}
+	#mission_why .wrap {
+		transform: translateY(-30px);
+		h1 {
+			margin-bottom: 5px;
+		}
+	}
+}
+
 [data-current=mission] + #logolink {
 		display: none;
 }
@@ -916,6 +1030,13 @@ h4 {
 		font-family: "heart" !important;	
 		color: #ECE5C9;
 		font-size: 40px;
+		cursor: pointer;
+}
+@media(max-width:600px) {
+	#diff h2 {
+		font-size: 24px;
+		margin-bottom: 10px;
+	}
 }
 @font-face {
 	font-family: "heart";
@@ -923,7 +1044,12 @@ h4 {
 }
 .slide {
 	h1, h4, p {
-		z-index: 99;
+		z-index: 10;
+	}
+}
+#diff:hover {
+	#rightrow {
+		transform: translateX(20px);
 	}
 }
 
