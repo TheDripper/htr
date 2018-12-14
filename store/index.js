@@ -11,7 +11,12 @@ const createStore = () => {
       mark: '',
       nextMark: '',
       prevMark: '',
-      id: ''
+      id: '',
+      pages:  {
+	"home": 0,
+	"mission": 1,
+	"impact": 2
+      }
     }),
     mutations: {
       next (state) {

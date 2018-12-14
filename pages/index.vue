@@ -1,7 +1,7 @@
 <template>
 <div id=frame>
 	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper">
-		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark">
+		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
 		</div>
 	</div>
 	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
@@ -40,9 +40,27 @@
 <script>
 
 
+function cleanOrder(store) {
+	let viewer = document.querySelector('#viewer').childNodes
+	let slides = store.state.slides
+	slides.sort((a,b)=>{
+		let keyA = a.order
+		if(keyA=='undefined')
+			keyA=0
+		let keyB = b.order
+		if(keyB=='undefined')
+			keyB=0
+		return keyA - keyB
+	})
+	console.log(slides)
+}
 
-function goto(dex,id) {
+
+function goto(dex,id,store) {
 	let view = document.querySelector('#viewer')
+	view.childNodes.forEach(node=>{
+	})
+	//store.commit('setCur',dex)
 	let first = document.querySelector('.slide')
 	let newMarg = dex * -100
 	first.style.marginLeft = newMarg + 'vw' 
@@ -76,7 +94,6 @@ const throttle = (func, limit) => {
   }
 }
 const up = (store) => {
-	console.log('up')
 	let subs = document.querySelector('.open')
 	var curMarg = Number(subs.style.transform.replace(/\D/g,'')) * -1
 	if(curMarg < 0) {
@@ -88,11 +105,8 @@ const up = (store) => {
 	},1100)
 }
 const down = (store) => {
-	console.log('down')
 	let subs = document.querySelector('.open')
 	var curMarg = Number(subs.style.transform.replace(/\D/g,''))
-	console.log(subs.children.length)
-	console.log(curMarg)
 		curMarg -= 100;
 		subs.style.transform='translateY('+curMarg+'vh)'
 	setTimeout(()=>{
@@ -125,6 +139,7 @@ const prev = (store) => {
 }
 
 const next = async (store) => {
+	cleanOrder(store)
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
@@ -146,15 +161,18 @@ const next = async (store) => {
 }
 const loadSlide = async function(id,store,isPrev) {
 	let nextMark = await axios(window.location.origin+'/dist/'+id+'.html')
+	let order = Number(store.state.pages[id])
 	let newSlide = {
 		id: id,
 		mark: nextMark.data,
-		img: id+'.png'
+		img: id+'.png',
+		order: order
 	}
 	if(isPrev)
 		store.commit('addPrev',newSlide)
 	else 
 		store.commit('addSlide',newSlide)
+	cleanOrder(store)
 }
 
 const vert = function(e,store) {
@@ -302,7 +320,7 @@ export default {
 		if(id) {
 			this.$store.commit('setID',id)
 			this.$store.commit('setCur',pages[id])
-			loadSlide(this.$store.state.id,this.$store,false)
+			await loadSlide(this.$store.state.id,this.$store,false)
 		} else {
 			this.$store.commit('setCur',0)
 			$store.commit('addSlide',index)
@@ -312,7 +330,7 @@ export default {
 		}
 	},
 	methods: {
-		tab: function(e) {
+		tab: async function(e) {
 			e.preventDefault();
 			let pages = {
 				"home": 0,
@@ -322,12 +340,11 @@ export default {
 			let id = e.target.dataset.slide
 			this.$store.commit('setID',id)
 			this.$store.commit('setCur',pages[id])
-			loadSlide(this.$store.state.id,this.$store,false)
+			if(!document.querySelector('#'+id))
+				await loadSlide(this.$store.state.id,this.$store,false)
 			let dex = e.target.dataset.dex
 			let count = document.querySelector('#viewer').dataset.count
-			console.log('dex'+dex)
-			console.log('count'+count)
-			goto(dex,id)
+			goto(dex,id,this.$store)
 		},
 		novert: function(e) {
 			document.querySelector('#logo').style.opacity = '1'
@@ -1211,6 +1228,15 @@ h4 {
 }
 #logo {
 	transition: all 0.2s ease;
+}
+#home {
+	order: 1;
+}
+#mission {
+	order: 2;
+}
+#impact {
+	order: 3;
 }
 
 </style>
