@@ -6,17 +6,18 @@
 	</div>
 	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
 	<div id=back @click="novert"><img src=/dist/back.svg />BACK</div>
-<nav>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
+<nav>
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">
 <div class=wrap>
-<a :href="'/dist/'+slide.id+'/'">{{ slide.id }}</a>
+<a @click=tab :href="'/dist/'+slide.id+'/'" :data-slide="slide.id" :data-dex="index">{{ slide.id }}
 <span class=dot>
 </span>
+</a>
 </div>
 	<ul class=subdots >
-	<li v-for="sub in slide.subs">{{ sub.name }}<span class=subdot></span></li>
+	<li v-for="sub in slide.subs">+{{ sub.name }}<span class=subdot></span></li>
 	</ul>
 </li>
 </ul>
@@ -27,7 +28,7 @@
 <li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/dist/'+slide.id+'/'">{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
-<img id=close src=~/assets/close.svg @click="nomob" />
+<img id=close src=/dist/close.svg @click="nomob" />
 </div>
 
 
@@ -37,6 +38,16 @@
 </template>
 
 <script>
+
+
+
+function goto(dex,id) {
+	console.log(id)
+	let first = document.querySelector('.slide')
+	let newMarg = dex * -100
+	first.style.marginLeft = newMarg + 'vw' 
+}
+
 const axios = require('axios')
 function debounce(func, wait, immediate) {
 	var timeout;
@@ -175,6 +186,14 @@ export default {
 	},
 	updated() {
 		if(process.browser) {
+			if (window.NodeList && !NodeList.prototype.forEach) {
+			    NodeList.prototype.forEach = function (callback, thisArg) {
+			        thisArg = thisArg || window;
+			        for (var i = 0; i < this.length; i++) {
+			            callback.call(thisArg, this[i], i, this);
+			        }
+			    };
+			}
 			let last = document.querySelector('.bindme')
 			let store = this.$store
 			if(last) {
@@ -212,6 +231,7 @@ export default {
 	},
 	async created() {
 		if(process.browser) {
+		
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
 			if(!vuestance.$store.state.vert) {
@@ -219,10 +239,10 @@ export default {
 				var view = document.querySelector('#viewer');
 				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
 					vuestance.$store.commit('choke')
-					prev(vuestance.$store)
+					next(vuestance.$store)
 				} else if (e.deltaY < 0 && !vuestance.$store.state.choke) {
 					vuestance.$store.commit('choke')
-					next(vuestance.$store)
+					prev(vuestance.$store)
 				} else {
 					return;
 				}
@@ -264,18 +284,6 @@ export default {
 				name: "Impact"
 			},
 			{
-				id: 'coalition',
-				name: "Coalition"
-			},
-			{
-				id: 'activities',
-				name: 'Activities'
-			},
-			{
-				id: 'news',
-				name: 'News & Events'
-			},
-			{
 				id: 'contact',
 				name: 'Contact'
 			}
@@ -304,6 +312,23 @@ export default {
 		}
 	},
 	methods: {
+		tab: function(e) {
+			e.preventDefault();
+			let pages = {
+				"home": 0,
+				"mission": 1,
+				"impact": 2
+			}
+			let id = e.target.dataset.slide
+			this.$store.commit('setID',id)
+			this.$store.commit('setCur',pages[id])
+			loadSlide(this.$store.state.id,this.$store,false)
+			let dex = e.target.dataset.dex
+			let count = document.querySelector('#viewer').dataset.count
+			console.log('dex'+dex)
+			console.log('count'+count)
+			goto(dex,id)
+		},
 		novert: function(e) {
 			document.querySelector('#logo').style.opacity = '1'
 			document.querySelector('#logo').style.pointerEvents = 'auto'
@@ -393,9 +418,10 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-end;
-	height: 85vh;
+	height: 66vh;
 	justify-content: space-between;
 	padding: 40px;
+	padding-right: 80px;
 	.wrap {
 		display: flex;
 	}
@@ -413,6 +439,7 @@ export default {
 		font-family: "flamaSemi";
 		text-transform: uppercase;
 		font-size: 12px;
+		display: flex;
 	}
 	&:not(.active) {
 		padding-right: 2px;
@@ -430,8 +457,11 @@ export default {
 		opacity: 0;
 		pointer-events: none;
 		position: absolute;
-		transform: translate(-5px,5vh);
 		right: 0;
+    		top: 0;
+    		height: calc(22vh - 14px);
+    		justify-content: space-around;
+    		padding: 50px 0px;
 		li {
 			position: relative;
 			color: #ECE5C9;
@@ -615,6 +645,9 @@ h4 {
 	justify-content: flex-end;
 	padding-right: 40px;
 	cursor: pointer;
+	position: absolute;
+	top: 30px;
+	right: 70px;
 }
 #explore {
 	width: 100vw;
@@ -655,8 +688,8 @@ h4 {
 #close {
 	cursor: pointer;
 	position: absolute;
-	top: 10px;
-	right: 13px;
+	top: 30px;
+	right: 110px;
 	width: 27px;
 }
 #home .name {

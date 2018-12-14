@@ -5,11 +5,20 @@
 		</div>
 	</div>
 	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
-	<h2 id=back @click="novert">Back</h2>
+	<div id=back @click="novert"><img src=/dist/back.svg />BACK</div>
 <nav>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <ul id=dots>
-<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}"><a :href="'/dist/'+slide.id+'/'">{{ slide.id }}</a><span class=dot></span></li>
+<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">
+<div class=wrap>
+<a :href="'/dist/'+slide.id+'/'">{{ slide.id }}</a>
+<span class=dot>
+</span>
+</div>
+	<ul class=subdots >
+	<li v-for="sub in slide.subs">{{ sub.name }}<span class=subdot></span></li>
+	</ul>
+</li>
 </ul>
 </nav>
 
@@ -54,6 +63,30 @@ const throttle = (func, limit) => {
       setTimeout(() => inThrottle = false, limit)
     }
   }
+}
+const up = (store) => {
+	console.log('up')
+	let subs = document.querySelector('.open')
+	var curMarg = Number(subs.style.transform.replace(/\D/g,'')) * -1
+	if(curMarg < 0) {
+		curMarg += 100;
+		subs.style.transform='translateY('+curMarg+'vh)'
+	}
+	setTimeout(()=>{
+		store.commit('choke')
+	},1100)
+}
+const down = (store) => {
+	console.log('down')
+	let subs = document.querySelector('.open')
+	var curMarg = Number(subs.style.transform.replace(/\D/g,''))
+	console.log(subs.children.length)
+	console.log(curMarg)
+		curMarg -= 100;
+		subs.style.transform='translateY('+curMarg+'vh)'
+	setTimeout(()=>{
+		store.commit('choke')
+	},1100)
 }
 const prev = (store) => {
 	var view = document.querySelector('#viewer');
@@ -114,6 +147,8 @@ const loadSlide = async function(id,store,isPrev) {
 }
 
 const vert = function(e,store) {
+	document.querySelector('#logo').style.opacity = '0'
+	document.querySelector('#logo').style.pointerEvents = 'none'
 	e.target.parentNode.querySelector('.subs').classList.add('open')
 	e.target.parentNode.querySelector('.subs').style.transform = "translateY(0%)"
 	store.commit('vert')
@@ -179,9 +214,8 @@ export default {
 		if(process.browser) {
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
-			e.preventDefault();
-			console.log(e.deltaY)
 			if(!vuestance.$store.state.vert) {
+				e.preventDefault();
 				var view = document.querySelector('#viewer');
 				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
 					vuestance.$store.commit('choke')
@@ -192,6 +226,18 @@ export default {
 				} else {
 					return;
 				}
+			} else {
+				e.preventDefault();
+				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
+					vuestance.$store.commit('choke')
+					down(vuestance.$store)
+				} else if (e.deltaY < 0 && !vuestance.$store.state.choke) {
+					vuestance.$store.commit('choke')
+					up(vuestance.$store)
+				} else {
+					return
+				}
+
 			}
 		})
 		let allslides = [
@@ -202,6 +248,16 @@ export default {
 			{
 				id: 'mission',
 				name: "Mission",
+				subs: [
+					{
+						id: 'mission_how',
+						name: "How",
+					},
+					{
+						id: 'mission_why',
+						name: "Why",
+					}
+				]
 			},
 			{
 				id: 'impact',
@@ -249,6 +305,8 @@ export default {
 	},
 	methods: {
 		novert: function(e) {
+			document.querySelector('#logo').style.opacity = '1'
+			document.querySelector('#logo').style.pointerEvents = 'auto'
 			document.querySelector('.open').style.transform="translateY(100%)"
 			document.querySelector('.open').classList.remove('open')
 			this.$store.commit('vert')
@@ -269,8 +327,10 @@ export default {
 				var slide = view.firstChild;
 				var count = view.dataset.count;
 				if(e=='left') {
+					this.$store.commit('choke')
 					next(this.$store)
 				} else if(e=='right') {
+					this.$store.commit('choke')
 					prev(this.$store)
 				}
 			}
@@ -336,10 +396,18 @@ export default {
 	height: 85vh;
 	justify-content: space-between;
 	padding: 40px;
+	.wrap {
+		display: flex;
+	}
+	.active {
+		transition: all 0.3s ease;
+	}
 }
-#dots li {
+#dots > li {
 	display: flex;
 	align-items: center;
+	flex-direction: column;
+	position: relative;
 	a {
 		color: #ECE5C9;
 		font-family: "flamaSemi";
@@ -355,6 +423,31 @@ export default {
 		}
 	}
 }
+	.subdots {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		opacity: 0;
+		pointer-events: none;
+		position: absolute;
+		transform: translate(-5px,5vh);
+		right: 0;
+		li {
+			position: relative;
+			color: #ECE5C9;
+			font-family: "flamaSemi";
+			font-size: 12px;
+			display: flex;
+			align-items: center;
+		}
+	}
+.subdot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50px;
+		border: 1px solid white;
+		margin-left: 5px;
+	}
 #dots .dot {
 	width: 14px;
 	height: 14px;
@@ -362,9 +455,12 @@ export default {
 	background: transparent;
 	border: 1px solid white;
 	transition: all 0.5s ease;
-	display: inline-block;
 	margin-left: 20px;
 	position: relative;
+	overflow: visible;
+	flex-shrink: 0;
+	
+	
 	//&:after {
 	//	content: '';
 	//	border-right: 1px solid white;
@@ -374,6 +470,14 @@ export default {
 	//	left: 50%;
 	//	transform: translate(-50%,14px);
 	//}
+}
+#dots {
+	.active {
+		.subdots {
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
 }
 #dots li.active .dot {
 	background: white;
@@ -434,12 +538,9 @@ h4 {
 	top: 0;
 	left: 0;
 	transform: translateY(100%);
-	transition: all 0.3s ease;
+	transition: all 0.6s ease;
 	width: 100vw;
-	height: 100vh;
-	z-index: 10;
-	overflow: hidden;
-	overflow-y: scroll;
+	z-index: 20;
 }
 .sub {
 	width: 100vw;
@@ -453,9 +554,11 @@ h4 {
 	background-position: center;
 }
 #back {
-	font-size: 43px;
+	background: rgba(0,0,0,0.7);
+	padding: 10px;
+	font-size: 16px;
 	text-transform: uppercase;
-	color: white;
+	color: #ECE5D1;
 	position: fixed;
 	bottom: 10px;
 	left: 10px;
@@ -463,8 +566,14 @@ h4 {
 	transition: all 0.3s ease;
 	font-family: "flamaSemi";
 	pointer-events: none;
-	z-index: 15;
+	z-index: 20;
 	cursor: pointer;
+	display: flex;
+	align-items: center;
+	img {
+		width: 40px;
+		margin-right: 10px;
+	}
 
 }
 .open .back {
@@ -478,12 +587,14 @@ h4 {
 	flex-direction: column;
 	align-items: center;
 	margin: 20px auto;
-	font-size: 24px;
-	font-family: "flamaSemi";
 	position: absolute;
 	bottom: 40px;
 	left: 50%;
 	transform: translateX(-50%);
+	font-family: "heart" !important;	
+	color: #ECE5C9;
+	font-size: 40px;
+	cursor: pointer;
 }
 .opener img {
 	pointer-events: none;
@@ -542,12 +653,11 @@ h4 {
 	font-family: "argentBold";
 }
 #close {
-	position: absolute;
-	top: 30px;
-	right: 40px;
-	width: 61px;
-	height: 61px;
 	cursor: pointer;
+	position: absolute;
+	top: 10px;
+	right: 13px;
+	width: 27px;
 }
 #home .name {
 }
@@ -647,11 +757,8 @@ h4 {
 	}
 }
 #photos {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100vw;
-
+}
+@media(max-width:1500px) {
 }
 #circle {
 	z-index: 3000;
@@ -660,6 +767,10 @@ h4 {
 	position: absolute;
 	right: 15%;
 	max-width: 100%;
+	background-image: url('/dist/circleback.svg');
+	background-size: 90%;
+	background-position: center;
+	background-repeat: no-repeat;
 	img {
 		transition: all 0.4s ease;
 		width: 100px;
@@ -843,18 +954,81 @@ h4 {
 	margin-right: 20px;
 }
 #photos {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
 	width: 100vw;
 	height: 100vh;
 	background-size: cover;
-	background-position: 100% 50%;
+	background-position: 100% 30%;
 }
 #mission_why {
+	.wrap {
+		max-width: 80%;
+		text-align: right;
+		justify-content: flex-end;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		//transform: translateY(30px);
+	}
 	h1, p, h4 {
 		color: #ECE5C9;
 		position: relative;
 		z-index: 55;
+		text-align: center;
+		width: 100%;
+		max-width: 80%;
 	}
 }
+@media(max-width:1540px) {
+	#photos {
+		transform: translateX(-10%);
+	}
+	#mission_why h1, #mission_why p, #mission_why h4 {
+		max-width: none !important;
+	}
+	#mission_why .wrap {
+		transform: translateY(-40px);
+	}
+}
+@media(max-width:1200px) {
+	#mission_why {
+		align-items: flex-start;
+	}
+	#mission_why h1, #mission_why p, #mission_why h4 {
+		max-width: none !important;
+		text-align: left !important;
+	}
+}
+@media(max-width:900px) {
+	#mission_why {
+		.wrap {
+			padding: 15px;
+			background: rgba(0,0,0,0.6);
+			border: 2px solid white;
+		}
+		p {
+			margin-bottom: 0;
+		}
+	}
+}
+@media(max-width:600px) {
+	#photos {
+		transform: none;
+	}
+	#mission_why h1, #mission_why p, #mission_why h4 {
+		transform: none;
+	}
+	#mission_why .wrap {
+		transform: translateY(-30px);
+		h1 {
+			margin-bottom: 5px;
+		}
+	}
+}
+
 [data-current=mission] + #logolink {
 		display: none;
 }
@@ -986,13 +1160,16 @@ h4 {
 }
 .slide {
 	h1, h4, p {
-		z-index: 60;
+		z-index: 10;
 	}
 }
 #diff:hover {
 	#rightrow {
 		transform: translateX(20px);
 	}
+}
+#logo {
+	transition: all 0.2s ease;
 }
 
 </style>
