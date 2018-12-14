@@ -42,7 +42,7 @@
 
 
 function goto(dex,id) {
-	console.log(id)
+	let view = document.querySelector('#viewer')
 	let first = document.querySelector('.slide')
 	let newMarg = dex * -100
 	first.style.marginLeft = newMarg + 'vw' 
@@ -424,6 +424,12 @@ export default {
 	padding-right: 80px;
 	.wrap {
 		display: flex;
+		&:hover {
+			.dot {
+				width: 20px;
+				height: 20px;
+			}
+		}
 	}
 	.active {
 		transition: all 0.3s ease;
@@ -440,6 +446,7 @@ export default {
 		text-transform: uppercase;
 		font-size: 12px;
 		display: flex;
+		align-items: center;
 	}
 	&:not(.active) {
 		padding-right: 2px;
@@ -484,11 +491,12 @@ export default {
 	border-radius: 50%;
 	background: transparent;
 	border: 1px solid white;
-	transition: all 0.5s ease;
+	transition: all 0.3s ease;
 	margin-left: 20px;
 	position: relative;
 	overflow: visible;
 	flex-shrink: 0;
+
 	
 	
 	//&:after {
