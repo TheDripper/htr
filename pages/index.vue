@@ -9,7 +9,16 @@
 <nav>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <ul id=dots>
-<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}"><a :href="'/dist/'+slide.id+'/'">{{ slide.id }}</a><span class=dot></span></li>
+<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">
+<div class=wrap>
+<a :href="'/dist/'+slide.id+'/'">{{ slide.id }}</a>
+<span class=dot>
+</span>
+</div>
+	<ul class=subdots >
+	<li v-for="sub in slide.subs">{{ sub.name }}<span class=subdot></span></li>
+	</ul>
+</li>
 </ul>
 </nav>
 
@@ -57,7 +66,7 @@ const throttle = (func, limit) => {
 }
 const up = (store) => {
 	console.log('up')
-	let subs = document.querySelector('.subs')
+	let subs = document.querySelector('.open')
 	var curMarg = Number(subs.style.transform.replace(/\D/g,'')) * -1
 	if(curMarg < 0) {
 		curMarg += 100;
@@ -69,7 +78,7 @@ const up = (store) => {
 }
 const down = (store) => {
 	console.log('down')
-	let subs = document.querySelector('.subs')
+	let subs = document.querySelector('.open')
 	var curMarg = Number(subs.style.transform.replace(/\D/g,''))
 	console.log(subs.children.length)
 	console.log(curMarg)
@@ -239,6 +248,16 @@ export default {
 			{
 				id: 'mission',
 				name: "Mission",
+				subs: [
+					{
+						id: 'mission_how',
+						name: "How",
+					},
+					{
+						id: 'mission_why',
+						name: "Why",
+					}
+				]
 			},
 			{
 				id: 'impact',
@@ -377,10 +396,18 @@ export default {
 	height: 85vh;
 	justify-content: space-between;
 	padding: 40px;
+	.wrap {
+		display: flex;
+	}
+	.active {
+		transition: all 0.3s ease;
+	}
 }
-#dots li {
+#dots > li {
 	display: flex;
 	align-items: center;
+	flex-direction: column;
+	position: relative;
 	a {
 		color: #ECE5C9;
 		font-family: "flamaSemi";
@@ -396,6 +423,31 @@ export default {
 		}
 	}
 }
+	.subdots {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		opacity: 0;
+		pointer-events: none;
+		position: absolute;
+		transform: translate(-5px,5vh);
+		right: 0;
+		li {
+			position: relative;
+			color: #ECE5C9;
+			font-family: "flamaSemi";
+			font-size: 12px;
+			display: flex;
+			align-items: center;
+		}
+	}
+.subdot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50px;
+		border: 1px solid white;
+		margin-left: 5px;
+	}
 #dots .dot {
 	width: 14px;
 	height: 14px;
@@ -403,9 +455,12 @@ export default {
 	background: transparent;
 	border: 1px solid white;
 	transition: all 0.5s ease;
-	display: inline-block;
 	margin-left: 20px;
 	position: relative;
+	overflow: visible;
+	flex-shrink: 0;
+	
+	
 	//&:after {
 	//	content: '';
 	//	border-right: 1px solid white;
@@ -415,6 +470,14 @@ export default {
 	//	left: 50%;
 	//	transform: translate(-50%,14px);
 	//}
+}
+#dots {
+	.active {
+		.subdots {
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
 }
 #dots li.active .dot {
 	background: white;
@@ -926,7 +989,7 @@ h4 {
 	#mission_why h1, #mission_why p, #mission_why h4 {
 		max-width: none !important;
 	}
-	.wrap {
+	#mission_why .wrap {
 		transform: translateY(-40px);
 	}
 }
