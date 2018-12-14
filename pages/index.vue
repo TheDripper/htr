@@ -5,7 +5,7 @@
 		</div>
 	</div>
 	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
-	<h2 id=back @click="novert">Back</h2>
+	<div id=back @click="novert"><img src=/dist/back.svg />BACK</div>
 <nav>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <ul id=dots>
@@ -54,6 +54,30 @@ const throttle = (func, limit) => {
       setTimeout(() => inThrottle = false, limit)
     }
   }
+}
+const up = (store) => {
+	console.log('up')
+	let subs = document.querySelector('.subs')
+	var curMarg = Number(subs.style.transform.replace(/\D/g,'')) * -1
+	if(curMarg < 0) {
+		curMarg += 100;
+		subs.style.transform='translateY('+curMarg+'vh)'
+	}
+	setTimeout(()=>{
+		store.commit('choke')
+	},1100)
+}
+const down = (store) => {
+	console.log('down')
+	let subs = document.querySelector('.subs')
+	var curMarg = Number(subs.style.transform.replace(/\D/g,''))
+	console.log(subs.children.length)
+	console.log(curMarg)
+		curMarg -= 100;
+		subs.style.transform='translateY('+curMarg+'vh)'
+	setTimeout(()=>{
+		store.commit('choke')
+	},1100)
 }
 const prev = (store) => {
 	var view = document.querySelector('#viewer');
@@ -114,6 +138,8 @@ const loadSlide = async function(id,store,isPrev) {
 }
 
 const vert = function(e,store) {
+	document.querySelector('#logo').style.opacity = '0'
+	document.querySelector('#logo').style.pointerEvents = 'none'
 	e.target.parentNode.querySelector('.subs').classList.add('open')
 	e.target.parentNode.querySelector('.subs').style.transform = "translateY(0%)"
 	store.commit('vert')
@@ -191,6 +217,18 @@ export default {
 				} else {
 					return;
 				}
+			} else {
+				e.preventDefault();
+				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
+					vuestance.$store.commit('choke')
+					down(vuestance.$store)
+				} else if (e.deltaY < 0 && !vuestance.$store.state.choke) {
+					vuestance.$store.commit('choke')
+					up(vuestance.$store)
+				} else {
+					return
+				}
+
 			}
 		})
 		let allslides = [
@@ -248,6 +286,8 @@ export default {
 	},
 	methods: {
 		novert: function(e) {
+			document.querySelector('#logo').style.opacity = '1'
+			document.querySelector('#logo').style.pointerEvents = 'auto'
 			document.querySelector('.open').style.transform="translateY(100%)"
 			document.querySelector('.open').classList.remove('open')
 			this.$store.commit('vert')
@@ -268,8 +308,10 @@ export default {
 				var slide = view.firstChild;
 				var count = view.dataset.count;
 				if(e=='left') {
+					this.$store.commit('choke')
 					next(this.$store)
 				} else if(e=='right') {
+					this.$store.commit('choke')
 					prev(this.$store)
 				}
 			}
@@ -433,12 +475,9 @@ h4 {
 	top: 0;
 	left: 0;
 	transform: translateY(100%);
-	transition: all 0.3s ease;
+	transition: all 0.6s ease;
 	width: 100vw;
-	height: 100vh;
 	z-index: 20;
-	overflow: hidden;
-	overflow-y: scroll;
 }
 .sub {
 	width: 100vw;
@@ -452,9 +491,11 @@ h4 {
 	background-position: center;
 }
 #back {
-	font-size: 43px;
+	background: rgba(0,0,0,0.7);
+	padding: 10px;
+	font-size: 16px;
 	text-transform: uppercase;
-	color: white;
+	color: #ECE5D1;
 	position: fixed;
 	bottom: 10px;
 	left: 10px;
@@ -462,8 +503,14 @@ h4 {
 	transition: all 0.3s ease;
 	font-family: "flamaSemi";
 	pointer-events: none;
-	z-index: 15;
+	z-index: 20;
 	cursor: pointer;
+	display: flex;
+	align-items: center;
+	img {
+		width: 40px;
+		margin-right: 10px;
+	}
 
 }
 .open .back {
@@ -477,12 +524,14 @@ h4 {
 	flex-direction: column;
 	align-items: center;
 	margin: 20px auto;
-	font-size: 24px;
-	font-family: "flamaSemi";
 	position: absolute;
 	bottom: 40px;
 	left: 50%;
 	transform: translateX(-50%);
+	font-family: "heart" !important;	
+	color: #ECE5C9;
+	font-size: 40px;
+	cursor: pointer;
 }
 .opener img {
 	pointer-events: none;
@@ -655,6 +704,10 @@ h4 {
 	position: absolute;
 	right: 15%;
 	max-width: 100%;
+	background-image: url('/dist/circleback.svg');
+	background-size: 90%;
+	background-position: center;
+	background-repeat: no-repeat;
 	img {
 		transition: all 0.4s ease;
 		width: 100px;
@@ -1051,6 +1104,9 @@ h4 {
 	#rightrow {
 		transform: translateX(20px);
 	}
+}
+#logo {
+	transition: all 0.2s ease;
 }
 
 </style>
