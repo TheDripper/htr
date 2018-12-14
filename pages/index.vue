@@ -10,9 +10,9 @@
 <nav>
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">
-<div class=wrap>
+<div @click=tab class=wrap  :data-slide="slide.id">
 <a @click=tab :href="'/dist/'+slide.id+'/'" :data-slide="slide.id" :data-dex="index">{{ slide.id }}
-<span class=dot>
+<span class=dot @click=tab :data-slide="slide.id">
 </span>
 </a>
 </div>
@@ -52,17 +52,20 @@ function cleanOrder(store) {
 			keyB=0
 		return keyA - keyB
 	})
-	console.log(slides)
 }
 
 
 function goto(dex,id,store) {
 	let view = document.querySelector('#viewer')
-	view.childNodes.forEach(node=>{
-	})
+	let targ = 0
+	for(var i=0; i<view.childNodes.length; i++) {
+		if(view.childNodes[i].id==id)
+			targ = i
+	}
+	console.log(targ)
 	//store.commit('setCur',dex)
 	let first = document.querySelector('.slide')
-	let newMarg = dex * -100
+	let newMarg = targ * -100
 	first.style.marginLeft = newMarg + 'vw' 
 }
 
