@@ -62,7 +62,6 @@ function goto(dex,id,store) {
 		if(view.childNodes[i].id==id)
 			targ = i
 	}
-	console.log(targ)
 	//store.commit('setCur',dex)
 	let first = document.querySelector('.slide')
 	let newMarg = targ * -100
@@ -237,7 +236,6 @@ export default {
 			if(rightrow) {
 				rightrow.addEventListener('click',function(e){
 					store.commit('choke')
-					console.log(rightrow)
 					next(store)
 				})
 				rightrow.classList.remove('diffbind')
@@ -319,14 +317,11 @@ export default {
 		id = id[id.length-1]
 		if(id=='dist')
 			id='home'
-		let pages = {
-			"home": 0,
-			"mission": 1,
-			"impact": 2
-		}
+		let pages = this.$store.state.pages
 		if(id) {
+			let pagedex = pages[id]
 			this.$store.commit('setID',id)
-			this.$store.commit('setCur',pages[id])
+			this.$store.commit('setCur',pagedex)
 			await loadSlide(this.$store.state.id,this.$store,false)
 		} else {
 			this.$store.commit('setCur',0)
@@ -339,13 +334,8 @@ export default {
 	methods: {
 		tab: async function(e,sub) {
 			e.preventDefault();
-			let pages = {
-				"home": 0,
-				"mission": 1,
-				"impact": 2
-			}
 			let id = e.target.closest('.tab').dataset.slide
-			console.log(id)
+			let pages = this.$store.state.pages
 			this.$store.commit('setID',id)
 			this.$store.commit('setCur',pages[id])
 			if(!document.querySelector('#'+id))
@@ -1237,7 +1227,6 @@ h4 {
 }
 .slide {
 	h1, h4, p {
-		z-index: 10;
 	}
 }
 #diff:hover {
@@ -1256,6 +1245,9 @@ h4 {
 }
 #impact {
 	order: 3;
+}
+#contact {
+	order: 4;
 }
 
 </style>

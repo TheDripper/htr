@@ -1,34 +1,55 @@
 <template>
 <div id=frame>
 	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper">
-		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
+		<div class="slide" v-for="slide in slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }">
+		<h4 class=name>{{ slide.name }}</h4>
+		<h1>{{ slide.text }}</h1>
+		<p v-html="slide.copy"></p>
+		<a v-if="slide.butt" class="opener bindme">{{ slide.name }}<img src=/dist/down.png /></a>
+		<div id=formcont>
+		<div class="field">
+		  <div class="control">
+		    <input type="text" name="first" placeholder="First Name">
+		  </div>
+		  <div class="control">
+		    <input type="text" name="last" placeholder="First Name">
+		  </div>
+		</div>
+		<div class="field">
+		  <div class="control">
+		    <input type="number" name="phone" placeholder="Phone">
+		  </div>
+		  <div class="control">
+		    <input type="email" name="email" placeholder="Email">
+		  </div>
+		</div>
+		<div class="field">
+		  <div class="control">
+		    <input type="text" name="subject" placeholder="Subject">
+		  </div>
+		</div>
+		<div class="field">
+		  <textarea id="message" name="message">
+		  </textarea>
+		</div>
+		</div>
 		</div>
 	</div>
 	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
-	<div id=back @click="novert"><img src=/dist/back.svg />BACK</div>
-<h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
+	<h2 id=back @click="novert">Back</h2>
 <nav>
+<h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <ul id=dots>
-<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
-<div class=wrap>
-<a @click=tab($event,false) :href="'/dist/'+slide.id+'/'" :data-dex="index">{{ slide.id }}
-<span class=dot>
-</span>
-</a>
-</div>
-	<ul class=subdots >
-	<li v-for="sub in slide.subs" @click=tab($event,true) :data-slide="slide.id" >+{{ sub.name }}<span class=subdot></span></li>
-	</ul>
-</li>
+<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">{{ slide.id }}<span class=dot></span></li>
 </ul>
 </nav>
 
 <div id=explore>
 <ul id=menu>
-<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" @click=tab($event,false) :data-slide="slide.id">{{ slide.name }}</a></li>
+<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/dist/'+slide.id+'/'">{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
-<img id=close src=/dist/close.svg @click="nomob" />
+<img id=close src=~/assets/close.svg @click="nomob" />
 </div>
 
 
@@ -38,36 +59,6 @@
 </template>
 
 <script>
-
-
-function cleanOrder(store) {
-	let viewer = document.querySelector('#viewer').childNodes
-	let slides = store.state.slides
-	slides.sort((a,b)=>{
-		let keyA = a.order
-		if(keyA=='undefined')
-			keyA=0
-		let keyB = b.order
-		if(keyB=='undefined')
-			keyB=0
-		return keyA - keyB
-	})
-}
-
-
-function goto(dex,id,store) {
-	let view = document.querySelector('#viewer')
-	let targ = 0
-	for(var i=0; i<view.childNodes.length; i++) {
-		if(view.childNodes[i].id==id)
-			targ = i
-	}
-	//store.commit('setCur',dex)
-	let first = document.querySelector('.slide')
-	let newMarg = targ * -100
-	first.style.marginLeft = newMarg + 'vw' 
-}
-
 const axios = require('axios')
 function debounce(func, wait, immediate) {
 	var timeout;
@@ -95,26 +86,6 @@ const throttle = (func, limit) => {
     }
   }
 }
-const up = (store) => {
-	let subs = document.querySelector('.open')
-	var curMarg = Number(subs.style.transform.replace(/\D/g,'')) * -1
-	if(curMarg < 0) {
-		curMarg += 100;
-		subs.style.transform='translateY('+curMarg+'vh)'
-	}
-	setTimeout(()=>{
-		store.commit('choke')
-	},1100)
-}
-const down = (store) => {
-	let subs = document.querySelector('.open')
-	var curMarg = Number(subs.style.transform.replace(/\D/g,''))
-		curMarg -= 100;
-		subs.style.transform='translateY('+curMarg+'vh)'
-	setTimeout(()=>{
-		store.commit('choke')
-	},1100)
-}
 const prev = (store) => {
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
@@ -141,7 +112,6 @@ const prev = (store) => {
 }
 
 const next = async (store) => {
-	cleanOrder(store)
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
@@ -162,26 +132,19 @@ const next = async (store) => {
 	},800)
 }
 const loadSlide = async function(id,store,isPrev) {
-	if(!document.querySelector('#'+id)) {
-		let nextMark = await axios(window.location.origin+'/dist/'+id+'.html')
-		let order = Number(store.state.pages[id])
-		let newSlide = {
-			id: id,
-			mark: nextMark.data,
-			img: id+'.png',
-			order: order
-		}
-		if(isPrev)
-			store.commit('addPrev',newSlide)
-		else 
-			store.commit('addSlide',newSlide)
+	let nextMark = await axios(window.location.origin+'/dist/'+id+'.html')
+	let newSlide = {
+		id: id,
+		mark: nextMark.data,
+		img: id+'.png'
 	}
-	cleanOrder(store)
+	if(isPrev)
+		store.commit('addPrev',newSlide)
+	else 
+		store.commit('addSlide',newSlide)
 }
 
 const vert = function(e,store) {
-	document.querySelector('#logo').style.opacity = '0'
-	document.querySelector('#logo').style.pointerEvents = 'none'
 	e.target.parentNode.querySelector('.subs').classList.add('open')
 	e.target.parentNode.querySelector('.subs').style.transform = "translateY(0%)"
 	store.commit('vert')
@@ -203,19 +166,24 @@ export default {
 		]
 	},
 	asyncData({store}) {
-		if(process.browser) {
-		}
+			return {
+				slides: [
+					{
+						id: 'connect',
+						img: '/impact.png',
+						text: "Connect With Us",
+						name: "Get Involved",
+						copy: `For donations, contact: lorem@haititakesroot.com <br />
+						For press inquiries, contact: lorem@haititakesroot.com <br />
+						To join our parters, contact: lorem@haititakesroot.com <br />
+						Reach us via telephone: <br /> USA: +1 (999) 999-9999 <br /> Haiti: +2 999 9999`
+
+					}
+				]
+			}
 	},
 	updated() {
 		if(process.browser) {
-			if (window.NodeList && !NodeList.prototype.forEach) {
-			    NodeList.prototype.forEach = function (callback, thisArg) {
-			        thisArg = thisArg || window;
-			        for (var i = 0; i < this.length; i++) {
-			            callback.call(thisArg, this[i], i, this);
-			        }
-			    };
-			}
 			let last = document.querySelector('.bindme')
 			let store = this.$store
 			if(last) {
@@ -232,13 +200,11 @@ export default {
 					})
 				})
 			}
-			let rightrow = document.querySelector('.diffbind')
-			if(rightrow) {
-				rightrow.addEventListener('click',function(e){
-					store.commit('choke')
+			let trace = document.querySelector('#tracerow')
+			if(trace) {
+				trace.addEventListener('click',function(e){
 					next(store)
 				})
-				rightrow.classList.remove('diffbind')
 			}
 			let onbutt = document.querySelectorAll('.view')
 			if(onbutt) {
@@ -254,33 +220,21 @@ export default {
 	},
 	async created() {
 		if(process.browser) {
-		
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
+			e.preventDefault();
+			console.log(e.deltaY)
 			if(!vuestance.$store.state.vert) {
-				e.preventDefault();
 				var view = document.querySelector('#viewer');
 				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
 					vuestance.$store.commit('choke')
-					next(vuestance.$store)
+					prev(vuestance.$store)
 				} else if (e.deltaY < 0 && !vuestance.$store.state.choke) {
 					vuestance.$store.commit('choke')
-					prev(vuestance.$store)
+					next(vuestance.$store)
 				} else {
 					return;
 				}
-			} else {
-				e.preventDefault();
-				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
-					vuestance.$store.commit('choke')
-					down(vuestance.$store)
-				} else if (e.deltaY < 0 && !vuestance.$store.state.choke) {
-					vuestance.$store.commit('choke')
-					up(vuestance.$store)
-				} else {
-					return
-				}
-
 			}
 		})
 		let allslides = [
@@ -291,24 +245,10 @@ export default {
 			{
 				id: 'mission',
 				name: "Mission",
-				subs: [
-					{
-						id: 'mission_how',
-						name: "How",
-					},
-					{
-						id: 'mission_why',
-						name: "Why",
-					}
-				]
 			},
 			{
 				id: 'impact',
 				name: "Impact"
-			},
-			{
-				id: 'contact',
-				name: 'Contact'
 			}
 		]
 		let id = window.location.pathname.split('/').filter(dir=>{
@@ -317,12 +257,15 @@ export default {
 		id = id[id.length-1]
 		if(id=='dist')
 			id='home'
-		let pages = this.$store.state.pages
+		let pages = {
+			"home": 0,
+			"mission": 1,
+			"impact": 2
+		}
 		if(id) {
-			let pagedex = pages[id]
 			this.$store.commit('setID',id)
-			this.$store.commit('setCur',pagedex)
-			await loadSlide(this.$store.state.id,this.$store,false)
+			this.$store.commit('setCur',pages[id])
+			loadSlide(this.$store.state.id,this.$store,false)
 		} else {
 			this.$store.commit('setCur',0)
 			$store.commit('addSlide',index)
@@ -332,30 +275,7 @@ export default {
 		}
 	},
 	methods: {
-		tab: async function(e,sub) {
-			e.preventDefault();
-			let id = e.target.closest('.tab').dataset.slide
-			let pages = this.$store.state.pages
-			this.$store.commit('setID',id)
-			this.$store.commit('setCur',pages[id])
-			if(!document.querySelector('#'+id))
-				await loadSlide(this.$store.state.id,this.$store,false)
-			let dex = e.target.closest('.tab').dataset.dex
-			let count = document.querySelector('#viewer').dataset.count
-			goto(dex,id,this.$store)
-			document.querySelector('#explore').style.opacity='0';
-			document.querySelector('#explore').style.pointerEvents='none';
-			let subs = document.querySelectorAll('.subs')
-			if(sub) {
-				for(var i=0; i<subs.length; i++) {
-					if(subs[i].parentNode.id==id)
-						subs[i].style.transform='translate(0)'
-				}
-			}
-		},
 		novert: function(e) {
-			document.querySelector('#logo').style.opacity = '1'
-			document.querySelector('#logo').style.pointerEvents = 'auto'
 			document.querySelector('.open').style.transform="translateY(100%)"
 			document.querySelector('.open').classList.remove('open')
 			this.$store.commit('vert')
@@ -376,10 +296,8 @@ export default {
 				var slide = view.firstChild;
 				var count = view.dataset.count;
 				if(e=='left') {
-					this.$store.commit('choke')
 					next(this.$store)
 				} else if(e=='right') {
-					this.$store.commit('choke')
 					prev(this.$store)
 				}
 			}
@@ -442,106 +360,27 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-end;
-	height: 66vh;
+	height: 85vh;
 	justify-content: space-between;
 	padding: 40px;
-	padding-right: 80px;
-	.wrap {
-		display: flex;
-		&:hover {
-			.dot {
-				width: 20px;
-				height: 20px;
-			}
-		}
-	}
-	.active {
-		transition: all 0.3s ease;
-	}
 }
-#dots > li {
+#dots li {
+	color: #ECE5C9;
 	display: flex;
 	align-items: center;
-	flex-direction: column;
-	position: relative;
-	a {
-		color: #ECE5C9;
-		font-family: "flamaSemi";
-		text-transform: uppercase;
-		font-size: 12px;
-		display: flex;
-		align-items: center;
-	}
-	&:not(.active) {
-		padding-right: 2px;
-	}
-	&:last-child {
-		.dot:after {
-			display: none;
-		}
-	}
+	font-family: "flamaSemi";
+	text-transform: uppercase;
+	font-size: 12px;
 }
-	.subdots {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		opacity: 0;
-		pointer-events: none;
-		position: absolute;
-		right: 0;
-    		top: 0;
-    		height: calc(22vh - 14px);
-    		justify-content: space-around;
-    		padding: 50px 0px;
-		li {
-			position: relative;
-			color: #ECE5C9;
-			font-family: "flamaSemi";
-			font-size: 12px;
-			display: flex;
-			align-items: center;
-			cursor: pointer;
-		}
-	}
-	.subdot {
-		width: 8px;
-		height: 8px;
-		border-radius: 50px;
-		border: 1px solid white;
-		margin-left: 5px;
-		cursor: pointer;
-	}
 #dots .dot {
 	width: 14px;
 	height: 14px;
 	border-radius: 50%;
 	background: transparent;
 	border: 1px solid white;
-	transition: all 0.3s ease;
+	transition: all 0.5s ease;
+	display: inline-block;
 	margin-left: 20px;
-	position: relative;
-	overflow: visible;
-	flex-shrink: 0;
-
-	
-	
-	//&:after {
-	//	content: '';
-	//	border-right: 1px solid white;
-	//	height: calc(12vh - 14px);
-	//	position: absolute;
-	//	top: 0;
-	//	left: 50%;
-	//	transform: translate(-50%,14px);
-	//}
-}
-#dots {
-	.active {
-		.subdots {
-			opacity: 1;
-			pointer-events: auto;
-		}
-	}
 }
 #dots li.active .dot {
 	background: white;
@@ -602,9 +441,12 @@ h4 {
 	top: 0;
 	left: 0;
 	transform: translateY(100%);
-	transition: all 0.6s ease;
+	transition: all 0.3s ease;
 	width: 100vw;
-	z-index: 20;
+	height: 100vh;
+	z-index: 10;
+	overflow: hidden;
+	overflow-y: scroll;
 }
 .sub {
 	width: 100vw;
@@ -618,11 +460,9 @@ h4 {
 	background-position: center;
 }
 #back {
-	background: rgba(0,0,0,0.7);
-	padding: 10px;
-	font-size: 16px;
+	font-size: 43px;
 	text-transform: uppercase;
-	color: #ECE5D1;
+	color: white;
 	position: fixed;
 	bottom: 10px;
 	left: 10px;
@@ -630,14 +470,8 @@ h4 {
 	transition: all 0.3s ease;
 	font-family: "flamaSemi";
 	pointer-events: none;
-	z-index: 20;
+	z-index: 15;
 	cursor: pointer;
-	display: flex;
-	align-items: center;
-	img {
-		width: 40px;
-		margin-right: 10px;
-	}
 
 }
 .open .back {
@@ -651,14 +485,12 @@ h4 {
 	flex-direction: column;
 	align-items: center;
 	margin: 20px auto;
+	font-size: 24px;
+	font-family: "flamaSemi";
 	position: absolute;
 	bottom: 40px;
 	left: 50%;
 	transform: translateX(-50%);
-	font-family: "heart" !important;	
-	color: #ECE5C9;
-	font-size: 40px;
-	cursor: pointer;
 }
 .opener img {
 	pointer-events: none;
@@ -679,9 +511,6 @@ h4 {
 	justify-content: flex-end;
 	padding-right: 40px;
 	cursor: pointer;
-	position: absolute;
-	top: 30px;
-	right: 70px;
 }
 #explore {
 	width: 100vw;
@@ -695,7 +524,7 @@ h4 {
 	background-image:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url('~/assets/explore.png');
 	position: fixed;
 	opacity: 0;
-	z-index: 950;
+	z-index: 50;
 	pointer-events: none;
 	transition: all 0.3s ease;
 }
@@ -720,11 +549,12 @@ h4 {
 	font-family: "argentBold";
 }
 #close {
-	cursor: pointer;
 	position: absolute;
 	top: 30px;
-	right: 110px;
-	width: 27px;
+	right: 40px;
+	width: 61px;
+	height: 61px;
+	cursor: pointer;
 }
 #home .name {
 }
@@ -737,12 +567,8 @@ h4 {
 	}
 }
 @media(max-width:600px) {
-	#dots {
-		display: none;
-	}
 	nav {
-		top: 25px;
-		right: 5px;
+		display: none;
 	}
 	.slide {
 		padding: 0 5vw;
@@ -775,20 +601,12 @@ h4 {
 #prevslide {
 	transition: all 0.3s ease;
 }
-#dot {
-	background-image: url('/dist/dot.png');
-	width: 318px;
-	height: 216px;
-	background-size: cover;
-	transform: translate(20px,110px);
-}
 #trace {
-	width: 890px;
+	width: 894px;
 	position: absolute;
-	top: 8vh;
+	top: 50%;
 	left: 50%;
-	transform: translateX(-50%);
-	opacity: 0.6;
+	transform: translate(-50%,-50%);
 }
 #tracerow {
 	position: absolute;
@@ -798,34 +616,18 @@ h4 {
 	cursor: pointer;
 }
 #rightrow {
-	width: 80px;
-	margin-left: 40px;
-	transition: all 0.3s ease;
-	cursor: pointer;
-}
-#diff {
-	display: flex;
 	position: absolute;
-	align-items: center;
-	transform: translateY(22vh);
-	cursor: pointer;
-}
-@media(max-width:800px) {
-	#diff {
-		flex-direction: column;
-		transform: none;
-		bottom: 10vh;
-	}
-	#dot {
-		display: none;
-	}
-	#rightrow {
-		width: 50px;
-	}
+	bottom: 10vh;
+	left: 50%;
+	transform: translateX(-50%) rotate(270deg);
+
 }
 #photos {
-}
-@media(max-width:1500px) {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+
 }
 #circle {
 	z-index: 3000;
@@ -834,10 +636,6 @@ h4 {
 	position: absolute;
 	right: 15%;
 	max-width: 100%;
-	background-image: url('/dist/circleback.svg');
-	background-size: 90%;
-	background-position: center;
-	background-repeat: no-repeat;
 	img {
 		transition: all 0.4s ease;
 		width: 100px;
@@ -1021,81 +819,18 @@ h4 {
 	margin-right: 20px;
 }
 #photos {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100vw;
 	width: 100vw;
 	height: 100vh;
 	background-size: cover;
-	background-position: 100% 30%;
+	background-position: 100% 50%;
 }
 #mission_why {
-	.wrap {
-		max-width: 80%;
-		text-align: right;
-		justify-content: flex-end;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		//transform: translateY(30px);
-	}
 	h1, p, h4 {
 		color: #ECE5C9;
 		position: relative;
 		z-index: 55;
-		text-align: center;
-		width: 100%;
-		max-width: 80%;
 	}
 }
-@media(max-width:1540px) {
-	#photos {
-		transform: translateX(-10%);
-	}
-	#mission_why h1, #mission_why p, #mission_why h4 {
-		max-width: none !important;
-	}
-	#mission_why .wrap {
-		transform: translateY(-40px);
-	}
-}
-@media(max-width:1200px) {
-	#mission_why {
-		align-items: flex-start;
-	}
-	#mission_why h1, #mission_why p, #mission_why h4 {
-		max-width: none !important;
-		text-align: left !important;
-	}
-}
-@media(max-width:900px) {
-	#mission_why {
-		.wrap {
-			padding: 15px;
-			background: rgba(0,0,0,0.6);
-			border: 2px solid white;
-		}
-		p {
-			margin-bottom: 0;
-		}
-	}
-}
-@media(max-width:600px) {
-	#photos {
-		transform: none;
-	}
-	#mission_why h1, #mission_why p, #mission_why h4 {
-		transform: none;
-	}
-	#mission_why .wrap {
-		transform: translateY(-30px);
-		h1 {
-			margin-bottom: 5px;
-		}
-	}
-}
-
 [data-current=mission] + #logolink {
 		display: none;
 }
@@ -1209,48 +944,6 @@ h4 {
 #stories {
 	width: 800px;
 }
-#diff h2 {
-		font-family: "heart" !important;	
-		color: #ECE5C9;
-		font-size: 40px;
-		cursor: pointer;
-}
-@media(max-width:600px) {
-	#diff h2 {
-		font-size: 24px;
-		margin-bottom: 10px;
-	}
-}
-@font-face {
-	font-family: "heart";
-	src: url('/dist/heartone.ttf')
-}
-.slide {
-	h1, h4, p {
-	}
-}
-#diff:hover {
-	#rightrow {
-		transform: translateX(20px);
-	}
-}
-#logo {
-	transition: all 0.2s ease;
-}
-#home {
-	order: 1;
-}
-#mission {
-	order: 2;
-}
-#impact {
-	order: 3;
-}
-#contact {
-	order: 4;
-}
-
 </style>
-
 
 

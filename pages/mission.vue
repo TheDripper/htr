@@ -1,7 +1,7 @@
 <template>
 <div id=frame>
 	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper">
-		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark">
+		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
 		</div>
 	</div>
 	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
@@ -9,15 +9,15 @@
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <nav>
 <ul id=dots>
-<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">
+<li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
 <div class=wrap>
-<a @click=tab :href="'/dist/'+slide.id+'/'" :data-slide="slide.id" :data-dex="index">{{ slide.id }}
+<a @click=tab($event,false) :href="'/dist/'+slide.id+'/'" :data-dex="index">{{ slide.id }}
 <span class=dot>
 </span>
 </a>
 </div>
 	<ul class=subdots >
-	<li v-for="sub in slide.subs">+{{ sub.name }}<span class=subdot></span></li>
+	<li v-for="sub in slide.subs" @click=tab($event,true) :data-slide="slide.id" >+{{ sub.name }}<span class=subdot></span></li>
 	</ul>
 </li>
 </ul>
@@ -25,7 +25,7 @@
 
 <div id=explore>
 <ul id=menu>
-<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/dist/'+slide.id+'/'">{{ slide.name }}</a></li>
+<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" @click=tab($event,false) :data-slide="slide.id">{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
 <img id=close src=/dist/close.svg @click="nomob" />
@@ -40,11 +40,31 @@
 <script>
 
 
+function cleanOrder(store) {
+	let viewer = document.querySelector('#viewer').childNodes
+	let slides = store.state.slides
+	slides.sort((a,b)=>{
+		let keyA = a.order
+		if(keyA=='undefined')
+			keyA=0
+		let keyB = b.order
+		if(keyB=='undefined')
+			keyB=0
+		return keyA - keyB
+	})
+}
 
-function goto(dex,id) {
+
+function goto(dex,id,store) {
 	let view = document.querySelector('#viewer')
+	let targ = 0
+	for(var i=0; i<view.childNodes.length; i++) {
+		if(view.childNodes[i].id==id)
+			targ = i
+	}
+	//store.commit('setCur',dex)
 	let first = document.querySelector('.slide')
-	let newMarg = dex * -100
+	let newMarg = targ * -100
 	first.style.marginLeft = newMarg + 'vw' 
 }
 
@@ -76,7 +96,6 @@ const throttle = (func, limit) => {
   }
 }
 const up = (store) => {
-	console.log('up')
 	let subs = document.querySelector('.open')
 	var curMarg = Number(subs.style.transform.replace(/\D/g,'')) * -1
 	if(curMarg < 0) {
@@ -88,11 +107,8 @@ const up = (store) => {
 	},1100)
 }
 const down = (store) => {
-	console.log('down')
 	let subs = document.querySelector('.open')
 	var curMarg = Number(subs.style.transform.replace(/\D/g,''))
-	console.log(subs.children.length)
-	console.log(curMarg)
 		curMarg -= 100;
 		subs.style.transform='translateY('+curMarg+'vh)'
 	setTimeout(()=>{
@@ -125,6 +141,7 @@ const prev = (store) => {
 }
 
 const next = async (store) => {
+	cleanOrder(store)
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
@@ -145,16 +162,21 @@ const next = async (store) => {
 	},800)
 }
 const loadSlide = async function(id,store,isPrev) {
-	let nextMark = await axios(window.location.origin+'/dist/'+id+'.html')
-	let newSlide = {
-		id: id,
-		mark: nextMark.data,
-		img: id+'.png'
+	if(!document.querySelector('#'+id)) {
+		let nextMark = await axios(window.location.origin+'/dist/'+id+'.html')
+		let order = Number(store.state.pages[id])
+		let newSlide = {
+			id: id,
+			mark: nextMark.data,
+			img: id+'.png',
+			order: order
+		}
+		if(isPrev)
+			store.commit('addPrev',newSlide)
+		else 
+			store.commit('addSlide',newSlide)
 	}
-	if(isPrev)
-		store.commit('addPrev',newSlide)
-	else 
-		store.commit('addSlide',newSlide)
+	cleanOrder(store)
 }
 
 const vert = function(e,store) {
@@ -210,12 +232,13 @@ export default {
 					})
 				})
 			}
-			let rightrow = document.querySelector('#diff')
+			let rightrow = document.querySelector('.diffbind')
 			if(rightrow) {
 				rightrow.addEventListener('click',function(e){
 					store.commit('choke')
 					next(store)
 				})
+				rightrow.classList.remove('diffbind')
 			}
 			let onbutt = document.querySelectorAll('.view')
 			if(onbutt) {
@@ -294,15 +317,12 @@ export default {
 		id = id[id.length-1]
 		if(id=='dist')
 			id='home'
-		let pages = {
-			"home": 0,
-			"mission": 1,
-			"impact": 2
-		}
+		let pages = this.$store.state.pages
 		if(id) {
+			let pagedex = pages[id]
 			this.$store.commit('setID',id)
-			this.$store.commit('setCur',pages[id])
-			loadSlide(this.$store.state.id,this.$store,false)
+			this.$store.commit('setCur',pagedex)
+			await loadSlide(this.$store.state.id,this.$store,false)
 		} else {
 			this.$store.commit('setCur',0)
 			$store.commit('addSlide',index)
@@ -312,22 +332,26 @@ export default {
 		}
 	},
 	methods: {
-		tab: function(e) {
+		tab: async function(e,sub) {
 			e.preventDefault();
-			let pages = {
-				"home": 0,
-				"mission": 1,
-				"impact": 2
-			}
-			let id = e.target.dataset.slide
+			let id = e.target.closest('.tab').dataset.slide
+			let pages = this.$store.state.pages
 			this.$store.commit('setID',id)
 			this.$store.commit('setCur',pages[id])
-			loadSlide(this.$store.state.id,this.$store,false)
-			let dex = e.target.dataset.dex
+			if(!document.querySelector('#'+id))
+				await loadSlide(this.$store.state.id,this.$store,false)
+			let dex = e.target.closest('.tab').dataset.dex
 			let count = document.querySelector('#viewer').dataset.count
-			console.log('dex'+dex)
-			console.log('count'+count)
-			goto(dex,id)
+			goto(dex,id,this.$store)
+			document.querySelector('#explore').style.opacity='0';
+			document.querySelector('#explore').style.pointerEvents='none';
+			let subs = document.querySelectorAll('.subs')
+			if(sub) {
+				for(var i=0; i<subs.length; i++) {
+					if(subs[i].parentNode.id==id)
+						subs[i].style.transform='translate(0)'
+				}
+			}
 		},
 		novert: function(e) {
 			document.querySelector('#logo').style.opacity = '1'
@@ -476,14 +500,16 @@ export default {
 			font-size: 12px;
 			display: flex;
 			align-items: center;
+			cursor: pointer;
 		}
 	}
-.subdot {
+	.subdot {
 		width: 8px;
 		height: 8px;
 		border-radius: 50px;
 		border: 1px solid white;
 		margin-left: 5px;
+		cursor: pointer;
 	}
 #dots .dot {
 	width: 14px;
@@ -1201,7 +1227,6 @@ h4 {
 }
 .slide {
 	h1, h4, p {
-		z-index: 10;
 	}
 }
 #diff:hover {
@@ -1211,6 +1236,18 @@ h4 {
 }
 #logo {
 	transition: all 0.2s ease;
+}
+#home {
+	order: 1;
+}
+#mission {
+	order: 2;
+}
+#impact {
+	order: 3;
+}
+#contact {
+	order: 4;
 }
 
 </style>

@@ -15,7 +15,8 @@ const createStore = () => {
       pages:  {
 	"home": 0,
 	"mission": 1,
-	"impact": 2
+	"impact": 2,
+	"contact": 3
       }
     }),
     mutations: {
