@@ -10,9 +10,9 @@
 <nav>
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}">
-<div @click=tab class=wrap  :data-slide="slide.id">
+<div class=wrap>
 <a @click=tab :href="'/dist/'+slide.id+'/'" :data-slide="slide.id" :data-dex="index">{{ slide.id }}
-<span class=dot @click=tab :data-slide="slide.id">
+<span class=dot>
 </span>
 </a>
 </div>
@@ -25,7 +25,7 @@
 
 <div id=explore>
 <ul id=menu>
-<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/dist/'+slide.id+'/'">{{ slide.name }}</a></li>
+<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" @click=tab :data-slide="slide.id">{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
 <img id=close src=/dist/close.svg @click="nomob" />
@@ -163,18 +163,20 @@ const next = async (store) => {
 	},800)
 }
 const loadSlide = async function(id,store,isPrev) {
-	let nextMark = await axios(window.location.origin+'/dist/'+id+'.html')
-	let order = Number(store.state.pages[id])
-	let newSlide = {
-		id: id,
-		mark: nextMark.data,
-		img: id+'.png',
-		order: order
+	if(!document.querySelector('#'+id)) {
+		let nextMark = await axios(window.location.origin+'/dist/'+id+'.html')
+		let order = Number(store.state.pages[id])
+		let newSlide = {
+			id: id,
+			mark: nextMark.data,
+			img: id+'.png',
+			order: order
+		}
+		if(isPrev)
+			store.commit('addPrev',newSlide)
+		else 
+			store.commit('addSlide',newSlide)
 	}
-	if(isPrev)
-		store.commit('addPrev',newSlide)
-	else 
-		store.commit('addSlide',newSlide)
 	cleanOrder(store)
 }
 
@@ -231,12 +233,14 @@ export default {
 					})
 				})
 			}
-			let rightrow = document.querySelector('#diff')
+			let rightrow = document.querySelector('.diffbind')
 			if(rightrow) {
 				rightrow.addEventListener('click',function(e){
 					store.commit('choke')
+					console.log(rightrow)
 					next(store)
 				})
+				rightrow.classList.remove('diffbind')
 			}
 			let onbutt = document.querySelectorAll('.view')
 			if(onbutt) {
@@ -340,14 +344,16 @@ export default {
 				"mission": 1,
 				"impact": 2
 			}
-			let id = e.target.dataset.slide
+			let id = e.target.closest('a').dataset.slide
 			this.$store.commit('setID',id)
 			this.$store.commit('setCur',pages[id])
 			if(!document.querySelector('#'+id))
 				await loadSlide(this.$store.state.id,this.$store,false)
-			let dex = e.target.dataset.dex
+			let dex = e.target.closest('a').dataset.dex
 			let count = document.querySelector('#viewer').dataset.count
 			goto(dex,id,this.$store)
+			document.querySelector('#explore').style.opacity='0';
+			document.querySelector('#explore').style.pointerEvents='none';
 		},
 		novert: function(e) {
 			document.querySelector('#logo').style.opacity = '1'
