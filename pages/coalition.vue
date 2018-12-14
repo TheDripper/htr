@@ -1,7 +1,7 @@
 <template>
 <div id=frame>
 	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper">
-		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/' +slide.img+ ')' }" v-html="slide.mark">
+		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark">
 		</div>
 	</div>
 	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
@@ -15,7 +15,7 @@
 
 <div id=explore>
 <ul id=menu>
-<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/'+slide.id+'/'">{{ slide.name }}</a></li>
+<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/dist/'+slide.id+'/'">{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
 <img id=close src=~/assets/close.svg @click="nomob" />
@@ -54,7 +54,7 @@ const prev = (curslide,store) => {
 		store.commit('prev')
 		let prevdex = Number(store.state.current)
 		let prevID = store.state.allslides[prevdex].id
-		window.history.pushState(null,'','/'+prevID+'/')
+		window.history.pushState(null,'','/dist/'+prevID+'/')
 		if(!document.querySelector('#'+prevID))
 			loadSlide(prevID,store,true)
 	}
@@ -72,7 +72,7 @@ const next = async (curslide,store) => {
 		store.commit('next')
 		let nextdex = Number(store.state.current)
 		let nextID = store.state.allslides[nextdex].id
-		window.history.pushState(null,'','/'+nextID+'/')
+		window.history.pushState(null,'','/dist/'+nextID+'/')
 		console.log(store.state.current)
 		console.log(count)
 		if(store.state.current == count) {
@@ -82,7 +82,7 @@ const next = async (curslide,store) => {
 }
 const loadSlide = async function(id,store,isPrev) {
 	console.log(id)
-	let nextMark = await axios(window.location.origin+'/'+id+'.html')
+	let nextMark = await axios(window.location.origin+'/dist/'+id+'.html')
 	let newSlide = {
 		id: id,
 		mark: nextMark.data,
@@ -150,15 +150,6 @@ export default {
 			{
 				id: 'coalition',
 				name: "Coalition"
-			}
-		]
-		let home = await axios('/home.html')
-		let index = [
-			{
-				id: 'home',
-				name: 'Home',
-				mark: home.data,
-				img: 'one.png'
 			}
 		]
 		//let id = this.route.name.replace(/\//g, "");

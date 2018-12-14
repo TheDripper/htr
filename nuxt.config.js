@@ -5,9 +5,9 @@ module.exports = {
   //env: {
   //      baseUrl: 'http://localhost:3000'
   //},
-  //router: {
-  //        base: '/dist/'
-  //},
+  router: {
+          base: '/dist/'
+  },
 
   /*
   ** Headers of the page

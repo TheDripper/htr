@@ -5,6 +5,7 @@ const createStore = () => {
     state: () => ({
       current: 0,
       vert: false,
+      choke: false,
       slides: [],
       allslides: [],
       mark: '',
@@ -39,6 +40,9 @@ const createStore = () => {
       },
       setCur(state,data) {
 	      state.current=data
+      },
+      choke(state) {
+        state.choke ? state.choke = false : state.choke = true
       }
 
     }

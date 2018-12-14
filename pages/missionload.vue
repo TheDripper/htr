@@ -5,7 +5,7 @@
 		<h4 class=name>{{ slide.name }}</h4>
 		<h1>{{ slide.text }}</h1>
 		<p>{{ slide.copy }}</p>
-		<a v-if="slide.butt" class=opener @click='vert'>{{ slide.name }}<img src=~/assets/down.png /></a>
+		<a v-if="slide.butt" class="opener bindme" @click='vert'>{{ slide.name }}<img src=/dist/down.png /></a>
 		<div class=subs>
 		<div class=sub v-for="(sub,index) in slide.subs" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +sub.img+ ')' }" :id="sub.id">
 			<h4>{{ sub.name }}</h4>
@@ -187,30 +187,6 @@ export default {
 				name: "Coalition"
 			}
 		]
-		//let slides = [
-		//	{
-		//		id: 'home',
-		//		name: 'Home',
-		//		mark: home.data,
-		//		img: 'one.png'
-		//	}
-		//]
-		//let id = new URL(window.location).pathname.replace(/\//g, "");
-		//let pages = {
-		//	"home": 0,
-		//	"mission": 1,
-		//	"coalition": 2
-		//}
-		//if(id) {
-		//	context.store.commit('setID',id)
-		//	context.store.commit('setCur',pages[id])
-		//	loadSlide(context.store.state.id,context.store,false)
-		//} else {
-		//	loadSlide('home',context.store,false)
-		//	context.store.commit
-		//}
-		//context.store.commit('loadAll',allslides);
-
 	},
 	methods: {
 		novert: function(e) {

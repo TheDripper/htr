@@ -1,7 +1,7 @@
 <template>
 <div id=frame>
 	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper">
-		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/' +slide.img+ ')' }" v-html="slide.mark">
+		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark">
 		</div>
 	</div>
 	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
@@ -15,7 +15,7 @@
 
 <div id=explore>
 <ul id=menu>
-<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/'+slide.id+'/'">{{ slide.name }}</a></li>
+<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" :href="'/dist/'+slide.id+'/'">{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
 <img id=close src=~/assets/close.svg @click="nomob" />
@@ -29,6 +29,20 @@
 
 <script>
 const axios = require('axios')
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+}
 const throttle = (func, limit) => {
   let inThrottle
   return function() {
@@ -41,7 +55,7 @@ const throttle = (func, limit) => {
     }
   }
 }
-const prev = (curslide,store) => {
+const prev = (store) => {
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
@@ -54,14 +68,19 @@ const prev = (curslide,store) => {
 		store.commit('prev')
 		let prevdex = Number(store.state.current)
 		let prevID = store.state.allslides[prevdex].id
-		window.history.pushState(null,'','/'+prevID+'/')
 		if(!document.querySelector('#'+prevID))
 			loadSlide(prevID,store,true)
+		if(prevID=='home')
+			window.history.pushState(null,'','/dist/')
+		else
+			window.history.pushState(null,'','/dist/'+prevID+'/')
 	}
+	setTimeout(()=>{
+		store.commit('choke')
+	},800)
 }
 
-const next = async (curslide,store) => {
-	console.log('test')
+const next = async (store) => {
 	var view = document.querySelector('#viewer');
 	var slide = view.firstChild;
 	var count = view.dataset.count;
@@ -72,17 +91,17 @@ const next = async (curslide,store) => {
 		store.commit('next')
 		let nextdex = Number(store.state.current)
 		let nextID = store.state.allslides[nextdex].id
-		window.history.pushState(null,'','/'+nextID+'/')
-		console.log(store.state.current)
-		console.log(count)
+		window.history.pushState(null,'','/dist/'+nextID+'/')
 		if(store.state.current == count) {
 			loadSlide(nextID,store,false)
 		}
 	}
+	setTimeout(()=>{
+		store.commit('choke')
+	},800)
 }
 const loadSlide = async function(id,store,isPrev) {
-	console.log(id)
-	let nextMark = await axios(window.location.origin+'/'+id+'.html')
+	let nextMark = await axios(window.location.origin+'/dist/'+id+'.html')
 	let newSlide = {
 		id: id,
 		mark: nextMark.data,
@@ -100,6 +119,13 @@ const vert = function(e,store) {
 	store.commit('vert')
 	document.querySelector('#back').style.opacity='1'
 	document.querySelector('#back').style.pointerEvents='auto'
+}
+const spinner = function(e){
+	document.getElementById('circle').dataset.cur=e.target.id
+	document.getElementById('blocktext').textContent = e.target.dataset.copy
+	document.getElementById('green').src = '/dist/green'+e.target.id+'.png'
+	document.querySelector('.big').classList.remove('big')
+	e.target.classList.add('big')
 }
 
 export default {
@@ -122,22 +148,51 @@ export default {
 				});
 				last.classList.remove('bindme')
 			}
+			let spin = document.querySelectorAll('.bindspin')
+			if(spin) {
+				spin.forEach(img=>{
+					img.addEventListener('click',function(e){
+						spinner(e)
+					})
+				})
+			}
+			let trace = document.querySelector('#tracerow')
+			if(trace) {
+				trace.addEventListener('click',function(e){
+					next(store)
+				})
+			}
+			let onbutt = document.querySelectorAll('.view')
+			if(onbutt) {
+				onbutt.forEach(butt=>{
+					butt.addEventListener('click',function(e){
+						document.querySelector('#storycont').dataset.mode=e.target.dataset.view
+						document.querySelector('.on').classList.remove('on')
+						e.target.classList.add('on')
+					})
+				})
+			}
 		}
 	},
 	async created() {
 		if(process.browser) {
 		let vuestance = this
-		document.addEventListener('wheel',throttle(function(e){
+		document.addEventListener('wheel',function(e){
+			e.preventDefault();
+			console.log(e.deltaY)
 			if(!vuestance.$store.state.vert) {
 				var view = document.querySelector('#viewer');
-				let curslide = view.childNodes[vuestance.$store.state.current]
-				if (e.deltaY > 0) {
-					prev(curslide,vuestance.$store)
-				} else if (e.deltaY < 0) {
-					next(curslide,vuestance.$store)
+				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
+					vuestance.$store.commit('choke')
+					prev(vuestance.$store)
+				} else if (e.deltaY < 0 && !vuestance.$store.state.choke) {
+					vuestance.$store.commit('choke')
+					next(vuestance.$store)
+				} else {
+					return;
 				}
 			}
-		},1000));
+		})
 		let allslides = [
 			{
 				id: 'home',
@@ -148,62 +203,34 @@ export default {
 				name: "Mission",
 			},
 			{
-				id: 'coalition',
-				name: "Coalition"
+				id: 'impact',
+				name: "Impact"
 			}
 		]
-		let home = await axios('/home.html')
-		let index = [
-			{
-				id: 'home',
-				name: 'Home',
-				mark: home.data,
-				img: 'one.png'
-			}
-		]
-		//let id = this.route.name.replace(/\//g, "");
-		let id = 'home'
+		let id = window.location.pathname.split('/').filter(dir=>{
+			return dir != ''
+		})
+		id = id[id.length-1]
+		if(id=='dist')
+			id='home'
 		let pages = {
 			"home": 0,
 			"mission": 1,
-			"coalition": 2
+			"impact": 2
 		}
 		if(id) {
 			this.$store.commit('setID',id)
 			this.$store.commit('setCur',pages[id])
 			loadSlide(this.$store.state.id,this.$store,false)
 		} else {
-			console.log(this.$store.state.current)
 			this.$store.commit('setCur',0)
-			console.log(this.route.name)
 			$store.commit('addSlide',index)
 			//loadSlide('index',this.$store,false)
 		}
 		this.$store.commit('loadAll',allslides);
 		}
-
 	},
 	methods: {
-		//next: async () => {
-		//	console.log('test')
-		//	var view = document.querySelector('#viewer');
-		//	var slide = view.firstChild;
-		//	var count = view.dataset.count;
-		//	if(store.state.current < store.state.allslides.length - 1) {
-		//		var curMarg = Number(slide.style.marginLeft.slice(0,-2));
-		//		curMarg -= 100;
-		//		slide.style.marginLeft = curMarg+'vw';
-		//		store.commit('next')
-		//		let nextdex = Number(store.state.current)
-		//		let nextID = store.state.allslides[nextdex].id
-		//		window.history.pushState(null,'','/'+nextID+'/')
-		//		console.log(store.state.current)
-		//		console.log(count)
-		//		if(store.state.current == count) {
-		//			loadSlide(nextID,store,false)
-		//		}
-		//	}
-		//},
 		novert: function(e) {
 			document.querySelector('.open').style.transform="translateY(100%)"
 			document.querySelector('.open').classList.remove('open')
@@ -224,11 +251,10 @@ export default {
 				var view = document.querySelector('#viewer');
 				var slide = view.firstChild;
 				var count = view.dataset.count;
-				let curslide = view.childNodes[this.$store.state.current]
 				if(e=='left') {
-					next(curslide,this)
+					next(this.$store)
 				} else if(e=='right') {
-					prev(curslide,this)
+					prev(this.$store)
 				}
 			}
 		}
@@ -236,7 +262,7 @@ export default {
 	}
 }
 </script>
-<style>
+<style lang="scss">
 #frame {
 	width: 100vw;
 	height: 100vh;
@@ -386,6 +412,8 @@ h4 {
 	align-items: center;
 	flex-direction: column;
 	padding: 0 10vw;
+	background-size: cover;
+	background-position: center;
 }
 #back {
 	font-size: 43px;
@@ -529,25 +557,38 @@ h4 {
 #prevslide {
 	transition: all 0.3s ease;
 }
+#dot {
+	background-image: url('/dist/dot.png');
+	width: 318px;
+	height: 216px;
+	background-size: cover;
+	transform: translate(20px,110px);
+}
 #trace {
-	width: 894px;
+	width: 890px;
 	position: absolute;
-	top: 50%;
+	top: 8vh;
 	left: 50%;
-	transform: translate(-50%,-50%);
+	transform: translateX(-50%);
+	opacity: 0.6;
 }
 #tracerow {
 	position: absolute;
 	bottom: -70px;
 	left: 50%;
 	width: 416px;
+	cursor: pointer;
 }
 #rightrow {
-	position: absolute;
-	bottom: 10vh;
-	left: 50%;
-	transform: translateX(-50%) rotate(270deg);
+	width: 80px;
+	margin-left: 40px;
 
+}
+#diff {
+	display: flex;
+	position: absolute;
+	align-items: center;
+	transform: translateY(22vh);
 }
 #photos {
 	position: absolute;
@@ -556,7 +597,335 @@ h4 {
 	width: 100vw;
 
 }
+#circle {
+	z-index: 3000;
+	width: 470px;
+	height: 470px;
+	position: absolute;
+	right: 15%;
+	max-width: 100%;
+	img {
+		transition: all 0.4s ease;
+		width: 100px;
+		cursor: pointer;
+		&.big {
+			width: 150px;
+		}
+		@media(max-width:600px) {
+			width: 60px;
+			&.big {
+				width: 80px;
+			}
+		}
+	}
+	&[data-cur=seeds] {
+		#seeds {
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+		#hands {
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+		}
+		#lake {
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+		#heart {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			transform: translateY(-50%);
+		}
+	}
+&[data-cur=lake] {
+		#lake {
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+		#heart {
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+		}
+		#seeds {
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+		#hands {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			transform: translateY(-50%);
+		}
+}
+	&[data-cur=hands] {
+		#hands {
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+		#lake {
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+		}
+		#heart {
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+		#seeds {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			transform: translateY(-50%);
+		}
+	}
+	&[data-cur=heart] {
+		#heart {
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+		#seeds {
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+		}
+		#hands {
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+		#lake {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			transform: translateY(-50%);
+		}
+	}
+	@media(max-width:1150px) {
+		position: relative;
+		order: 1;
+		right: auto;
+	}
+}
+#mission_how {
+	h1 {
+		font-size: 40px !important;
+	}
+	h4, h1, p {
+		width: 50%;
+		padding-right: 50px;
+		@media(max-width:1200px) {
+			width: 50%;
+		}
+		@media(max-width:1150px) {
+			width: 100%;
+			max-width: none;
+		}
+	}
+	align-items: flex-start;
+	@media(max-width:1400px) {
+		padding-left: 20px;
+	}
+	@media(max-width:1150px) {
+		height: auto;
+		flex-direction: column;
+		padding: 20px;
+		align-items: center;
+	}
+}
+#copyblock {
+	width: 40%;
+	height: 250px;
+	background: url('/dist/copyblock.png');
+	background-size: cover;
+	padding: 20px;
+	display: flex;
+	font-size: 17px;
+	color: #444830;
+	align-items: center;
+	padding-top: 40px;
+	@media(max-width:1200px) {
+		width: 60%;
+	}
+	@media(max-width:1150px) {
+		order: 2;
+		width: 100%;
+		p {
+			font-size: 12px;
+		}
+	}
+}
+#blocktext {
+	width: 100% !important;
+	color: #444830 !important;
+	padding: 0 !important;
+	font-size: 14px;
+}
+#green {
+	width: 100px;
+	margin-right: 20px;
+}
+#photos {
+	width: 100vw;
+	height: 100vh;
+	background-size: cover;
+	background-position: 100% 50%;
+}
+#mission_why {
+	h1, p, h4 {
+		color: #ECE5C9;
+		position: relative;
+		z-index: 55;
+	}
+}
+[data-current=mission] + #logolink {
+		display: none;
+}
+#impact_map {
+	h1, p, h4, a {
+		color: #373930;
+	}
+}
+#impact {
+	align-items: flex-start;
+	h1, p, h4, a {
+		text-align: left;
+	}
 
+}
+#map {
+	width: 700px;
+	flex-shrink: 0;
+}
+#impact_map {
+	flex-direction: row;
+}
+#impact_stories {
+	background-color: #D8CFB7;
+	flex-direction: row;
+}
+#onestory {
+	width: 512px;
+	height: 352px;
+}
+#twostory {
+	width: 297px;
+	height: 446px;
+}
+#threestory {
+	width: 379px;
+	height: 253px;
+}
+#fourstory {
+	width: 249px;
+	height: 373px;
+}
+#fivestory {
+	width: 465px;
+	height: 375px;
+}
+.paper {
+	background-image: url('/dist/paper.png');
+	padding: 12px 10px;
+}
+#collage {
+	display: flex; 
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	align-items: flex-end;
+}
+.open .sub {
+	height: auto;
+	min-height: 100vh;
+}
+#storycont {
+	transition: all 0.3s ease;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	&[data-mode=map] {
+		#collage {
+			display: none;
+		}
+	}
+	&[data-mode=collage] {
+		#stories {
+			display: none;
+		}
+	}
+	width: 60%;
+	flex-shrink: 0;
+}
+#papeone {
+	transform: translate(-60px,150px);
+	z-index: 2;
+}
+#papethree {
+	transform: translate(0,-150px);
+}
+#papefive {
+	transform: translate(-60%,-200px);
+	z-index: 10;
+}
+#storyswitch {
+	margin-top: 40px;
+	width: 600px;
+	display: flex;
+	cursor: pointer;
+	div {
+		width: 50%;
+		height: 65px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		text-transform: uppercase;
+		background: #E6E5E0;
+		font-family: "flamaSemi";
+		color: #444444;
+		&.on {
+			background: #444444;
+			color: #E6E5E0;
+		}
+	}
+}
+#stories {
+	width: 800px;
+}
+#diff h2 {
+		font-family: "heart" !important;	
+		color: #ECE5C9;
+		font-size: 40px;
+}
+@font-face {
+	font-family: "heart";
+	src: url('/dist/heartone.ttf')
+}
+.slide {
+	h1, h4, p {
+		z-index: 99;
+	}
+}
 
 </style>
 

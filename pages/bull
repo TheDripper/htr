@@ -1,0 +1,211 @@
+#mission_how {
+	h1 {
+		font-size: 40px !important;
+	}
+	h4, h1, p {
+		width: 50%;
+		padding-right: 50px;
+	}
+	align-items: flex-start;
+	padding-left: 15vw;
+	@media(max-width:1400px) {
+		padding: 0 80px;
+		padding-left: 20vw;
+	}
+}
+#copyblock {
+	width: 400px;
+	height: 350px;
+	background: url('/dist/copyblock.png');
+	padding: 20px;
+	display: flex;
+	font-size: 17px;
+	color: #444830;
+	align-items: center;
+	padding-top: 40px;
+}
+#blocktext {
+	width: 100% !important;
+	color: #444830 !important;
+	padding: 0 !important;
+	font-size: 14px;
+}
+#green {
+	width: 100px;
+	margin-right: 20px;
+}
+@media(max-width:1400px) {
+	#logo {
+		display: none;
+	}
+	#mission_how {
+		padding-left: 20px;
+		p {
+			font-size: 14px;
+		}
+	}
+	.bindspin {
+
+	}
+}
+@media(max-width:1100px) {
+	#mission_how {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		height: auto;
+		padding: 20px;
+		h1, h4, p {
+			width: 100%;
+		}
+	}
+	#circle {
+		position: relative;
+		right: auto;
+	}
+	#copyblock {
+		margin: 40px 0;
+	}
+}
+@media(max-width:400px) {
+	#copyblock {
+		font-size: 12px;
+	}
+}
+#photos {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+
+}
+#circle {
+	z-index: 3000;
+	width: 450px;
+	height: 450px;
+	position: absolute;
+	right: 15%;
+	max-width: 590px;
+	max-height: 590px;
+	img {
+		transition: all 0.4s ease;
+		width: 100px;
+	}
+	&[data-cur=seeds] {
+		#seeds {
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 180px;
+		}
+		#hands {
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+		}
+		#lake {
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+		#heart {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			transform: translateY(-50%);
+		}
+	}
+&[data-cur=lake] {
+		#lake {
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 180px;
+		}
+		#heart {
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+			width: 135px;
+		}
+		#seeds {
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 135px;
+		}
+		#hands {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			transform: translateY(-50%);
+			width: 135px;
+		}
+}
+	&[data-cur=hands] {
+		#hands {
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 180px;
+		}
+		#lake {
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+			width: 135px;
+		}
+		#heart {
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 135px;
+		}
+		#seeds {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			transform: translateY(-50%);
+			width: 135px;
+		}
+	}
+	&[data-cur=heart] {
+		#heart {
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 180px;
+		}
+		#seeds {
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+			width: 135px;
+		}
+		#hands {
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 135px;
+		}
+		#lake {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			transform: translateY(-50%);
+			width: 135px;
+		}
+	}
+}
