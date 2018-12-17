@@ -5,7 +5,8 @@
 		</div>
 	</div>
 	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
-	<div id=back @click="novert"><img src=/dist/back.svg />BACK</div>
+	<div id=back @click=novert($event,false)><img src=/dist/back.svg />BACK</div>
+	<div id=next @click=novert($event,true)><img src=/dist/next.svg />NEXT</div>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <nav>
 <ul id=dots>
@@ -38,6 +39,7 @@
 </template>
 
 <script>
+
 
 
 function cleanOrder(store) {
@@ -109,12 +111,16 @@ const up = (store) => {
 }
 const down = (store) => {
 	let sub = document.querySelector('.open').firstChild
-	console.log(sub)
 	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
-	if(curMarg > sub.children.length-1 * 100) {
+	console.log(curMarg)
+	console.log((sub.children.length - 1) * -100)
+	if(curMarg > ((sub.children.length - 1) * -100)) {
 		curMarg -= 100;
-		console.log(curMarg)
 		sub.style.marginTop = curMarg + 'vh'
+	}
+	if(curMarg == ((sub.children.length - 1) * -100)) {
+		document.querySelector('#next').style.opacity='1'
+		document.querySelector('#next').style.pointerEvents='auto'
 	}
 	setTimeout(()=>{
 		store.commit('choke')
@@ -371,7 +377,7 @@ export default {
 				//}
 			}
 		},
-		novert: function(e) {
+		novert: function(e,showNext) {
 			document.querySelector('#logo').style.opacity = '1'
 			document.querySelector('#logo').style.pointerEvents = 'auto'
 			document.querySelector('.open').style.transform="translateY(100%)"
@@ -380,6 +386,13 @@ export default {
 			this.$store.commit('vert')
 			document.querySelector('#back').style.opacity='0'
 			document.querySelector('#back').style.pointerEvents='none'
+			document.querySelector('#next').style.opacity='0'
+			document.querySelector('#next').style.pointerEvents='none'
+			console.log(this.$store.state.vert)
+			if(showNext) {
+				this.$store.commit('choke')
+				next(this.$store)
+			}
 		},
 		mob: function(e) {
 			document.querySelector('#explore').style.opacity='1';
@@ -469,14 +482,30 @@ export default {
 		display: flex;
 		&:hover {
 			.dot {
-				width: 20px;
-				height: 20px;
+  				animation: pulse 1s infinite;
 			}
 		}
 	}
 	.active {
 		transition: all 0.3s ease;
 	}
+}
+.element {
+}
+
+@keyframes pulse {
+  0% {
+	  width: 14px;
+	  height: 14px;
+  }
+  50% {
+	width: 20px;
+	height: 20px;
+  }
+  100% {
+	  width: 14px;
+	  height: 14px;
+  }
 }
 #dots > li {
 	display: flex;
@@ -646,6 +675,29 @@ h4 {
 	position: fixed;
 	bottom: 10px;
 	left: 10px;
+	opacity: 0;
+	transition: all 0.3s ease;
+	font-family: "flamaSemi";
+	pointer-events: none;
+	z-index: 20;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	img {
+		width: 40px;
+		margin-right: 10px;
+	}
+
+}
+#next {
+	background: rgba(0,0,0,0.7);
+	padding: 10px;
+	font-size: 16px;
+	text-transform: uppercase;
+	color: #ECE5D1;
+	position: fixed;
+	bottom: 10px;
+	left: 130px;
 	opacity: 0;
 	transition: all 0.3s ease;
 	font-family: "flamaSemi";
