@@ -5,9 +5,10 @@
 		</div>
 	</div>
 	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
-	<div id=back @click="novert"><img src=/dist/back.svg />BACK</div>
+	<div id=back @click=novert($event,false)><img src=/dist/back.svg />BACK</div>
+	<div id=next @click=novert($event,true)><img src=/dist/next.svg />NEXT</div>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
-<nav>
+<nav :data-id="$store.state.id" :data-open="$store.state.vert">
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
 <div class=wrap>
@@ -16,8 +17,8 @@
 </span>
 </a>
 </div>
-	<ul class=subdots >
-	<li v-for="sub in slide.subs" @click=tab($event,true) :data-slide="slide.id" >+{{ sub.name }}<span class=subdot></span></li>
+	<ul class=subdots>
+	<li v-for="(sub,index) in slide.subs" @click=tab($event,true) :data-slide="slide.id" :data-subdex="index">{{ sub.name }}<span class=subdot></span></li>
 	</ul>
 </li>
 </ul>
@@ -40,6 +41,7 @@
 <script>
 
 
+
 function cleanOrder(store) {
 	let viewer = document.querySelector('#viewer').childNodes
 	let slides = store.state.slides
@@ -55,9 +57,9 @@ function cleanOrder(store) {
 }
 
 
-function goto(dex,id,store) {
+function goto(id,store) {
 	let view = document.querySelector('#viewer')
-	let targ = 0
+	let targ = null 
 	for(var i=0; i<view.childNodes.length; i++) {
 		if(view.childNodes[i].id==id)
 			targ = i
@@ -66,6 +68,10 @@ function goto(dex,id,store) {
 	let first = document.querySelector('.slide')
 	let newMarg = targ * -100
 	first.style.marginLeft = newMarg + 'vw' 
+	if(id=='home')
+		window.history.pushState(null,'','/dist/')
+	else
+		window.history.pushState(null,'','/dist/'+id+'/')
 }
 
 const axios = require('axios')
@@ -96,21 +102,29 @@ const throttle = (func, limit) => {
   }
 }
 const up = (store) => {
-	let subs = document.querySelector('.open')
-	var curMarg = Number(subs.style.transform.replace(/\D/g,'')) * -1
+	let sub = document.querySelector('.open').firstChild
+	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
 	if(curMarg < 0) {
 		curMarg += 100;
-		subs.style.transform='translateY('+curMarg+'vh)'
+		sub.style.marginTop = curMarg + 'vh'
 	}
+	document.querySelector('#next').style.opacity='0'
+	document.querySelector('#next').style.pointerEvents='none'
 	setTimeout(()=>{
 		store.commit('choke')
 	},1100)
 }
 const down = (store) => {
-	let subs = document.querySelector('.open')
-	var curMarg = Number(subs.style.transform.replace(/\D/g,''))
+	let sub = document.querySelector('.open').firstChild
+	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
+	if(curMarg > ((sub.children.length - 1) * -100)) {
 		curMarg -= 100;
-		subs.style.transform='translateY('+curMarg+'vh)'
+		sub.style.marginTop = curMarg + 'vh'
+	}
+	if(curMarg == ((sub.children.length - 1) * -100)) {
+		document.querySelector('#next').style.opacity='1'
+		document.querySelector('#next').style.pointerEvents='auto'
+	}
 	setTimeout(()=>{
 		store.commit('choke')
 	},1100)
@@ -128,6 +142,7 @@ const prev = (store) => {
 		store.commit('prev')
 		let prevdex = Number(store.state.current)
 		let prevID = store.state.allslides[prevdex].id
+		store.commit('setID',prevID)
 		if(!document.querySelector('#'+prevID))
 			loadSlide(prevID,store,true)
 		if(prevID=='home')
@@ -152,6 +167,8 @@ const next = async (store) => {
 		store.commit('next')
 		let nextdex = Number(store.state.current)
 		let nextID = store.state.allslides[nextdex].id
+		console.log(nextID)
+		store.commit('setID',nextID)
 		window.history.pushState(null,'','/dist/'+nextID+'/')
 		if(store.state.current == count) {
 			loadSlide(nextID,store,false)
@@ -179,11 +196,19 @@ const loadSlide = async function(id,store,isPrev) {
 	cleanOrder(store)
 }
 
-const vert = function(e,store) {
+const vert = function(id,store,subdex) {
 	document.querySelector('#logo').style.opacity = '0'
 	document.querySelector('#logo').style.pointerEvents = 'none'
-	e.target.parentNode.querySelector('.subs').classList.add('open')
-	e.target.parentNode.querySelector('.subs').style.transform = "translateY(0%)"
+	document.querySelectorAll('.subs').forEach(sub=>{
+		if(sub.parentNode.id==id) {
+			sub.classList.add('open')
+			sub.style.transform = "translateY(0%)"
+			if(subdex) {
+				let newMarg = Number(subdex) * -100 + 'vh'
+				sub.firstChild.style.marginTop = newMarg
+			}
+		}
+	})
 	store.commit('vert')
 	document.querySelector('#back').style.opacity='1'
 	document.querySelector('#back').style.pointerEvents='auto'
@@ -220,7 +245,8 @@ export default {
 			let store = this.$store
 			if(last) {
 				last.addEventListener('click',function(e){
-					vert(e,store)
+					let id = e.target.closest('.slide').id
+					vert(id,store,0)
 				});
 				last.classList.remove('bindme')
 			}
@@ -250,6 +276,17 @@ export default {
 					})
 				})
 			}
+			let timebutt = document.querySelectorAll('.time')
+			if(timebutt) {
+				timebutt.forEach(butt=>{
+					butt.addEventListener('click',function(e){
+						document.querySelector('.timeon').classList.remove('timeon')
+						e.target.classList.add('timeon')
+					})
+				})
+			}
+			let mappins = document.querySelectorAll('.cls-9').forEach(pin=>{
+			})
 		}
 	},
 	async created() {
@@ -259,6 +296,7 @@ export default {
 		document.addEventListener('wheel',function(e){
 			if(!vuestance.$store.state.vert) {
 				e.preventDefault();
+				console.log(vuestance.$store.state.id)
 				var view = document.querySelector('#viewer');
 				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
 					vuestance.$store.commit('choke')
@@ -334,33 +372,55 @@ export default {
 	methods: {
 		tab: async function(e,sub) {
 			e.preventDefault();
+			if(this.$store.state.vert)
+				this.$store.commit('vert')
 			let id = e.target.closest('.tab').dataset.slide
 			let pages = this.$store.state.pages
 			this.$store.commit('setID',id)
 			this.$store.commit('setCur',pages[id])
 			if(!document.querySelector('#'+id))
 				await loadSlide(this.$store.state.id,this.$store,false)
-			let dex = e.target.closest('.tab').dataset.dex
-			let count = document.querySelector('#viewer').dataset.count
-			goto(dex,id,this.$store)
+			setTimeout(()=>{
+				goto(id,this.$store)
+			},50)
 			document.querySelector('#explore').style.opacity='0';
 			document.querySelector('#explore').style.pointerEvents='none';
+			document.querySelector('#back').style.opacity='0';
+			document.querySelector('#back').style.pointerEvents='none';
+			document.querySelector('#next').style.opacity='0';
+			document.querySelector('#next').style.pointerEvents='none';
+			if(document.querySelector('.open')) {
+				document.querySelector('.open').style.transform = 'translateY(100%)'
+				document.querySelector('.open').firstChild.style.marginTop = '0'
+				document.querySelector('.open').classList.remove('open')
+			}
 			let subs = document.querySelectorAll('.subs')
 			if(sub) {
-				for(var i=0; i<subs.length; i++) {
-					if(subs[i].parentNode.id==id)
-						subs[i].style.transform='translate(0)'
-				}
+				let subdex = e.target.dataset.subdex
+				vert(id,this.$store,subdex)
+				//for(var i=0; i<subs.length; i++) {
+				//	if(subs[i].parentNode.id==id) {
+				//		subs[i].style.transform='translate(0)'
+				//		vert(id,this.$store)
+				//	}
+				//}
 			}
 		},
-		novert: function(e) {
+		novert: function(e,showNext) {
 			document.querySelector('#logo').style.opacity = '1'
 			document.querySelector('#logo').style.pointerEvents = 'auto'
 			document.querySelector('.open').style.transform="translateY(100%)"
+			document.querySelector('.open').firstChild.style.marginTop = '0'
 			document.querySelector('.open').classList.remove('open')
 			this.$store.commit('vert')
 			document.querySelector('#back').style.opacity='0'
 			document.querySelector('#back').style.pointerEvents='none'
+			document.querySelector('#next').style.opacity='0'
+			document.querySelector('#next').style.pointerEvents='none'
+			if(showNext) {
+				this.$store.commit('choke')
+				next(this.$store)
+			}
 		},
 		mob: function(e) {
 			document.querySelector('#explore').style.opacity='1';
@@ -450,14 +510,30 @@ export default {
 		display: flex;
 		&:hover {
 			.dot {
-				width: 20px;
-				height: 20px;
+  				animation: pulse 1s infinite;
 			}
 		}
 	}
 	.active {
 		transition: all 0.3s ease;
 	}
+}
+.element {
+}
+
+@keyframes pulse {
+  0% {
+	  width: 14px;
+	  height: 14px;
+  }
+  50% {
+	width: 20px;
+	height: 20px;
+  }
+  100% {
+	  width: 14px;
+	  height: 14px;
+  }
 }
 #dots > li {
 	display: flex;
@@ -493,6 +569,7 @@ export default {
     		height: calc(22vh - 14px);
     		justify-content: space-around;
     		padding: 50px 0px;
+		transition: all 0.2s ease;
 		li {
 			position: relative;
 			color: #ECE5C9;
@@ -548,6 +625,20 @@ export default {
 	width: 20px;
 	height: 20px;
 }
+
+[data-id=impact][data-open=true] {
+	#dots > li a {
+		color: #24261c;
+	}
+	.dot {
+		border-color: #24261c !important;
+	}
+	.active .dot {
+		color: #24261c;
+		border-color: #24261c;
+		background: #24261c !important;
+	}
+}
 nav{
 	position: fixed;
 	right: 20px;
@@ -560,6 +651,9 @@ nav{
 	max-width: 80%;
 	line-height: 1;
 	margin-bottom: 40px;
+	@media(max-width:800px) {
+		margin-bottom: 20px;
+	}
 }
 .slide p {
 	max-width: 80%;
@@ -607,6 +701,7 @@ h4 {
 	z-index: 20;
 }
 .sub {
+	transition: all 0.4s ease;
 	width: 100vw;
 	height: 100vh;
 	display: flex;
@@ -626,6 +721,29 @@ h4 {
 	position: fixed;
 	bottom: 10px;
 	left: 10px;
+	opacity: 0;
+	transition: all 0.3s ease;
+	font-family: "flamaSemi";
+	pointer-events: none;
+	z-index: 20;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	img {
+		width: 40px;
+		margin-right: 10px;
+	}
+
+}
+#next {
+	background: rgba(0,0,0,0.7);
+	padding: 10px;
+	font-size: 16px;
+	text-transform: uppercase;
+	color: #ECE5D1;
+	position: fixed;
+	bottom: 10px;
+	left: 130px;
 	opacity: 0;
 	transition: all 0.3s ease;
 	font-family: "flamaSemi";
@@ -682,6 +800,9 @@ h4 {
 	position: absolute;
 	top: 30px;
 	right: 70px;
+	@media(max-width:1660px) {
+		right: 20px;
+	}
 }
 #explore {
 	width: 100vw;
@@ -728,7 +849,7 @@ h4 {
 }
 #home .name {
 }
-@media(max-width:1100px) {
+@media(max-width:1660px) {
 	#dots {
 		padding: 10px;
 	}
@@ -760,11 +881,7 @@ h4 {
 		font-size: 12px;
 		margin-bottom: 40px;
 	}
-	#logo {
-		width: 60px;
-		top: 10px;
-		left: 10px;
-	}
+	
 	#home p {
 		font-size: 15px;
 	}
@@ -1117,30 +1234,21 @@ h4 {
 }
 #impact_map {
 	flex-direction: row;
+	background: #c8dadb !important;
 }
 #impact_stories {
 	background-color: #D8CFB7;
 	flex-direction: row;
 }
 #onestory {
-	width: 512px;
-	height: 352px;
 }
 #twostory {
-	width: 297px;
-	height: 446px;
 }
 #threestory {
-	width: 379px;
-	height: 253px;
 }
 #fourstory {
-	width: 249px;
-	height: 373px;
 }
 #fivestory {
-	width: 465px;
-	height: 375px;
 }
 .paper {
 	background-image: url('/dist/paper.png');
@@ -1148,13 +1256,13 @@ h4 {
 }
 #collage {
 	display: flex; 
-	flex-wrap: wrap;
 	justify-content: flex-end;
 	align-items: flex-end;
 }
 .open .sub {
 	height: auto;
 	min-height: 100vh;
+	position: relative;
 }
 #storycont {
 	transition: all 0.3s ease;
@@ -1185,7 +1293,7 @@ h4 {
 	transform: translate(-60%,-200px);
 	z-index: 10;
 }
-#storyswitch {
+#storyswitch, #timeswitch {
 	margin-top: 40px;
 	width: 600px;
 	display: flex;
@@ -1200,7 +1308,7 @@ h4 {
 		background: #E6E5E0;
 		font-family: "flamaSemi";
 		color: #444444;
-		&.on {
+		&.on, &.timeon {
 			background: #444444;
 			color: #E6E5E0;
 		}
@@ -1237,6 +1345,13 @@ h4 {
 #logo {
 	transition: all 0.2s ease;
 }
+@media(max-width:800px) {
+	#logo {
+		width: 60px;
+		top: 15px;
+		left: 20px;
+	}
+}
 #home {
 	order: 1;
 }
@@ -1248,8 +1363,103 @@ h4 {
 }
 #contact {
 	order: 4;
+	flex-direction: row;
+	h1, h4, p {
+		text-align: left;
+	}
+	#formcont {
+		width: 50%;
+		.field {
+			display: flex;
+		}
+		.control {
+			width: 100%;
+			padding: 10px;
+		}
+		input, textarea {
+			width: 100%;
+			background: none;
+			appearance: none;
+			border: 2px solid #ece5d1;
+			font-family: "flamaSemi";
+			color: #ece5d1;
+			font-size: 15px;
+			text-transform: uppercase;
+			height: 70px;
+			padding: 20px 40px;
+			&:focus {
+				background: #7e8959;
+			}
+			&::placeholder {
+				color: #ece5d1;
+			}
+		}
+		textarea {
+			height: 150px;
+		}
+		
+	}
+	@media(max-width: 1360px) {
+		#formcont {
+			width: 80%;
+		}
+		p {
+			max-width: none;
+		}
+	}
+	@media(max-width:1100px) {
+		flex-direction: column;
+		align-items: center;
+		#formcont {
+			margin-top: 40px;
+		}
+	}
+	@media(max-width:720px) {
+		align-items: flex-start;
+		padding: 40px 20px;
+		padding-top: 80px;
+		#formcont {
+			width: 80%;
+			margin-top: 0;
+			transform: translateX(-10px)
+		}
+		.field {
+			flex-wrap: wrap;
+			margin-bottom: 0;
+		}
+		.wrap {
+			width: 80%;
+			padding-top: 40px;
+		}
+		h1 {
+			margin-bottom: 0;
+		}
+		p {
+		}
+	}
+	@media(max-width:600px) {
+		padding-right: 0;
+		#formcont {
+			width: 100%;
+		}
+		p{
+			width: 100%;
+		}
+		.wrap {
+			width: 100%;
+		}
+	}
 }
-
+#impact_stories {
+	background-image:url('/dist/leaf.png'),linear-gradient(to top, #d8cfb7, #d8cfb7) !important;
+}
+.cls-9 {
+	cursor: pointer;
+}
+.pin {
+	width: 100px;
+	clip-path: circle(40%);
+}
 </style>
 
 

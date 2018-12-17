@@ -8,7 +8,7 @@
 	<div id=back @click=novert($event,false)><img src=/dist/back.svg />BACK</div>
 	<div id=next @click=novert($event,true)><img src=/dist/next.svg />NEXT</div>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
-<nav>
+<nav :data-id="$store.state.id" :data-open="$store.state.vert">
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
 <div class=wrap>
@@ -17,7 +17,7 @@
 </span>
 </a>
 </div>
-	<ul class=subdots >
+	<ul class=subdots>
 	<li v-for="(sub,index) in slide.subs" @click=tab($event,true) :data-slide="slide.id" :data-subdex="index">{{ sub.name }}<span class=subdot></span></li>
 	</ul>
 </li>
@@ -58,18 +58,20 @@ function cleanOrder(store) {
 
 
 function goto(id,store) {
-	console.log('go')
 	let view = document.querySelector('#viewer')
 	let targ = null 
 	for(var i=0; i<view.childNodes.length; i++) {
 		if(view.childNodes[i].id==id)
 			targ = i
 	}
-	console.log(targ)
 	//store.commit('setCur',dex)
 	let first = document.querySelector('.slide')
 	let newMarg = targ * -100
 	first.style.marginLeft = newMarg + 'vw' 
+	if(id=='home')
+		window.history.pushState(null,'','/dist/')
+	else
+		window.history.pushState(null,'','/dist/'+id+'/')
 }
 
 const axios = require('axios')
@@ -140,6 +142,7 @@ const prev = (store) => {
 		store.commit('prev')
 		let prevdex = Number(store.state.current)
 		let prevID = store.state.allslides[prevdex].id
+		store.commit('setID',prevID)
 		if(!document.querySelector('#'+prevID))
 			loadSlide(prevID,store,true)
 		if(prevID=='home')
@@ -164,6 +167,8 @@ const next = async (store) => {
 		store.commit('next')
 		let nextdex = Number(store.state.current)
 		let nextID = store.state.allslides[nextdex].id
+		console.log(nextID)
+		store.commit('setID',nextID)
 		window.history.pushState(null,'','/dist/'+nextID+'/')
 		if(store.state.current == count) {
 			loadSlide(nextID,store,false)
@@ -189,7 +194,6 @@ const loadSlide = async function(id,store,isPrev) {
 			store.commit('addSlide',newSlide)
 	}
 	cleanOrder(store)
-	console.log('done')
 }
 
 const vert = function(id,store,subdex) {
@@ -272,6 +276,17 @@ export default {
 					})
 				})
 			}
+			let timebutt = document.querySelectorAll('.time')
+			if(timebutt) {
+				timebutt.forEach(butt=>{
+					butt.addEventListener('click',function(e){
+						document.querySelector('.timeon').classList.remove('timeon')
+						e.target.classList.add('timeon')
+					})
+				})
+			}
+			let mappins = document.querySelectorAll('.cls-9').forEach(pin=>{
+			})
 		}
 	},
 	async created() {
@@ -281,6 +296,7 @@ export default {
 		document.addEventListener('wheel',function(e){
 			if(!vuestance.$store.state.vert) {
 				e.preventDefault();
+				console.log(vuestance.$store.state.id)
 				var view = document.querySelector('#viewer');
 				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
 					vuestance.$store.commit('choke')
@@ -356,19 +372,28 @@ export default {
 	methods: {
 		tab: async function(e,sub) {
 			e.preventDefault();
+			if(this.$store.state.vert)
+				this.$store.commit('vert')
 			let id = e.target.closest('.tab').dataset.slide
 			let pages = this.$store.state.pages
 			this.$store.commit('setID',id)
 			this.$store.commit('setCur',pages[id])
 			if(!document.querySelector('#'+id))
 				await loadSlide(this.$store.state.id,this.$store,false)
-			console.log(this.$store.state.slides)
 			setTimeout(()=>{
 				goto(id,this.$store)
 			},50)
-			console.log("TEST")
 			document.querySelector('#explore').style.opacity='0';
 			document.querySelector('#explore').style.pointerEvents='none';
+			document.querySelector('#back').style.opacity='0';
+			document.querySelector('#back').style.pointerEvents='none';
+			document.querySelector('#next').style.opacity='0';
+			document.querySelector('#next').style.pointerEvents='none';
+			if(document.querySelector('.open')) {
+				document.querySelector('.open').style.transform = 'translateY(100%)'
+				document.querySelector('.open').firstChild.style.marginTop = '0'
+				document.querySelector('.open').classList.remove('open')
+			}
 			let subs = document.querySelectorAll('.subs')
 			if(sub) {
 				let subdex = e.target.dataset.subdex
@@ -510,6 +535,18 @@ export default {
 	  height: 14px;
   }
 }
+@keyframes subpulse {
+	0% {
+		background: transparent;
+	}
+	50% {
+		background: white;
+	}
+	100% {
+		background: transparent;
+	}
+
+}
 #dots > li {
 	display: flex;
 	align-items: center;
@@ -553,6 +590,11 @@ export default {
 			display: flex;
 			align-items: center;
 			cursor: pointer;
+			&:hover {
+				.subdot {
+  					animation: subpulse 1s infinite;
+				}
+			}
 		}
 	}
 	.subdot {
@@ -599,6 +641,20 @@ export default {
 	background: white;
 	width: 20px;
 	height: 20px;
+}
+
+[data-id=impact][data-open=true] {
+	#dots > li a {
+		color: #24261c;
+	}
+	.dot {
+		border-color: #24261c !important;
+	}
+	.active .dot {
+		color: #24261c;
+		border-color: #24261c;
+		background: #24261c !important;
+	}
 }
 nav{
 	position: fixed;
@@ -1195,30 +1251,21 @@ h4 {
 }
 #impact_map {
 	flex-direction: row;
+	background: #c8dadb !important;
 }
 #impact_stories {
 	background-color: #D8CFB7;
 	flex-direction: row;
 }
 #onestory {
-	width: 512px;
-	height: 352px;
 }
 #twostory {
-	width: 297px;
-	height: 446px;
 }
 #threestory {
-	width: 379px;
-	height: 253px;
 }
 #fourstory {
-	width: 249px;
-	height: 373px;
 }
 #fivestory {
-	width: 465px;
-	height: 375px;
 }
 .paper {
 	background-image: url('/dist/paper.png');
@@ -1226,7 +1273,6 @@ h4 {
 }
 #collage {
 	display: flex; 
-	flex-wrap: wrap;
 	justify-content: flex-end;
 	align-items: flex-end;
 }
@@ -1264,7 +1310,7 @@ h4 {
 	transform: translate(-60%,-200px);
 	z-index: 10;
 }
-#storyswitch {
+#storyswitch, #timeswitch {
 	margin-top: 40px;
 	width: 600px;
 	display: flex;
@@ -1279,7 +1325,7 @@ h4 {
 		background: #E6E5E0;
 		font-family: "flamaSemi";
 		color: #444444;
-		&.on {
+		&.on, &.timeon {
 			background: #444444;
 			color: #E6E5E0;
 		}
@@ -1420,6 +1466,16 @@ h4 {
 			width: 100%;
 		}
 	}
+}
+#impact_stories {
+	background-image:url('/dist/leaf.png'),linear-gradient(to top, #d8cfb7, #d8cfb7) !important;
+}
+.cls-9 {
+	cursor: pointer;
+}
+.pin {
+	width: 100px;
+	clip-path: circle(40%);
 }
 </style>
 
