@@ -17,7 +17,7 @@
 </a>
 </div>
 	<ul class=subdots >
-	<li v-for="sub in slide.subs" @click=tab($event,true) :data-slide="slide.id" >+{{ sub.name }}<span class=subdot></span></li>
+	<li v-for="(sub,index) in slide.subs" @click=tab($event,true) :data-slide="slide.id" :data-subdex="index">{{ sub.name }}<span class=subdot></span></li>
 	</ul>
 </li>
 </ul>
@@ -96,21 +96,26 @@ const throttle = (func, limit) => {
   }
 }
 const up = (store) => {
-	let subs = document.querySelector('.open')
-	var curMarg = Number(subs.style.transform.replace(/\D/g,'')) * -1
+	let sub = document.querySelector('.open').firstChild
+	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
+	console.log(curMarg)
 	if(curMarg < 0) {
 		curMarg += 100;
-		subs.style.transform='translateY('+curMarg+'vh)'
+		sub.style.marginTop = curMarg + 'vh'
 	}
 	setTimeout(()=>{
 		store.commit('choke')
 	},1100)
 }
 const down = (store) => {
-	let subs = document.querySelector('.open')
-	var curMarg = Number(subs.style.transform.replace(/\D/g,''))
+	let sub = document.querySelector('.open').firstChild
+	console.log(sub)
+	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
+	if(curMarg > sub.children.length-1 * 100) {
 		curMarg -= 100;
-		subs.style.transform='translateY('+curMarg+'vh)'
+		console.log(curMarg)
+		sub.style.marginTop = curMarg + 'vh'
+	}
 	setTimeout(()=>{
 		store.commit('choke')
 	},1100)
@@ -179,11 +184,19 @@ const loadSlide = async function(id,store,isPrev) {
 	cleanOrder(store)
 }
 
-const vert = function(e,store) {
+const vert = function(id,store,subdex) {
 	document.querySelector('#logo').style.opacity = '0'
 	document.querySelector('#logo').style.pointerEvents = 'none'
-	e.target.parentNode.querySelector('.subs').classList.add('open')
-	e.target.parentNode.querySelector('.subs').style.transform = "translateY(0%)"
+	document.querySelectorAll('.subs').forEach(sub=>{
+		if(sub.parentNode.id==id) {
+			sub.classList.add('open')
+			sub.style.transform = "translateY(0%)"
+			if(subdex) {
+				let newMarg = Number(subdex) * -100 + 'vh'
+				sub.firstChild.style.marginTop = newMarg
+			}
+		}
+	})
 	store.commit('vert')
 	document.querySelector('#back').style.opacity='1'
 	document.querySelector('#back').style.pointerEvents='auto'
@@ -220,7 +233,8 @@ export default {
 			let store = this.$store
 			if(last) {
 				last.addEventListener('click',function(e){
-					vert(e,store)
+					let id = e.target.closest('.slide').id
+					vert(id,store,0)
 				});
 				last.classList.remove('bindme')
 			}
@@ -347,16 +361,21 @@ export default {
 			document.querySelector('#explore').style.pointerEvents='none';
 			let subs = document.querySelectorAll('.subs')
 			if(sub) {
-				for(var i=0; i<subs.length; i++) {
-					if(subs[i].parentNode.id==id)
-						subs[i].style.transform='translate(0)'
-				}
+				let subdex = e.target.dataset.subdex
+				vert(id,this.$store,subdex)
+				//for(var i=0; i<subs.length; i++) {
+				//	if(subs[i].parentNode.id==id) {
+				//		subs[i].style.transform='translate(0)'
+				//		vert(id,this.$store)
+				//	}
+				//}
 			}
 		},
 		novert: function(e) {
 			document.querySelector('#logo').style.opacity = '1'
 			document.querySelector('#logo').style.pointerEvents = 'auto'
 			document.querySelector('.open').style.transform="translateY(100%)"
+			document.querySelector('.open').firstChild.style.marginTop = '0'
 			document.querySelector('.open').classList.remove('open')
 			this.$store.commit('vert')
 			document.querySelector('#back').style.opacity='0'
@@ -607,6 +626,7 @@ h4 {
 	z-index: 20;
 }
 .sub {
+	transition: all 0.4s ease;
 	width: 100vw;
 	height: 100vh;
 	display: flex;
@@ -1155,6 +1175,7 @@ h4 {
 .open .sub {
 	height: auto;
 	min-height: 100vh;
+	position: relative;
 }
 #storycont {
 	transition: all 0.3s ease;
