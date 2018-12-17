@@ -57,13 +57,15 @@ function cleanOrder(store) {
 }
 
 
-function goto(dex,id,store) {
+function goto(id,store) {
+	console.log('go')
 	let view = document.querySelector('#viewer')
-	let targ = 0
+	let targ = null 
 	for(var i=0; i<view.childNodes.length; i++) {
 		if(view.childNodes[i].id==id)
 			targ = i
 	}
+	console.log(targ)
 	//store.commit('setCur',dex)
 	let first = document.querySelector('.slide')
 	let newMarg = targ * -100
@@ -100,11 +102,12 @@ const throttle = (func, limit) => {
 const up = (store) => {
 	let sub = document.querySelector('.open').firstChild
 	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
-	console.log(curMarg)
 	if(curMarg < 0) {
 		curMarg += 100;
 		sub.style.marginTop = curMarg + 'vh'
 	}
+	document.querySelector('#next').style.opacity='0'
+	document.querySelector('#next').style.pointerEvents='none'
 	setTimeout(()=>{
 		store.commit('choke')
 	},1100)
@@ -112,8 +115,6 @@ const up = (store) => {
 const down = (store) => {
 	let sub = document.querySelector('.open').firstChild
 	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
-	console.log(curMarg)
-	console.log((sub.children.length - 1) * -100)
 	if(curMarg > ((sub.children.length - 1) * -100)) {
 		curMarg -= 100;
 		sub.style.marginTop = curMarg + 'vh'
@@ -188,6 +189,7 @@ const loadSlide = async function(id,store,isPrev) {
 			store.commit('addSlide',newSlide)
 	}
 	cleanOrder(store)
+	console.log('done')
 }
 
 const vert = function(id,store,subdex) {
@@ -360,9 +362,11 @@ export default {
 			this.$store.commit('setCur',pages[id])
 			if(!document.querySelector('#'+id))
 				await loadSlide(this.$store.state.id,this.$store,false)
-			let dex = e.target.closest('.tab').dataset.dex
-			let count = document.querySelector('#viewer').dataset.count
-			goto(dex,id,this.$store)
+			console.log(this.$store.state.slides)
+			setTimeout(()=>{
+				goto(id,this.$store)
+			},50)
+			console.log("TEST")
 			document.querySelector('#explore').style.opacity='0';
 			document.querySelector('#explore').style.pointerEvents='none';
 			let subs = document.querySelectorAll('.subs')
@@ -388,7 +392,6 @@ export default {
 			document.querySelector('#back').style.pointerEvents='none'
 			document.querySelector('#next').style.opacity='0'
 			document.querySelector('#next').style.pointerEvents='none'
-			console.log(this.$store.state.vert)
 			if(showNext) {
 				this.$store.commit('choke')
 				next(this.$store)
@@ -541,6 +544,7 @@ export default {
     		height: calc(22vh - 14px);
     		justify-content: space-around;
     		padding: 50px 0px;
+		transition: all 0.2s ease;
 		li {
 			position: relative;
 			color: #ECE5C9;
@@ -608,6 +612,9 @@ nav{
 	max-width: 80%;
 	line-height: 1;
 	margin-bottom: 40px;
+	@media(max-width:800px) {
+		margin-bottom: 20px;
+	}
 }
 .slide p {
 	max-width: 80%;
@@ -754,6 +761,9 @@ h4 {
 	position: absolute;
 	top: 30px;
 	right: 70px;
+	@media(max-width:1660px) {
+		right: 20px;
+	}
 }
 #explore {
 	width: 100vw;
@@ -800,7 +810,7 @@ h4 {
 }
 #home .name {
 }
-@media(max-width:1100px) {
+@media(max-width:1660px) {
 	#dots {
 		padding: 10px;
 	}
@@ -832,11 +842,7 @@ h4 {
 		font-size: 12px;
 		margin-bottom: 40px;
 	}
-	#logo {
-		width: 60px;
-		top: 10px;
-		left: 10px;
-	}
+	
 	#home p {
 		font-size: 15px;
 	}
@@ -1310,6 +1316,13 @@ h4 {
 #logo {
 	transition: all 0.2s ease;
 }
+@media(max-width:800px) {
+	#logo {
+		width: 60px;
+		top: 15px;
+		left: 20px;
+	}
+}
 #home {
 	order: 1;
 }
@@ -1321,8 +1334,93 @@ h4 {
 }
 #contact {
 	order: 4;
+	flex-direction: row;
+	h1, h4, p {
+		text-align: left;
+	}
+	#formcont {
+		width: 50%;
+		.field {
+			display: flex;
+		}
+		.control {
+			width: 100%;
+			padding: 10px;
+		}
+		input, textarea {
+			width: 100%;
+			background: none;
+			appearance: none;
+			border: 2px solid #ece5d1;
+			font-family: "flamaSemi";
+			color: #ece5d1;
+			font-size: 15px;
+			text-transform: uppercase;
+			height: 70px;
+			padding: 20px 40px;
+			&:focus {
+				background: #7e8959;
+			}
+			&::placeholder {
+				color: #ece5d1;
+			}
+		}
+		textarea {
+			height: 150px;
+		}
+		
+	}
+	@media(max-width: 1360px) {
+		#formcont {
+			width: 80%;
+		}
+		p {
+			max-width: none;
+		}
+	}
+	@media(max-width:1100px) {
+		flex-direction: column;
+		align-items: center;
+		#formcont {
+			margin-top: 40px;
+		}
+	}
+	@media(max-width:720px) {
+		align-items: flex-start;
+		padding: 40px 20px;
+		padding-top: 80px;
+		#formcont {
+			width: 80%;
+			margin-top: 0;
+			transform: translateX(-10px)
+		}
+		.field {
+			flex-wrap: wrap;
+			margin-bottom: 0;
+		}
+		.wrap {
+			width: 80%;
+			padding-top: 40px;
+		}
+		h1 {
+			margin-bottom: 0;
+		}
+		p {
+		}
+	}
+	@media(max-width:600px) {
+		padding-right: 0;
+		#formcont {
+			width: 100%;
+		}
+		p{
+			width: 100%;
+		}
+		.wrap {
+			width: 100%;
+		}
+	}
 }
-
 </style>
 
 
