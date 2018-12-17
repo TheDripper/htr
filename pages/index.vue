@@ -26,7 +26,7 @@
 
 <div id=explore>
 <ul id=menu>
-<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" @click=tab($event,false) :data-slide="slide.id">{{ slide.name }}</a></li>
+<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" @click=tab($event,false) :data-slide="slide.id" class=tab>{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
 <img id=close src=/dist/close.svg @click="nomob" />
@@ -170,9 +170,7 @@ const next = async (store) => {
 		console.log(nextID)
 		store.commit('setID',nextID)
 		window.history.pushState(null,'','/dist/'+nextID+'/')
-		if(store.state.current == count) {
-			loadSlide(nextID,store,false)
-		}
+		loadSlide(nextID,store,false)
 	}
 	setTimeout(()=>{
 		store.commit('choke')
@@ -342,7 +340,17 @@ export default {
 			},
 			{
 				id: 'impact',
-				name: "Impact"
+				name: "Impact",
+				subs: [
+					{
+						id: 'impact_map',
+						name: "Map"
+					},
+					{
+						id: 'impact_stories',
+						name: 'Stories'
+					}
+				]
 			},
 			{
 				id: 'contact',

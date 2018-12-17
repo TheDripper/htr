@@ -26,22 +26,21 @@
 
 <div id=explore>
 <ul id=menu>
-<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" @click=tab($event,false) :data-slide="slide.id">{{ slide.name }}</a></li>
+<li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" @click=tab($event,false) :data-slide="slide.id" class=tab>{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
 <img id=close src=/dist/close.svg @click="nomob" />
 </div>
-
-
-
-
+<div id=modal>
+</div>
 </div>
 </template>
 
 <script>
-
-
-
+const nomode = ()=>{
+	document.querySelector('#modal').style.opacity = '0'
+	document.querySelector('#modal').style.pointerEvents = 'none'
+}
 function cleanOrder(store) {
 	let viewer = document.querySelector('#viewer').childNodes
 	let slides = store.state.slides
@@ -170,9 +169,7 @@ const next = async (store) => {
 		console.log(nextID)
 		store.commit('setID',nextID)
 		window.history.pushState(null,'','/dist/'+nextID+'/')
-		if(store.state.current == count) {
-			loadSlide(nextID,store,false)
-		}
+		loadSlide(nextID,store,false)
 	}
 	setTimeout(()=>{
 		store.commit('choke')
@@ -285,8 +282,23 @@ export default {
 					})
 				})
 			}
-			let mappins = document.querySelectorAll('.cls-9').forEach(pin=>{
-			})
+			let bindpape = document.querySelectorAll('.bindpape')
+			if(bindpape) {
+				bindpape.forEach(pape=>{
+					pape.addEventListener('click',async (e)=>{
+						let mark = await axios('/dist/'+e.target.id+'.html')
+						mark = mark.data
+						console.log(mark)
+						document.querySelector('#modal').innerHTML = mark
+						document.querySelector('#modal').style.opacity = '1'
+						document.querySelector('#modal').style.pointerEvents = 'auto'
+						document.querySelector('#modeclose').addEventListener('click',e=>{
+							nomode()
+						})
+					})
+					pape.classList.remove('bindpape')
+				})
+			}
 		}
 	},
 	async created() {
@@ -342,7 +354,17 @@ export default {
 			},
 			{
 				id: 'impact',
-				name: "Impact"
+				name: "Impact",
+				subs: [
+					{
+						id: 'impact_map',
+						name: "Map"
+					},
+					{
+						id: 'impact_stories',
+						name: 'Stories'
+					}
+				]
 			},
 			{
 				id: 'contact',
@@ -370,6 +392,7 @@ export default {
 		}
 	},
 	methods: {
+		
 		tab: async function(e,sub) {
 			e.preventDefault();
 			if(this.$store.state.vert)
@@ -535,6 +558,18 @@ export default {
 	  height: 14px;
   }
 }
+@keyframes subpulse {
+	0% {
+		background: transparent;
+	}
+	50% {
+		background: white;
+	}
+	100% {
+		background: transparent;
+	}
+
+}
 #dots > li {
 	display: flex;
 	align-items: center;
@@ -578,6 +613,11 @@ export default {
 			display: flex;
 			align-items: center;
 			cursor: pointer;
+			&:hover {
+				.subdot {
+  					animation: subpulse 1s infinite;
+				}
+			}
 		}
 	}
 	.subdot {
@@ -845,6 +885,13 @@ h4 {
 	position: absolute;
 	top: 30px;
 	right: 110px;
+	width: 27px;
+}
+#modeclose {
+	cursor: pointer;
+	position: absolute;
+	top: 30px;
+	right: 30px;
 	width: 27px;
 }
 #home .name {
@@ -1258,6 +1305,10 @@ h4 {
 	display: flex; 
 	justify-content: flex-end;
 	align-items: flex-end;
+	height: 60vh;
+	position: relative;
+	flex-wrap: wrap;
+	width: 60%;
 }
 .open .sub {
 	height: auto;
@@ -1283,15 +1334,41 @@ h4 {
 	flex-shrink: 0;
 }
 #papeone {
-	transform: translate(-60px,150px);
 	z-index: 2;
+	position: absolute;
+    	top: 0;
+    	left: 0;
+    	width: 30%;
 }
 #papethree {
-	transform: translate(0,-150px);
+    	position: absolute;
+    	left: 50%;
+    	top: 50%;
+    	transform: translate(-50%,-69%);
+    	width: 70%;
 }
 #papefive {
-	transform: translate(-60%,-200px);
+	flex: 40%;
 	z-index: 10;
+    width: 10%;
+    position: absolute;
+    width: 50%;
+    bottom: 0;
+    left: 0;
+}
+#papefour {
+	flex: 50%;
+    width: 50%;
+    transform: translate(25%,30%);
+    position: absolute;
+}
+#papetwo {
+	flex: 20%;
+	width: 60%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translateY(-50%);
 }
 #storyswitch, #timeswitch {
 	margin-top: 40px;
@@ -1459,6 +1536,44 @@ h4 {
 .pin {
 	width: 100px;
 	clip-path: circle(40%);
+}
+#modal {
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	background: rgba(0,0,0,0.6);
+	opacity: 0;
+	pointer-events: none;
+}
+#story {
+	width: 60vw;
+	max-width: 100%;
+	height: 80vh;
+	display: flex;
+	align-items: center;
+	background: #dfe1d2;
+	padding: 20px;
+	position: relative;
+	.paper {
+		width: 400px;
+		flex-shrink: 0;
+		background-size: cover;
+		margin-right: 40px;
+	}
+	h1, h4, p {
+		color: #373930;
+	}
+	h1 {
+		margin-bottom: 0 !important;
+	}
+	h4 {
+		margin-top: 0 !important;
+		margin-bottom: 20px
+	}
 }
 </style>
 
