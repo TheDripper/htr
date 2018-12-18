@@ -279,6 +279,7 @@ export default {
 					butt.addEventListener('click',function(e){
 						document.querySelector('.timeon').classList.remove('timeon')
 						e.target.classList.add('timeon')
+						document.querySelector('#mapmage').src = '/dist/impact_trees_'+e.target.dataset.view+'.svg'
 					})
 				})
 			}
@@ -381,6 +382,7 @@ export default {
 		if(id) {
 			let pagedex = pages[id]
 			this.$store.commit('setID',id)
+			document.querySelector('nav').dataset.id = id
 			this.$store.commit('setCur',pagedex)
 			await loadSlide(this.$store.state.id,this.$store,false)
 		} else {
@@ -669,6 +671,12 @@ export default {
 [data-id=impact][data-open=true] {
 	#dots > li a {
 		color: #24261c;
+	}
+	.subdots li {
+		color: #24261c;
+		.subdot {
+			border-color: #24261c;
+		}
 	}
 	.dot {
 		border-color: #24261c !important;
@@ -1136,43 +1144,58 @@ h4 {
 		@media(max-width:1200px) {
 			width: 50%;
 		}
-		@media(max-width:1150px) {
-			width: 100%;
-			max-width: none;
-		}
 	}
 	align-items: flex-start;
 	@media(max-width:1400px) {
 		padding-left: 20px;
 	}
 	@media(max-width:1150px) {
-		height: auto;
 		flex-direction: column;
-		padding: 20px;
 		align-items: center;
+		.wrap {
+			width: 100%;
+			align-items: center;
+		}
+		h4, h1, p {
+			width: 100%;
+		}
+		#circle {
+			width: 300px;
+			height: 300px;
+			transform: none;
+			margin-left: 20px;
+			img {
+				width: 80px;
+			}
+		}
+		#copyblock {
+			width: 50%;
+		}
+	}
+	@media(max-width:900px) {
+		.bot {
+			flex-direction: column;
+		}
+		#circle {
+			order: 1;
+		}
+		#copyblock {
+			order: 2;
+		}
 	}
 }
 #copyblock {
 	width: 40%;
-	height: 250px;
 	background: url('/dist/copyblock.png');
 	background-size: cover;
 	padding: 20px;
+	padding-bottom: 25px;
+	margin-top: 10px;
 	display: flex;
 	font-size: 17px;
 	color: #444830;
 	align-items: center;
 	padding-top: 40px;
-	@media(max-width:1200px) {
-		width: 60%;
-	}
-	@media(max-width:1150px) {
-		order: 2;
-		width: 100%;
-		p {
-			font-size: 12px;
-		}
-	}
 }
 #blocktext {
 	width: 100% !important;
@@ -1183,6 +1206,13 @@ h4 {
 #green {
 	width: 100px;
 	margin-right: 20px;
+}
+.bot {
+	display: flex;
+	align-items: center;
+	#circle {
+		transform: translateY(-30%)
+	}
 }
 #photos {
 	position: absolute;
@@ -1276,12 +1306,33 @@ h4 {
 
 }
 #map {
-	width: 700px;
-	flex-shrink: 0;
 }
 #impact_map {
 	flex-direction: row;
 	background: #c8dadb !important;
+	#map {
+		padding: 0 20px;
+		width: 50%;
+	}
+	@media(max-width:1520px) {
+		flex-direction: column;
+		#map {
+			order: 1;
+			margin-bottom: 40px;
+			width: 70% !important;
+		}	
+		.wrap {
+			order: 2;
+		}
+	}
+	@media(max-width:955px) {
+		.wrap {
+			align-self: center;
+		}
+	}
+}
+#timeswitch {
+	margin-top: 40px;
 }
 #impact_stories {
 	background-color: #D8CFB7;
@@ -1575,7 +1626,40 @@ h4 {
 		margin-bottom: 20px
 	}
 }
+@media(max-height:780px) {
+	#logo {
+		top: 15px;
+		left: 15px;
+		width: 70px;
+	}
+	#ex {
+		top: 15px;
+	}
+	#dots {
+		height: 77vh;
+	}
+	.subdots {
+		height: calc(30vh - 14px);
+	}
+	.opener {
+		bottom: 20px;
+	}
+	.slide h1 {
+		font-size: 56px;
+		margin-bottom: 20px;
+	}
+	.slide p {
+		font-size: 14px;
+	}
+	#mission_how {
+		h1 {
+			font-size: 30px !important;
+		}
+	}
+}
 </style>
+
+
 
 
 

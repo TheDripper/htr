@@ -31,17 +31,16 @@
 <img id=flower src=~/assets/flower.svg />
 <img id=close src=/dist/close.svg @click="nomob" />
 </div>
-
-
-
-
+<div id=modal>
+</div>
 </div>
 </template>
 
 <script>
-
-
-
+const nomode = ()=>{
+	document.querySelector('#modal').style.opacity = '0'
+	document.querySelector('#modal').style.pointerEvents = 'none'
+}
 function cleanOrder(store) {
 	let viewer = document.querySelector('#viewer').childNodes
 	let slides = store.state.slides
@@ -283,8 +282,23 @@ export default {
 					})
 				})
 			}
-			let mappins = document.querySelectorAll('.cls-9').forEach(pin=>{
-			})
+			let bindpape = document.querySelectorAll('.bindpape')
+			if(bindpape) {
+				bindpape.forEach(pape=>{
+					pape.addEventListener('click',async (e)=>{
+						let mark = await axios('/dist/'+e.target.id+'.html')
+						mark = mark.data
+						console.log(mark)
+						document.querySelector('#modal').innerHTML = mark
+						document.querySelector('#modal').style.opacity = '1'
+						document.querySelector('#modal').style.pointerEvents = 'auto'
+						document.querySelector('#modeclose').addEventListener('click',e=>{
+							nomode()
+						})
+					})
+					pape.classList.remove('bindpape')
+				})
+			}
 		}
 	},
 	async created() {
@@ -378,6 +392,7 @@ export default {
 		}
 	},
 	methods: {
+		
 		tab: async function(e,sub) {
 			e.preventDefault();
 			if(this.$store.state.vert)
@@ -872,6 +887,13 @@ h4 {
 	right: 110px;
 	width: 27px;
 }
+#modeclose {
+	cursor: pointer;
+	position: absolute;
+	top: 30px;
+	right: 30px;
+	width: 27px;
+}
 #home .name {
 }
 @media(max-width:1660px) {
@@ -1114,43 +1136,58 @@ h4 {
 		@media(max-width:1200px) {
 			width: 50%;
 		}
-		@media(max-width:1150px) {
-			width: 100%;
-			max-width: none;
-		}
 	}
 	align-items: flex-start;
 	@media(max-width:1400px) {
 		padding-left: 20px;
 	}
 	@media(max-width:1150px) {
-		height: auto;
 		flex-direction: column;
-		padding: 20px;
 		align-items: center;
+		.wrap {
+			width: 100%;
+			align-items: center;
+		}
+		h4, h1, p {
+			width: 100%;
+		}
+		#circle {
+			width: 300px;
+			height: 300px;
+			transform: none;
+			margin-left: 20px;
+			img {
+				width: 80px;
+			}
+		}
+		#copyblock {
+			width: 50%;
+		}
+	}
+	@media(max-width:900px) {
+		.bot {
+			flex-direction: column;
+		}
+		#circle {
+			order: 1;
+		}
+		#copyblock {
+			order: 2;
+		}
 	}
 }
 #copyblock {
 	width: 40%;
-	height: 250px;
 	background: url('/dist/copyblock.png');
 	background-size: cover;
 	padding: 20px;
+	padding-bottom: 25px;
+	margin-top: 10px;
 	display: flex;
 	font-size: 17px;
 	color: #444830;
 	align-items: center;
 	padding-top: 40px;
-	@media(max-width:1200px) {
-		width: 60%;
-	}
-	@media(max-width:1150px) {
-		order: 2;
-		width: 100%;
-		p {
-			font-size: 12px;
-		}
-	}
 }
 #blocktext {
 	width: 100% !important;
@@ -1161,6 +1198,13 @@ h4 {
 #green {
 	width: 100px;
 	margin-right: 20px;
+}
+.bot {
+	display: flex;
+	align-items: center;
+	#circle {
+		transform: translateY(-30%)
+	}
 }
 #photos {
 	position: absolute;
@@ -1283,6 +1327,10 @@ h4 {
 	display: flex; 
 	justify-content: flex-end;
 	align-items: flex-end;
+	height: 60vh;
+	position: relative;
+	flex-wrap: wrap;
+	width: 60%;
 }
 .open .sub {
 	height: auto;
@@ -1308,15 +1356,41 @@ h4 {
 	flex-shrink: 0;
 }
 #papeone {
-	transform: translate(-60px,150px);
 	z-index: 2;
+	position: absolute;
+    	top: 0;
+    	left: 0;
+    	width: 30%;
 }
 #papethree {
-	transform: translate(0,-150px);
+    	position: absolute;
+    	left: 50%;
+    	top: 50%;
+    	transform: translate(-50%,-69%);
+    	width: 70%;
 }
 #papefive {
-	transform: translate(-60%,-200px);
+	flex: 40%;
 	z-index: 10;
+    width: 10%;
+    position: absolute;
+    width: 50%;
+    bottom: 0;
+    left: 0;
+}
+#papefour {
+	flex: 50%;
+    width: 50%;
+    transform: translate(25%,30%);
+    position: absolute;
+}
+#papetwo {
+	flex: 20%;
+	width: 60%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translateY(-50%);
 }
 #storyswitch, #timeswitch {
 	margin-top: 40px;
@@ -1485,7 +1559,77 @@ h4 {
 	width: 100px;
 	clip-path: circle(40%);
 }
+#modal {
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	background: rgba(0,0,0,0.6);
+	opacity: 0;
+	pointer-events: none;
+}
+#story {
+	width: 60vw;
+	max-width: 100%;
+	height: 80vh;
+	display: flex;
+	align-items: center;
+	background: #dfe1d2;
+	padding: 20px;
+	position: relative;
+	.paper {
+		width: 400px;
+		flex-shrink: 0;
+		background-size: cover;
+		margin-right: 40px;
+	}
+	h1, h4, p {
+		color: #373930;
+	}
+	h1 {
+		margin-bottom: 0 !important;
+	}
+	h4 {
+		margin-top: 0 !important;
+		margin-bottom: 20px
+	}
+}
+@media(max-height:780px) {
+	#logo {
+		top: 15px;
+		left: 15px;
+		width: 70px;
+	}
+	#ex {
+		top: 15px;
+	}
+	#dots {
+		height: 77vh;
+	}
+	.subdots {
+		height: calc(30vh - 14px);
+	}
+	.opener {
+		bottom: 20px;
+	}
+	.slide h1 {
+		font-size: 56px;
+		margin-bottom: 20px;
+	}
+	.slide p {
+		font-size: 14px;
+	}
+	#mission_how {
+		h1 {
+			font-size: 30px !important;
+		}
+	}
+}
 </style>
+
 
 
 
