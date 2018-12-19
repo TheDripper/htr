@@ -307,6 +307,9 @@ export default {
 		
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
+			if(e.target.closest('#formcont')) {
+				return 
+			}
 			if(!vuestance.$store.state.vert) {
 				e.preventDefault();
 				console.log(vuestance.$store.state.id)
@@ -644,15 +647,15 @@ export default {
 
 	
 	
-	//&:after {
-	//	content: '';
-	//	border-right: 1px solid white;
-	//	height: calc(12vh - 14px);
-	//	position: absolute;
-	//	top: 0;
-	//	left: 50%;
-	//	transform: translate(-50%,14px);
-	//}
+	&:after {
+		content: '';
+		border-right: 1px solid white;
+		height: calc(12vh - 14px);
+		position: absolute;
+		top: 0;
+		left: 50%;
+		transform: translate(-50%,14px);
+	}
 }
 #dots {
 	.active {
@@ -1306,28 +1309,55 @@ h4 {
 
 }
 #map {
+	max-width: 760px;
 }
 #impact_map {
 	flex-direction: row;
 	background: #c8dadb !important;
+	justify-content: space-between;
 	#map {
 		padding: 0 20px;
 		width: 50%;
 	}
 	@media(max-width:1520px) {
 		flex-direction: column;
+		justify-content: center;
+		padding: 20px;
 		#map {
-			order: 1;
 			margin-bottom: 40px;
 			width: 70% !important;
 		}	
 		.wrap {
-			order: 2;
+			align-self: flex-start;
+			width: 40%;
 		}
 	}
-	@media(max-width:955px) {
+	@media(max-width:1200px) {
+		#timeswitch div {
+			height: 40px;
+		}
+	}
+	@media(max-width:1055px) {
+		justify-content: center;
 		.wrap {
 			align-self: center;
+			width: 70%;
+		}
+		#map {
+			transform: none !important;
+		}
+		#timeswitch {
+			max-width: 100%;
+			margin-bottom: 20px;
+		}
+			max-width: 760px;
+	}
+	@media(max-width:600px) {
+		.wrap {
+			width: 100%;
+		}
+		#map {
+			width: 100% !important;
 		}
 	}
 }
@@ -1371,9 +1401,9 @@ h4 {
 	flex-wrap: wrap;
 	width: 60%;
 	max-height: 400px;
+
 }
 .open .sub {
-	height: auto;
 	min-height: 100vh;
 	position: relative;
 }
@@ -1396,7 +1426,7 @@ h4 {
 	flex-shrink: 0;
 }
 #storysvg {
-	width: 90%;
+	width: 100%;
 }
 #stories {
 	width: 100%;
@@ -1469,16 +1499,26 @@ h4 {
 @media(max-width:1660px) {
 	#collage {
 		max-height: 40vh;
-		transform: translate(-10%,30%)
+		transform: translate(20%,30%);
+		pointer-events: auto;
+		min-height: 60vh;
 	}
 	#impact_stories {
+		padding: 40px;
 		justify-content: flex-start;
+		.wrap {
+			align-self: flex-start;
+		}
 	}
 	#storycont {
 		margin-top: 20px;
+		pointer-events: none;
+		position: absolute;
+		left: 30%;
+		top: 12%;
 	}
 }
-@media(max-width:700px) {
+@media(max-width:1200px) {
 	#impact_stories {
 		h1 {
 			font-size: 40px;
@@ -1486,7 +1526,24 @@ h4 {
 		}
 	}
 	#storycont {
+		position: relative;
+		top: auto;
+		left: auto;
+		width: 80%;
+	}
+	#collage {
+		min-height: 0;
+	}
+}
+@media(max-width:700px) {
+	#impact_stories {
+		padding: 20px;
+	}
+	#storycont {
 		width: 100%;
+	}
+	#collage {
+		transform: translate(-10%,30%);
 	}
 }
 
@@ -1534,11 +1591,23 @@ h4 {
 #impact {
 	order: 3;
 }
+#downcont {
+	position: relative;
+	width: 92%;
+	display: none;
+	h4 {
+		text-align: right !important;
+		padding-right: 30px;
+	}
+}
 #contact {
 	order: 4;
 	flex-direction: row;
 	h1, h4, p {
 		text-align: left;
+	}
+	#downform {
+		display: none;
 	}
 	#formcont {
 		width: 50%;
@@ -1548,6 +1617,7 @@ h4 {
 		.control {
 			width: 100%;
 			padding: 10px;
+			text-align: center;
 		}
 		input, textarea {
 			width: 100%;
@@ -1570,11 +1640,32 @@ h4 {
 		textarea {
 			height: 150px;
 		}
+		#submit {
+			max-width: 500px;
+			margin: 0 auto;
+			cursor: pointer;
+			width: 50%;
+			padding: 0;
+			&:hover {
+				background: #ece5d1;
+				color: black;
+			}
+		}
 		
 	}
 	@media(max-width: 1360px) {
 		#formcont {
 			width: 80%;
+			input {
+				height: 40px;
+			}
+		}
+		h1 {
+			white-space: nowrap;
+			font-size: 40px;
+		}
+		.field {
+			margin-bottom: 0;
 		}
 		p {
 			max-width: none;
@@ -1582,44 +1673,73 @@ h4 {
 	}
 	@media(max-width:1100px) {
 		flex-direction: column;
-		align-items: center;
+		align-items: flex-start;
+		h1 {
+			margin-bottom: 0;
+		}
 		#formcont {
-			margin-top: 40px;
 		}
 	}
-	@media(max-width:720px) {
-		align-items: flex-start;
-		padding: 40px 20px;
-		padding-top: 80px;
+	//@media(max-width:720px) {
+	//	padding: 80px 20px;
+	//	.field {
+	//		flex-wrap: wrap;
+	//		margin-bottom: 0;
+	//	}
+	//	#formcont {
+	//		input {
+	//			height: 40px;
+	//		}
+	//	}
+	//	.wrap {
+	//		width: 80%;
+	//		padding-top: 40px;
+	//	}
+	//	h1 {
+	//		margin-bottom: 0;
+	//	}
+	//	p {
+	//	}
+	//}
+	@media(max-width:600px) {
+		padding-right: 0;
+		h1 {
+			font-size: 20px;
+		}
 		#formcont {
-			width: 80%;
-			margin-top: 0;
-			transform: translateX(-10px)
+			width: 95%;
+			height: 200px;
+			overflow: scroll;
+			flex-shrink: 0;
+			position: relative;
+			input {
+				height: 40px;
+			}
+			.control {
+				width: 100%;
+			}
+			
+		}
+		#downcont {
+			display: block;
+		}
+		#downform {
+			display: block;
+			position: absolute;
+			right: 0;
+			top: 0;
+			width: 20px;
 		}
 		.field {
 			flex-wrap: wrap;
 			margin-bottom: 0;
 		}
-		.wrap {
-			width: 80%;
-			padding-top: 40px;
-		}
-		h1 {
-			margin-bottom: 0;
-		}
-		p {
-		}
-	}
-	@media(max-width:600px) {
-		padding-right: 0;
-		#formcont {
-			width: 100%;
-		}
 		p{
-			width: 100%;
+			width: 95%;
+			margin-bottom: 10px;
 		}
 		.wrap {
-			width: 100%;
+			width: 95%;
 		}
 	}
 }
@@ -1673,9 +1793,9 @@ h4 {
 }
 @media(max-height:780px) {
 	#logo {
-		top: 15px;
-		left: 15px;
-		width: 70px;
+		top: 5px;
+		left: 5px;
+		width: 50px;
 	}
 	#ex {
 		top: 15px;
@@ -1705,12 +1825,10 @@ h4 {
 	}
 	#impact_map {
 		#map {
-			width: 40% !important;
 		}
 	}
 	
 	#stories {
-		width: 70%;
 	}
 	#storyswitch div {
 		height: 40px;

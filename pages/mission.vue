@@ -1306,28 +1306,55 @@ h4 {
 
 }
 #map {
+	max-width: 760px;
 }
 #impact_map {
 	flex-direction: row;
 	background: #c8dadb !important;
+	justify-content: space-between;
 	#map {
 		padding: 0 20px;
 		width: 50%;
 	}
 	@media(max-width:1520px) {
 		flex-direction: column;
+		justify-content: center;
+		padding: 20px;
 		#map {
-			order: 1;
 			margin-bottom: 40px;
 			width: 70% !important;
 		}	
 		.wrap {
-			order: 2;
+			align-self: flex-start;
+			width: 40%;
 		}
 	}
-	@media(max-width:955px) {
+	@media(max-width:1200px) {
+		#timeswitch div {
+			height: 40px;
+		}
+	}
+	@media(max-width:1055px) {
+		justify-content: center;
 		.wrap {
 			align-self: center;
+			width: 70%;
+		}
+		#map {
+			transform: none !important;
+		}
+		#timeswitch {
+			max-width: 100%;
+			margin-bottom: 20px;
+		}
+			max-width: 760px;
+	}
+	@media(max-width:600px) {
+		.wrap {
+			width: 100%;
+		}
+		#map {
+			width: 100% !important;
 		}
 	}
 }
@@ -1371,9 +1398,9 @@ h4 {
 	flex-wrap: wrap;
 	width: 60%;
 	max-height: 400px;
+
 }
 .open .sub {
-	height: auto;
 	min-height: 100vh;
 	position: relative;
 }
@@ -1396,7 +1423,7 @@ h4 {
 	flex-shrink: 0;
 }
 #storysvg {
-	width: 90%;
+	width: 100%;
 }
 #stories {
 	width: 100%;
@@ -1469,16 +1496,26 @@ h4 {
 @media(max-width:1660px) {
 	#collage {
 		max-height: 40vh;
-		transform: translate(-10%,30%)
+		transform: translate(20%,30%);
+		pointer-events: auto;
+		min-height: 60vh;
 	}
 	#impact_stories {
+		padding: 40px;
 		justify-content: flex-start;
+		.wrap {
+			align-self: flex-start;
+		}
 	}
 	#storycont {
 		margin-top: 20px;
+		pointer-events: none;
+		position: absolute;
+		left: 30%;
+		top: 12%;
 	}
 }
-@media(max-width:700px) {
+@media(max-width:1200px) {
 	#impact_stories {
 		h1 {
 			font-size: 40px;
@@ -1486,7 +1523,24 @@ h4 {
 		}
 	}
 	#storycont {
+		position: relative;
+		top: auto;
+		left: auto;
+		width: 80%;
+	}
+	#collage {
+		min-height: 0;
+	}
+}
+@media(max-width:700px) {
+	#impact_stories {
+		padding: 20px;
+	}
+	#storycont {
 		width: 100%;
+	}
+	#collage {
+		transform: translate(-10%,30%);
 	}
 }
 
@@ -1705,12 +1759,10 @@ h4 {
 	}
 	#impact_map {
 		#map {
-			width: 40% !important;
 		}
 	}
 	
 	#stories {
-		width: 70%;
 	}
 	#storyswitch div {
 		height: 40px;
