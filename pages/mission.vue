@@ -216,6 +216,10 @@ const spinner = function(e){
 	document.getElementById('green').src = '/dist/green'+e.target.id+'.png'
 	document.querySelector('.big').classList.remove('big')
 	e.target.classList.add('big')
+	if(window.innerWidth < 900) {
+		document.querySelector('#shader').style.opacity = '1'
+		document.querySelector('#shader').style.pointerEvents = 'auto';
+	}
 }
 
 export default {
@@ -319,6 +323,13 @@ export default {
 
 				})
 			}
+			let noshade = document.querySelector('#closeshade')
+			if(noshade) {
+				noshade.addEventListener('click',e=>{
+					document.querySelector('#shader').style.opacity = '0'
+					document.querySelector('#shader').style.pointerEvents = 'none'
+				})
+			}
 		}
 	},
 	async created() {
@@ -326,9 +337,6 @@ export default {
 		
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
-			if(e.target.closest('#formcont')) {
-				return 
-			}
 			if(!vuestance.$store.state.vert) {
 				e.preventDefault();
 				console.log(vuestance.$store.state.id)
@@ -544,6 +552,12 @@ export default {
 	height: 100%;
 	pointer-events: none;
 }
+#closeshade {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	width: 27px;
+}
 #lime {
 	background: lime;
 }
@@ -559,15 +573,16 @@ export default {
 	align-items: flex-end;
 	height: 66vh;
 	justify-content: space-between;
-	padding: 40px;
-	padding-right: 80px;
+	padding-right: 65px;
 	.wrap {
 		display: flex;
-		&:hover {
-			.dot {
-  				animation: pulse 1s infinite;
+	}
+	li:not(.active) {
+			&:hover {
+				.dot {
+  					animation: pulse 1s infinite;
+				}
 			}
-		}
 	}
 	.active {
 		transition: all 0.3s ease;
@@ -604,6 +619,13 @@ export default {
 	align-items: center;
 	flex-direction: column;
 	position: relative;
+	height: calc(22vh + 2px);
+	flex-shrink: 0;
+	overflow: hidden;
+	&:not(:first-child) {
+		margin-top: -2px;
+	}
+
 	a {
 		color: #ECE5C9;
 		font-family: "flamaSemi";
@@ -619,6 +641,14 @@ export default {
 		.dot:after {
 			display: none;
 		}
+	}
+	&:not(:last-child):after {
+		content: '';
+		border-right: 1px solid #ECE5C9;
+		position: absolute;
+		top: 15px;
+		right: 8px;
+		height: 100%;
 	}
 }
 	.subdots {
@@ -668,21 +698,12 @@ export default {
 	position: relative;
 	overflow: visible;
 	flex-shrink: 0;
-
-	
-	
-	//&:after {
-	//	content: '';
-	//	border-right: 1px solid #ECE5C9;
-	//	height: 22vh;
-	//	position: absolute;
-	//	top: 14px;
-	//	left: 50%;
-	//	transform: translateX(-1px);
-	//}
 }
 #dots {
 	.active {
+		padding-top: 2px;
+		.dot {
+		}
 		.subdots {
 			opacity: 1;
 			pointer-events: auto;
@@ -720,6 +741,10 @@ nav{
 	top: 50%;
 	transform: translateY(-50%);
 	z-index: 40;
+	//background-image: url('/dist/lines.svg');
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
 }
 .slide h1 {
 	text-align: center;
@@ -1195,9 +1220,6 @@ h4 {
 				width: 80px;
 			}
 		}
-		#copyblock {
-			width: 50%;
-		}
 	}
 	@media(max-width:900px) {
 		.bot {
@@ -1210,9 +1232,18 @@ h4 {
 			order: 2;
 		}
 	}
+	@media(max-width:600px) {
+		h1 {
+			padding: 0;
+			margin-bottom: 5px;
+			font-size: 18px !important;
+		}
+		p {
+			font-size: 10px !important;
+		}
+	}
 }
 #copyblock {
-	width: 40%;
 	background: url('/dist/copyblock.png');
 	background-size: cover;
 	padding: 20px;
@@ -1223,6 +1254,25 @@ h4 {
 	color: #444830;
 	align-items: center;
 	padding-top: 40px;
+}
+#shader {
+	width: 40%;
+	@media(max-width:1150px) {
+		width: 50%;
+	}
+	@media(max-width:900px) {
+		opacity: 0;
+		pointer-events: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+		padding: 5vh;
+		padding-bottom: 20vh;
+	}
 }
 #blocktext {
 	width: 100% !important;
@@ -1901,6 +1951,8 @@ h4 {
 	}
 }
 </style>
+
+
 
 
 

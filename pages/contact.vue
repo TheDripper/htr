@@ -559,15 +559,16 @@ export default {
 	align-items: flex-end;
 	height: 66vh;
 	justify-content: space-between;
-	padding: 40px;
-	padding-right: 80px;
+	padding-right: 65px;
 	.wrap {
 		display: flex;
-		&:hover {
-			.dot {
-  				animation: pulse 1s infinite;
+	}
+	li:not(.active) {
+			&:hover {
+				.dot {
+  					animation: pulse 1s infinite;
+				}
 			}
-		}
 	}
 	.active {
 		transition: all 0.3s ease;
@@ -604,6 +605,13 @@ export default {
 	align-items: center;
 	flex-direction: column;
 	position: relative;
+	height: calc(22vh + 2px);
+	flex-shrink: 0;
+	overflow: hidden;
+	&:not(:first-child) {
+		margin-top: -2px;
+	}
+
 	a {
 		color: #ECE5C9;
 		font-family: "flamaSemi";
@@ -619,6 +627,14 @@ export default {
 		.dot:after {
 			display: none;
 		}
+	}
+	&:not(:last-child):after {
+		content: '';
+		border-right: 1px solid #ECE5C9;
+		position: absolute;
+		top: 15px;
+		right: 8px;
+		height: 100%;
 	}
 }
 	.subdots {
@@ -668,21 +684,12 @@ export default {
 	position: relative;
 	overflow: visible;
 	flex-shrink: 0;
-
-	
-	
-	//&:after {
-	//	content: '';
-	//	border-right: 1px solid #ECE5C9;
-	//	height: 22vh;
-	//	position: absolute;
-	//	top: 14px;
-	//	left: 50%;
-	//	transform: translateX(-1px);
-	//}
 }
 #dots {
 	.active {
+		padding-top: 2px;
+		.dot {
+		}
 		.subdots {
 			opacity: 1;
 			pointer-events: auto;
@@ -720,6 +727,10 @@ nav{
 	top: 50%;
 	transform: translateY(-50%);
 	z-index: 40;
+	//background-image: url('/dist/lines.svg');
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
 }
 .slide h1 {
 	text-align: center;
@@ -1901,6 +1912,7 @@ h4 {
 	}
 }
 </style>
+
 
 
 
