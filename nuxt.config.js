@@ -8,7 +8,15 @@ module.exports = {
   router: {
           base: '/dist/'
   },
-
+  generate: {
+	  minify: false
+  },
+  html: {
+	  minify: {
+		  minifyCSS: false,
+		  minifyJS: false
+	  }
+  },
   /*
   ** Headers of the page
   */
@@ -21,7 +29,8 @@ module.exports = {
       { hid: 'robots', name: 'robots', content: 'noindex' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', type:'text/css', href:'/dist/global.css' }
     ]
   },
 

@@ -300,6 +300,25 @@ export default {
 					pape.classList.remove('bindpape')
 				})
 			}
+			let bindmess = document.querySelector('.bindmess')
+			if(bindmess) {
+				bindmess.addEventListener('click',e=>{
+					document.querySelector('#formcont').classList.add('full')
+					document.querySelector('#ex').style.display='none'
+					document.querySelector('#nomess').style.display='block'
+					document.querySelector('#logo').style.display='none'
+				})
+			}
+			let nomess = document.querySelector('#nomess')
+			if(nomess) {
+				nomess.addEventListener('click',e=>{
+					document.querySelector('#formcont').classList.remove('full')
+					document.querySelector('#ex').style.display='inherit'
+					document.querySelector('#nomess').style.display='none'
+					document.querySelector('#logo').style.display='inherit'
+
+				})
+			}
 		}
 	},
 	async created() {
@@ -307,6 +326,9 @@ export default {
 		
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
+			if(e.target.closest('#formcont')) {
+				return 
+			}
 			if(!vuestance.$store.state.vert) {
 				e.preventDefault();
 				console.log(vuestance.$store.state.id)
@@ -467,6 +489,14 @@ export default {
 					this.$store.commit('choke')
 					prev(this.$store)
 				}
+			} else {
+				if(e=='top') {
+					this.$store.commit('choke')
+					down(this.$store)
+				} else if (e=='bottom') {
+					this.$store.commit('choke')
+					up(this.$store)
+				}
 			}
 		}
 
@@ -548,16 +578,13 @@ export default {
 
 @keyframes pulse {
   0% {
-	  width: 14px;
-	  height: 14px;
+	  background: transparent;
   }
   50% {
-	width: 20px;
-	height: 20px;
+	  background: #ECE5C9;
   }
   100% {
-	  width: 14px;
-	  height: 14px;
+	  background: transparent;
   }
 }
 @keyframes subpulse {
@@ -635,7 +662,7 @@ export default {
 	height: 14px;
 	border-radius: 50%;
 	background: transparent;
-	border: 1px solid white;
+	border: 1px solid #ECE5C9;
 	transition: all 0.3s ease;
 	margin-left: 20px;
 	position: relative;
@@ -646,12 +673,12 @@ export default {
 	
 	//&:after {
 	//	content: '';
-	//	border-right: 1px solid white;
-	//	height: calc(12vh - 14px);
+	//	border-right: 1px solid #ECE5C9;
+	//	height: 22vh;
 	//	position: absolute;
-	//	top: 0;
+	//	top: 14px;
 	//	left: 50%;
-	//	transform: translate(-50%,14px);
+	//	transform: translateX(-1px);
 	//}
 }
 #dots {
@@ -663,7 +690,7 @@ export default {
 	}
 }
 #dots li.active .dot {
-	background: white;
+	background: #ECE5C9;
 	width: 20px;
 	height: 20px;
 }
@@ -1588,11 +1615,24 @@ h4 {
 #impact {
 	order: 3;
 }
+#downcont {
+	position: relative;
+	width: 100%;
+	display: none;
+	h4 {
+		text-align: center !important;
+		height: 40px;
+		border: 2px solid #ece5d1;
+	}
+}
 #contact {
 	order: 4;
 	flex-direction: row;
 	h1, h4, p {
 		text-align: left;
+	}
+	#downform {
+		display: none;
 	}
 	#formcont {
 		width: 50%;
@@ -1602,6 +1642,7 @@ h4 {
 		.control {
 			width: 100%;
 			padding: 10px;
+			text-align: center;
 		}
 		input, textarea {
 			width: 100%;
@@ -1624,11 +1665,42 @@ h4 {
 		textarea {
 			height: 150px;
 		}
+		#submit {
+			max-width: 500px;
+			margin: 0 auto;
+			cursor: pointer;
+			width: 50%;
+			padding: 0;
+			&:hover {
+				background: #ece5d1;
+				color: black;
+			}
+		}
+		h4 {
+			height: 40px;
+			border: 2px solid #ECE5C9;
+			text-align: center;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			display: none;
+		}
 		
 	}
 	@media(max-width: 1360px) {
 		#formcont {
 			width: 80%;
+			input {
+				height: 40px;
+			}
+		}
+		h1 {
+			white-space: nowrap;
+			font-size: 40px;
+		}
+		.field {
+			margin-bottom: 0;
 		}
 		p {
 			max-width: none;
@@ -1636,46 +1708,106 @@ h4 {
 	}
 	@media(max-width:1100px) {
 		flex-direction: column;
-		align-items: center;
+		align-items: flex-start;
+		h1 {
+			margin-bottom: 0;
+		}
 		#formcont {
-			margin-top: 40px;
 		}
 	}
-	@media(max-width:720px) {
-		align-items: flex-start;
-		padding: 40px 20px;
-		padding-top: 80px;
+	//@media(max-width:720px) {
+	//	padding: 80px 20px;
+	//	.field {
+	//		flex-wrap: wrap;
+	//		margin-bottom: 0;
+	//	}
+	//	#formcont {
+	//		input {
+	//			height: 40px;
+	//		}
+	//	}
+	//	.wrap {
+	//		width: 80%;
+	//		padding-top: 40px;
+	//	}
+	//	h1 {
+	//		margin-bottom: 0;
+	//	}
+	//	p {
+	//	}
+	//}
+	@media(max-width:600px) {
+		padding-right: 0;
+		h1 {
+			font-size: 20px;
+		}
 		#formcont {
-			width: 80%;
-			margin-top: 0;
-			transform: translateX(-10px)
+			width: 95%;
+			height: 60px;
+			flex-shrink: 0;
+			position: relative;
+			overflow: hidden;
+			input {
+				height: 30px;
+				padding: 0 10px;
+			}
+			.control {
+				width: 100%;
+				padding-bottom: 0;
+			}
+			
+			h4 {
+				display: flex;
+			}
+			&.full {
+				position: fixed;
+				width: 100vw;
+				height: 100vh;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: stretch;
+				overflow: scroll;
+				background: black;
+				left: 0;
+				top: 0;
+				padding-top: 40px;
+				h4 {
+					display: none;
+				}
+			}
+		}
+		#downcont {
+			display: block;
+		}
+		#downform {
+			display: block;
+			position: absolute;
+			right: 0;
+			top: 0;
+			width: 20px;
 		}
 		.field {
 			flex-wrap: wrap;
 			margin-bottom: 0;
 		}
-		.wrap {
-			width: 80%;
-			padding-top: 40px;
-		}
-		h1 {
-			margin-bottom: 0;
-		}
-		p {
-		}
-	}
-	@media(max-width:600px) {
-		padding-right: 0;
-		#formcont {
-			width: 100%;
-		}
 		p{
-			width: 100%;
+			width: 95%;
+			margin-bottom: 10px;
 		}
 		.wrap {
-			width: 100%;
+			width: 95%;
 		}
 	}
+}
+#nomess {
+	cursor: pointer;
+	position: absolute;
+	top: 30px;
+	right: 10px;
+	width: 27px;
+	display: none;
+	z-index: 9999;
 }
 #impact_stories {
 	background-image:url('/dist/leaf.png'),linear-gradient(to top, #d8cfb7, #d8cfb7) !important;
@@ -1727,9 +1859,9 @@ h4 {
 }
 @media(max-height:780px) {
 	#logo {
-		top: 15px;
-		left: 15px;
-		width: 70px;
+		top: 5px;
+		left: 5px;
+		width: 50px;
 	}
 	#ex {
 		top: 15px;
@@ -1769,6 +1901,7 @@ h4 {
 	}
 }
 </style>
+
 
 
 
