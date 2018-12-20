@@ -4,7 +4,6 @@
 		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
 		</div>
 	</div>
-	<a href=/dist/><img src=~/assets/logo.svg id=logo /></a>
 	<div id=back @click=novert($event,false)><img src=/dist/back.svg />BACK</div>
 	<div id=next @click=novert($event,true)><img src=/dist/next.svg />NEXT</div>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
@@ -194,8 +193,6 @@ const loadSlide = async function(id,store,isPrev) {
 }
 
 const vert = function(id,store,subdex) {
-	document.querySelector('#logo').style.opacity = '0'
-	document.querySelector('#logo').style.pointerEvents = 'none'
 	document.querySelectorAll('.subs').forEach(sub=>{
 		if(sub.parentNode.id==id) {
 			sub.classList.add('open')
@@ -216,6 +213,10 @@ const spinner = function(e){
 	document.getElementById('green').src = '/dist/green'+e.target.id+'.png'
 	document.querySelector('.big').classList.remove('big')
 	e.target.classList.add('big')
+	if(window.innerWidth < 900) {
+		document.querySelector('#shader').style.opacity = '1'
+		document.querySelector('#shader').style.pointerEvents = 'auto';
+	}
 }
 
 export default {
@@ -306,7 +307,6 @@ export default {
 					document.querySelector('#formcont').classList.add('full')
 					document.querySelector('#ex').style.display='none'
 					document.querySelector('#nomess').style.display='block'
-					document.querySelector('#logo').style.display='none'
 				})
 			}
 			let nomess = document.querySelector('#nomess')
@@ -315,8 +315,14 @@ export default {
 					document.querySelector('#formcont').classList.remove('full')
 					document.querySelector('#ex').style.display='inherit'
 					document.querySelector('#nomess').style.display='none'
-					document.querySelector('#logo').style.display='inherit'
 
+				})
+			}
+			let noshade = document.querySelector('#closeshade')
+			if(noshade) {
+				noshade.addEventListener('click',e=>{
+					document.querySelector('#shader').style.opacity = '0'
+					document.querySelector('#shader').style.pointerEvents = 'none'
 				})
 			}
 		}
@@ -326,8 +332,8 @@ export default {
 		
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
-			if(e.target.closest('#formcont')) {
-				return 
+			if(e.target.closest('#story')) {
+				return
 			}
 			if(!vuestance.$store.state.vert) {
 				e.preventDefault();
@@ -454,8 +460,6 @@ export default {
 			}
 		},
 		novert: function(e,showNext) {
-			document.querySelector('#logo').style.opacity = '1'
-			document.querySelector('#logo').style.pointerEvents = 'auto'
 			document.querySelector('.open').style.transform="translateY(100%)"
 			document.querySelector('.open').firstChild.style.marginTop = '0'
 			document.querySelector('.open').classList.remove('open')
@@ -544,6 +548,12 @@ export default {
 	height: 100%;
 	pointer-events: none;
 }
+#closeshade {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	width: 27px;
+}
 #lime {
 	background: lime;
 }
@@ -607,9 +617,7 @@ export default {
 	position: relative;
 	height: calc(22vh + 2px);
 	flex-shrink: 0;
-	overflow: hidden;
 	&:not(:first-child) {
-		margin-top: -2px;
 	}
 
 	a {
@@ -621,20 +629,50 @@ export default {
 		align-items: center;
 	}
 	&:not(.active) {
-		padding-right: 2px;
 	}
 	&:last-child {
 		.dot:after {
 			display: none;
 		}
 	}
-	&:not(:last-child):after {
-		content: '';
-		border-right: 1px solid #ECE5C9;
-		position: absolute;
-		top: 15px;
-		right: 8px;
-		height: 100%;
+	//&:not(:last-child):after {
+	//	content: '';
+	//	border-right: 1px solid #ECE5C9;
+	//	position: absolute;
+	//	top: 15px;
+	//	right: 8px;
+	//	height: 100%;
+	//}
+	&.active {
+		//&:not(:last-child):after {
+		//	content: '';
+		//	border-right: 1px solid #ECE5C9;
+		//	position: absolute;
+		//	top: 15px;
+		//	right: 8px;
+		//	height: 100%;
+		//	display: none;
+		//}
+		//.subdots {
+		//	padding-right: 4px;
+		//	height: 100%;
+		//	&:before {
+		//		content: '';
+		//		border-right: 1px solid #ECE5C9;
+		//		position: absolute;
+		//		top: 15px;
+		//		height: 29%;
+		//		right: 7px;
+		//	}
+		//	&:after {
+		//		content: '';
+		//		border-right: 1px solid #ECE5C9;
+		//		position: absolute;
+		//		bottom: 0;
+		//		height: 29%;
+		//		right: 7px;
+		//	}
+		//}
 	}
 }
 	.subdots {
@@ -643,13 +681,13 @@ export default {
 		align-items: flex-end;
 		opacity: 0;
 		pointer-events: none;
-		position: absolute;
 		right: 0;
     		top: 0;
     		height: calc(22vh - 14px);
-    		justify-content: space-around;
-    		padding: 50px 0px;
+    		justify-content: center;
+    		padding: 0;
 		transition: all 0.2s ease;
+		transform: translateX(21px);
 		li {
 			position: relative;
 			color: #ECE5C9;
@@ -658,6 +696,7 @@ export default {
 			display: flex;
 			align-items: center;
 			cursor: pointer;
+			margin: 2vh 0;
 			&:hover {
 				.subdot {
   					animation: subpulse 1s infinite;
@@ -711,6 +750,9 @@ export default {
 		.subdot {
 			border-color: #24261c;
 		}
+	}
+	.subdot:hover, .dot:hover {
+		background: #24261c !important;
 	}
 	.dot {
 		border-color: #24261c !important;
@@ -1173,9 +1215,6 @@ h4 {
 	}
 }
 #mission_how {
-	h1 {
-		font-size: 40px !important;
-	}
 	h4, h1, p {
 		width: 50%;
 		padding-right: 50px;
@@ -1206,9 +1245,6 @@ h4 {
 				width: 80px;
 			}
 		}
-		#copyblock {
-			width: 50%;
-		}
 	}
 	@media(max-width:900px) {
 		.bot {
@@ -1221,9 +1257,18 @@ h4 {
 			order: 2;
 		}
 	}
+	@media(max-width:600px) {
+		h1 {
+			padding: 0;
+			margin-bottom: 5px;
+			font-size: 18px !important;
+		}
+		p {
+			font-size: 10px !important;
+		}
+	}
 }
 #copyblock {
-	width: 40%;
 	background: url('/dist/copyblock.png');
 	background-size: cover;
 	padding: 20px;
@@ -1234,6 +1279,25 @@ h4 {
 	color: #444830;
 	align-items: center;
 	padding-top: 40px;
+}
+#shader {
+	width: 40%;
+	@media(max-width:1150px) {
+		width: 50%;
+	}
+	@media(max-width:900px) {
+		opacity: 0;
+		pointer-events: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+		padding: 5vh;
+		padding-bottom: 20vh;
+	}
 }
 #blocktext {
 	width: 100% !important;
@@ -1880,11 +1944,6 @@ h4 {
 	#dots {
 		height: 77vh;
 	}
-	.subdots {
-		height: calc(30vh - 14px);
-		justify-content: space-between;
-		padding: 9vh 0;
-	}
 	.opener {
 		bottom: 20px;
 	}
@@ -1895,23 +1954,16 @@ h4 {
 	.slide p {
 		font-size: 14px;
 	}
-	#mission_how {
-		h1 {
-			font-size: 30px !important;
-		}
-	}
-	#impact_map {
-		#map {
-		}
-	}
-	
-	#stories {
-	}
 	#storyswitch div {
 		height: 40px;
 	}
 }
 </style>
+
+
+
+
+
 
 
 

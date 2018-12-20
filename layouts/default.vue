@@ -77,7 +77,7 @@ h4 {
 	font-size: 15px;
 }
 #logo {
-	position: fixed;
+	position: absolute;
 	top: 40px;
 	left: 40px;
 	z-index: 50;
