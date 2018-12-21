@@ -1,0 +1,95 @@
+#modeclose {
+	z-index: 9999 !important;
+}
+#close {
+	right: 30px !important;
+}
+#circle {
+	flex-shrink: 0;
+}
+#mission_how h1 {
+	font-size: 46px;
+}
+#impact_map {
+	max-width: none !important;
+}
+#story img {
+	max-width: 100%;
+}
+.paper {
+	max-width: 100% !important;
+}
+@media(max-width:1550px) {
+	#story {
+		width: 90vw !important;
+		overflow-y: scroll !important;
+	}
+}
+@media(max-width:1000px) {
+	#story {
+		flex-direction: column;
+	}
+	#story p {
+		font-size: 12px !important;
+	}
+	.paper {
+		margin-right: 0 !important;
+		margin-bottom: 10px !important;
+	}
+}
+@media(max-width:900px) {
+	#mission_how p {
+		width: 100% !important;
+		padding: 0 !important;
+		margin: 0 !important;
+	}
+	#green {
+		width: 50px !important;
+	}
+}
+@media(max-width:600px) {
+	#formcont {
+		padding-top: 0 !important;
+		justify-content: flex-start !important;
+	}
+	#formcont #nomess {
+		bottom: 5px !important;
+		right: 5px !important;
+		position: fixed !important;
+		top: auto !important;
+		right: auto !important;
+	}
+	#formcont .field {
+	}
+	.slide h1 {
+		font-size: 36px !important;
+	}
+	#next img, #back img {
+		width: 20px !important;
+
+	}
+	#next, #back {
+		font-size: 12px !important;
+	}
+	#next {
+		left: 90px !important;
+	}
+	#mission_why {
+		padding: 0 10px !important;
+	}
+	#mission_why .wrap {
+		width: 95% !important;
+		max-width: none !important;
+	}
+	#shader {
+		padding-top: 20vh !important;
+		padding-bottom: 80vh !important;
+	}
+	#copyblock {
+		z-index: 9999 !important;
+	}
+}
+#diff {
+	display: none !important;
+}
+

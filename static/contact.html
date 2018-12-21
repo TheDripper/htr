@@ -1,15 +1,14 @@
 <div class=wrap>
     <h4 class="name">Get Involved</h4>
     <h1>Connect With Us</h1>
-    <p>For donations, contact: lorem@haititakesroot.com
-        <br> For press inquiries, contact: lorem@haititakesroot.com
-        <br> To join our parters, contact: lorem@haititakesroot.com
-        <br> Reach us via telephone:
-        <br> USA: +1 (999) 999-9999
-        <br> Haiti: +2 999 9999</p>
+    <p>For more information, or to join us, please email us at: <a href=mailto:coalition@haititakesroot.org>coalition@haititakesroot.org</a></p>
+    <p>Reach us via telephone: +509 2227-6676</p>
+	<p>6, Route de Puits Blain<br />
+	<p>Pétionville, Haiti</p>
 </div>
 <div id="formcont">
 <img id=nomess src=/dist/close.svg />
+<form id=contactform data-off=false>
     <div class="field">
     	<div class="control">
 	    <h4 class=bindmess>Send Message</h4>
@@ -17,18 +16,18 @@
     </div>
     <div class="field">
         <div class="control">
-            <input type="text" name="first" placeholder="First Name">
+            <input type="text" name="first" placeholder="First Name" required>
         </div>
         <div class="control">
-            <input type="text" name="last" placeholder="Last Name">
+            <input type="text" name="last" placeholder="Last Name" required>
         </div>
     </div>
     <div class="field">
         <div class="control">
-            <input type="number" name="phone" placeholder="Phone">
+            <input type="phone" name="phone" placeholder="Phone">
         </div>
         <div class="control">
-            <input type="email" name="email" placeholder="Email">
+            <input type="email" name="email" placeholder="Email" required>
         </div>
     </div>
     <div class="field">
@@ -38,7 +37,7 @@
     </div>
     <div class="field">
         <div class="control">
-            <textarea id="message" name="message" placeholder="Message"></textarea>
+            <textarea id="message" name="message" placeholder="Message" required></textarea>
         </div>
     </div>
     <div class="field">
@@ -46,4 +45,5 @@
 	    <input type=submit value=Submit id=submit />
         </div>
     </div>
+</form>
 </div>

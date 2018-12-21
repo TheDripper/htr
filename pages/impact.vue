@@ -7,7 +7,7 @@
 	<div id=back @click=novert($event,false)><img src=/dist/back.svg />BACK</div>
 	<div id=next @click=novert($event,true)><img src=/dist/next.svg />NEXT</div>
 <h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
-<nav :data-id="$store.state.id" :data-open="$store.state.vert">
+<nav :data-id="$store.state.id" :data-open="$store.state.vert" :data-cursub="$store.state.subdex">
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
 <div class=wrap>
@@ -36,6 +36,7 @@
 </template>
 
 <script>
+const serialize = require('form-serialize')
 const nomode = ()=>{
 	document.querySelector('#modal').style.opacity = '0'
 	document.querySelector('#modal').style.pointerEvents = 'none'
@@ -105,6 +106,7 @@ const up = (store) => {
 	if(curMarg < 0) {
 		curMarg += 100;
 		sub.style.marginTop = curMarg + 'vh'
+		store.commit('lowDex')
 	}
 	document.querySelector('#next').style.opacity='0'
 	document.querySelector('#next').style.pointerEvents='none'
@@ -118,6 +120,7 @@ const down = (store) => {
 	if(curMarg > ((sub.children.length - 1) * -100)) {
 		curMarg -= 100;
 		sub.style.marginTop = curMarg + 'vh'
+		store.commit('hiDex')
 	}
 	if(curMarg == ((sub.children.length - 1) * -100)) {
 		document.querySelector('#next').style.opacity='1'
@@ -197,10 +200,10 @@ const vert = function(id,store,subdex) {
 		if(sub.parentNode.id==id) {
 			sub.classList.add('open')
 			sub.style.transform = "translateY(0%)"
-			if(subdex) {
+				store.commit('setDex',subdex);
+				console.log('DEX'+subdex);
 				let newMarg = Number(subdex) * -100 + 'vh'
 				sub.firstChild.style.marginTop = newMarg
-			}
 		}
 	})
 	store.commit('vert')
@@ -325,6 +328,21 @@ export default {
 					document.querySelector('#shader').style.pointerEvents = 'none'
 				})
 			}
+			let formcont = document.querySelector('#contactform')
+			if(formcont) {
+				formcont.addEventListener('submit',async e=>{
+					e.preventDefault();
+					if(formcont.dataset.off=='false') {
+						formcont.dataset.off = 'true'
+						setTimeout(function(){
+							formcont.dataset.off='false'
+						},2000)
+						let formdata = serialize(formcont)
+						let res = await axios.post('/dist/mailer.php',formdata)
+						formcont.innerHTML="<h2 id=thanks>Thank you for connecting!</h2>"
+					}
+				})
+			}
 		}
 	},
 	async created() {
@@ -372,28 +390,28 @@ export default {
 				name: "Mission",
 				subs: [
 					{
-						id: 'mission_how',
-						name: "How",
-					},
-					{
 						id: 'mission_why',
 						name: "Why",
+					},
+					{
+						id: 'mission_how',
+						name: "How",
 					}
 				]
 			},
 			{
 				id: 'impact',
 				name: "Impact",
-				subs: [
-					{
-						id: 'impact_map',
-						name: "Map"
-					},
-					{
-						id: 'impact_stories',
-						name: 'Stories'
-					}
-				]
+				//subs: [
+				//	{
+				//		id: 'impact_map',
+				//		name: "Map"
+				//	},
+				//	{
+				//		id: 'impact_stories',
+				//		name: 'Stories'
+				//	}
+				//]
 			},
 			{
 				id: 'contact',
@@ -761,6 +779,16 @@ export default {
 		color: #24261c;
 		border-color: #24261c;
 		background: #24261c !important;
+	}
+}
+[data-open=true][data-cursub="0"] {
+	.active .subdots li:first-child .subdot {
+		background: #ECE5C9;
+	}
+}
+[data-open=true][data-cursub="1"] {
+	.active .subdots li:last-child .subdot {
+		background: #ECE5C9;
 	}
 }
 nav{
@@ -1449,7 +1477,6 @@ h4 {
 			max-width: 100%;
 			margin-bottom: 20px;
 		}
-			max-width: 760px;
 	}
 	@media(max-width:600px) {
 		.wrap {
@@ -1959,6 +1986,9 @@ h4 {
 	}
 }
 </style>
+
+
+
 
 
 

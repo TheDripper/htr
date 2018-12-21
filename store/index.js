@@ -12,6 +12,7 @@ const createStore = () => {
       nextMark: '',
       prevMark: '',
       id: '',
+      subdex: 0,
       pages:  {
 	"home": 0,
 	"mission": 1,
@@ -49,8 +50,16 @@ const createStore = () => {
       },
       choke(state) {
         state.choke ? state.choke = false : state.choke = true
+      },
+      setDex(state,data) {
+        state.subdex = data
+      },
+      lowDex(state) {
+	state.subdex--
+      },
+      hiDex(state) {
+	state.subdex++
       }
-
     }
   })
 }
