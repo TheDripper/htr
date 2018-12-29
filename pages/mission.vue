@@ -600,6 +600,10 @@ export default {
 	}
 	.active {
 		transition: all 0.3s ease;
+		background: none;
+		.dot {
+			transform: translateX(3px);
+		}
 	}
 }
 .element {
@@ -635,6 +639,9 @@ export default {
 	position: relative;
 	height: calc(22vh + 2px);
 	flex-shrink: 0;
+	background-size: 14px;
+	background-position: 100% 2px;
+	background-repeat: no-repeat;
 	&:not(:first-child) {
 	}
 
@@ -649,6 +656,9 @@ export default {
 	&:not(.active) {
 	}
 	&:last-child {
+		background-size: 14px;
+		background-position: top right;
+		background-repeat: no-repeat;
 		.dot:after {
 			display: none;
 		}
@@ -701,7 +711,6 @@ export default {
 		pointer-events: none;
 		right: 0;
     		top: 0;
-    		height: calc(22vh - 14px);
     		justify-content: center;
     		padding: 0;
 		transition: all 0.2s ease;
@@ -714,7 +723,8 @@ export default {
 			display: flex;
 			align-items: center;
 			cursor: pointer;
-			margin: 2vh 0;
+			margin: 0;
+			height: 11vh;
 			&:hover {
 				.subdot {
   					animation: subpulse 1s infinite;
@@ -725,10 +735,10 @@ export default {
 	.subdot {
 		width: 8px;
 		height: 8px;
-		border-radius: 50px;
-		border: 1px solid white;
 		margin-left: 5px;
 		cursor: pointer;
+		border: 1px solid #ECE5C9;
+		border-radius: 50px;
 	}
 #dots .dot {
 	width: 14px;
@@ -751,12 +761,82 @@ export default {
 			opacity: 1;
 			pointer-events: auto;
 		}
+		.wrap {
+			background-size: 14px;
+			background-position: top right;
+			background-repeat: no-repeat;
+		}
 	}
 }
 #dots li.active .dot {
 	background: #ECE5C9;
 	width: 20px;
 	height: 20px;
+}
+.subdots li {
+	background-size: contain;
+	background-position: right;
+	background-repeat: no-repeat;
+}
+//#dots > li:before {
+// content: '';
+// position: absolute;
+// top: -2px;
+// bottom: 0;
+// display:block;
+// width: 1px;
+// margin-top:16px;
+// background: #feffff;
+// right: 6px;
+// transform: translateY(1px);
+//}
+//
+//#dots li:last-child:before {
+// display:none;
+//}
+
+#dots > li:before {
+ content: '';
+ position: absolute;
+ top: 0;
+ bottom: 0;
+ display:block;
+ width: 1px;
+ margin-top:16px;
+ background: #feffff;
+ left: 90%;
+}
+
+#dots li:last-child:before {
+ display:none;
+}
+
+#dots > li.active:nth-child(2):before {
+content:none;
+}
+
+#dots > li:nth-child(2) .subdot:before {
+ content: '';
+ position: absolute;
+ top: 0;
+ bottom: 0;
+ display:block;
+ width: 1px;
+ margin-bottom:26px;
+ background: #ffffff;
+ left: 90%;
+}
+#dots > li:nth-child(2) .subdot:after {
+ content: '';
+ position: absolute;
+ top: 0;
+ bottom: 0;
+ display:block;
+ width: 1px;
+ margin-top:26px;
+ background: #ffffff;
+ left: 90%;
+
 }
 
 [data-id=impact][data-open=true] {
@@ -797,11 +877,8 @@ nav{
 	top: 50%;
 	transform: translateY(-50%);
 	z-index: 40;
-	//background-image: url('/dist/lines.svg');
-	background-size: contain;
-	background-position: center;
-	background-repeat: no-repeat;
 }
+
 .slide h1 {
 	text-align: center;
 	max-width: 80%;
@@ -1986,20 +2063,4 @@ h4 {
 	}
 }
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
