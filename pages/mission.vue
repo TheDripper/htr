@@ -58,7 +58,7 @@ function cleanOrder(store) {
 
 function goto(id,store) {
 	let view = document.querySelector('#viewer')
-	let targ = null 
+	let targ = null
 	for(var i=0; i<view.childNodes.length; i++) {
 		if(view.childNodes[i].id==id)
 			targ = i
@@ -66,7 +66,7 @@ function goto(id,store) {
 	//store.commit('setCur',dex)
 	let first = document.querySelector('.slide')
 	let newMarg = targ * -100
-	first.style.marginLeft = newMarg + 'vw' 
+	first.style.marginLeft = newMarg + 'vw'
 	if(id=='home')
 		window.history.pushState(null,'','/dist/')
 	else
@@ -189,7 +189,7 @@ const loadSlide = async function(id,store,isPrev) {
 		}
 		if(isPrev)
 			store.commit('addPrev',newSlide)
-		else 
+		else
 			store.commit('addSlide',newSlide)
 	}
 	cleanOrder(store)
@@ -347,7 +347,7 @@ export default {
 	},
 	async created() {
 		if(process.browser) {
-		
+
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
 			if(e.target.closest('#story')) {
@@ -440,7 +440,7 @@ export default {
 		}
 	},
 	methods: {
-		
+
 		tab: async function(e,sub) {
 			e.preventDefault();
 			if(this.$store.state.vert)
@@ -822,7 +822,7 @@ content:none;
  bottom: 0;
  display:block;
  width: 1px;
- margin-bottom:26px;
+ margin-bottom:5.3vh;
  background: #ffffff;
  left: 90%;
 }
@@ -833,10 +833,9 @@ content:none;
  bottom: 0;
  display:block;
  width: 1px;
- margin-top:26px;
+ margin-top:5.5vh;
  background: #ffffff;
  left: 90%;
-
 }
 
 [data-id=impact][data-open=true] {
@@ -921,7 +920,7 @@ nav{
 h4 {
 	text-transform: uppercase;
 	font-family: "flamaSemi";
-} 
+}
 .slide button {
 }
 .subs {
@@ -1006,7 +1005,7 @@ h4 {
 	bottom: 40px;
 	left: 50%;
 	transform: translateX(-50%);
-	font-family: "heart" !important;	
+	font-family: "heart" !important;
 	color: #ECE5C9;
 	font-size: 40px;
 	cursor: pointer;
@@ -1121,7 +1120,7 @@ h4 {
 		font-size: 12px;
 		margin-bottom: 40px;
 	}
-	
+
 	#home p {
 		font-size: 15px;
 	}
@@ -1530,7 +1529,7 @@ h4 {
 		#map {
 			margin-bottom: 40px;
 			width: 70% !important;
-		}	
+		}
 		.wrap {
 			align-self: flex-start;
 			width: 40%;
@@ -1596,7 +1595,7 @@ h4 {
 	}
 }
 #collage {
-	display: flex; 
+	display: flex;
 	justify-content: flex-end;
 	align-items: flex-end;
 	height: 60vh;
@@ -1751,7 +1750,7 @@ h4 {
 }
 
 #diff h2 {
-		font-family: "heart" !important;	
+		font-family: "heart" !important;
 		color: #ECE5C9;
 		font-size: 40px;
 		cursor: pointer;
@@ -1865,7 +1864,7 @@ h4 {
 			width: 100%;
 			display: none;
 		}
-		
+
 	}
 	@media(max-width: 1360px) {
 		#formcont {
@@ -1934,7 +1933,7 @@ h4 {
 				width: 100%;
 				padding-bottom: 0;
 			}
-			
+
 			h4 {
 				display: flex;
 			}
