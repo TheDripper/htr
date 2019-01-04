@@ -51,6 +51,9 @@ const createStore = () => {
       choke(state) {
         state.choke ? state.choke = false : state.choke = true
       },
+      nochoke(state){
+	      state.choke = false
+      },
       setDex(state,data) {
         state.subdex = data
       },

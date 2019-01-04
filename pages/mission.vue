@@ -183,7 +183,8 @@ const next = async (store) => {
 		loadSlide(nextID,store,false)
 	}
 	setTimeout(()=>{
-		store.commit('choke')
+		store.commit('nochoke')
+		console.log('breathe')
 	},800)
 }
 const loadSlide = async function(id,store,isPrev) {
@@ -361,12 +362,9 @@ export default {
 
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
-			if(e.target.closest('#story')) {
-				return
-			}
 			if(!vuestance.$store.state.vert) {
 				e.preventDefault();
-				console.log(vuestance.$store.state.id)
+				console.log(vuestance.$store.state.choke)
 				var view = document.querySelector('#viewer');
 				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
 					vuestance.$store.commit('choke')
@@ -490,10 +488,8 @@ export default {
 			}
 		},
 		novert: function(e,showNext) {
-			//this.$store.commit('vert')
 			let vuestance = this
 			if(showNext) {
-				vuestance.$store.commit('choke')
 				let sub = document.querySelector('.open').firstChild
 				var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
 				if(curMarg > ((sub.children.length - 1) * -100)) {
@@ -505,6 +501,7 @@ export default {
 					document.querySelector('.open').style.transform="translateY(100%)"
 					document.querySelector('.open').firstChild.style.marginTop = '0'
 					document.querySelector('.open').classList.remove('open')
+					console.log('vert')
 					vuestance.$store.commit('vert')
 					document.querySelector('#back').style.opacity='0'
 					document.querySelector('#back').style.pointerEvents='none'
@@ -607,7 +604,7 @@ export default {
 	pointer-events: none;
 }
 #closeshade {
-	position: fixed;
+	position: absolute;
 	top: 30px;
 	right: 15px;
 	width: 17px;
@@ -1072,6 +1069,7 @@ h4 {
 	position: absolute;
 	top: 30px;
 	right: 70px;
+	z-index: 21;
 	@media(max-width:1660px) {
 		right: 20px;
 	}
