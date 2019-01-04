@@ -1,5 +1,7 @@
 <template>
 <div id=frame>
+<div id=preload>
+</div>
 	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper">
 		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
 		</div>
@@ -36,6 +38,7 @@
 </template>
 
 <script>
+const imagesloaded = require('imagesloaded')
 const serialize = require('form-serialize')
 const nomode = ()=>{
 	document.querySelector('#modal').style.opacity = '0'
@@ -107,9 +110,18 @@ const up = (store) => {
 		curMarg += 100;
 		sub.style.marginTop = curMarg + 'vh'
 		store.commit('lowDex')
+	} else {
+		document.querySelector('.open').style.transform="translateY(100%)"
+		document.querySelector('.open').firstChild.style.marginTop = '0'
+		document.querySelector('.open').classList.remove('open')
+		store.commit('vert')
+		document.querySelector('#back').style.opacity='0'
+		document.querySelector('#back').style.pointerEvents='none'
+		document.querySelector('#next').style.opacity='0'
+		document.querySelector('#next').style.pointerEvents='none'
 	}
-	document.querySelector('#next').style.opacity='0'
-	document.querySelector('#next').style.pointerEvents='none'
+	//document.querySelector('#next').style.opacity='0'
+	//document.querySelector('#next').style.pointerEvents='none'
 	setTimeout(()=>{
 		store.commit('choke')
 	},1100)
@@ -174,7 +186,8 @@ const next = async (store) => {
 		loadSlide(nextID,store,false)
 	}
 	setTimeout(()=>{
-		store.commit('choke')
+		store.commit('nochoke')
+		console.log('breathe')
 	},800)
 }
 const loadSlide = async function(id,store,isPrev) {
@@ -200,6 +213,8 @@ const vert = function(id,store,subdex) {
 		if(sub.parentNode.id==id) {
 			sub.classList.add('open')
 			sub.style.transform = "translateY(0%)"
+			document.querySelector('#next').style.opacity='1'
+			document.querySelector('#next').style.pointerEvents='auto'
 				store.commit('setDex',subdex);
 				console.log('DEX'+subdex);
 				let newMarg = Number(subdex) * -100 + 'vh'
@@ -350,12 +365,9 @@ export default {
 
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
-			if(e.target.closest('#story')) {
-				return
-			}
 			if(!vuestance.$store.state.vert) {
 				e.preventDefault();
-				console.log(vuestance.$store.state.id)
+				console.log(vuestance.$store.state.choke)
 				var view = document.querySelector('#viewer');
 				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
 					vuestance.$store.commit('choke')
@@ -417,7 +429,22 @@ export default {
 				id: 'contact',
 				name: 'Contact'
 			}
-		]
+		] // PRELOAD
+		let loaded = []
+		//allslides.forEach(slide=>{
+		//	let img = new Image()
+		//	img.src = slide.id+".png"
+		//	console.log(img)
+		//	if(slide.subs) {
+		//		slide.subs.forEach(sub=>{
+		//			let img = new Image()
+		//			img.onload = ()=>{loaded.push(img.src)}
+		//			img.src = sub.id+".png"
+		//			console.log(img)
+		//		})
+		//	}
+		//})
+		//console.log('done')
 		let id = window.location.pathname.split('/').filter(dir=>{
 			return dir != ''
 		})
@@ -431,12 +458,20 @@ export default {
 			document.querySelector('nav').dataset.id = id
 			this.$store.commit('setCur',pagedex)
 			await loadSlide(this.$store.state.id,this.$store,false)
+			if(id=='home') {
+				await loadSlide('mission',this.$store,false)
+			}
 		} else {
 			this.$store.commit('setCur',0)
 			$store.commit('addSlide',index)
 			//loadSlide('index',this.$store,false)
 		}
 		this.$store.commit('loadAll',allslides);
+		let viewer = document.querySelector('#viewer')
+		imagesloaded(viewer,function(){
+			document.querySelector('#preload').style.opacity = '0'
+			document.querySelector('#preload').style.pointerEvents = 'none'
+		})
 		}
 	},
 	methods: {
@@ -479,17 +514,44 @@ export default {
 			}
 		},
 		novert: function(e,showNext) {
-			document.querySelector('.open').style.transform="translateY(100%)"
-			document.querySelector('.open').firstChild.style.marginTop = '0'
-			document.querySelector('.open').classList.remove('open')
-			this.$store.commit('vert')
-			document.querySelector('#back').style.opacity='0'
-			document.querySelector('#back').style.pointerEvents='none'
-			document.querySelector('#next').style.opacity='0'
-			document.querySelector('#next').style.pointerEvents='none'
+			let vuestance = this
 			if(showNext) {
-				this.$store.commit('choke')
-				next(this.$store)
+				let sub = document.querySelector('.open').firstChild
+				var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
+				if(curMarg > ((sub.children.length - 1) * -100)) {
+					curMarg -= 100;
+					sub.style.marginTop = curMarg + 'vh'
+					vuestance.$store.commit('hiDex')
+				} else {
+					next(vuestance.$store)
+					document.querySelector('.open').style.transform="translateY(100%)"
+					document.querySelector('.open').firstChild.style.marginTop = '0'
+					document.querySelector('.open').classList.remove('open')
+					console.log('vert')
+					vuestance.$store.commit('vert')
+					document.querySelector('#back').style.opacity='0'
+					document.querySelector('#back').style.pointerEvents='none'
+					document.querySelector('#next').style.opacity='0'
+					document.querySelector('#next').style.pointerEvents='none'
+				}
+			} else {
+				up(this.$store)
+				//let sub = document.querySelector('.open').firstChild
+				//var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
+				//console.log(curMarg)
+				//if(curMarg < 0) {
+				//	console.log('up')
+				//	curMarg += 100;
+				//	sub.style.marginTop = curMarg + 'vh'
+				//	vuestance.$store.commit('lowDex')
+				//	document.querySelector('#back').style.opacity='0'
+				//	document.querySelector('#back').style.pointerEvents='none'
+				//	document.querySelector('#next').style.opacity='0'
+				//	document.querySelector('#next').style.pointerEvents='none'
+				//} else {
+				//	up(vuestance.$store)
+				//	vuestance.$store.commit('vert')
+				//}
 			}
 		},
 		mob: function(e) {
@@ -568,9 +630,9 @@ export default {
 	pointer-events: none;
 }
 #closeshade {
-	position: fixed;
-	top: 20px;
-	right: 10px;
+	position: absolute;
+	top: 30px;
+	right: 15px;
 	width: 17px;
 }
 #lime {
@@ -1033,6 +1095,7 @@ h4 {
 	position: absolute;
 	top: 30px;
 	right: 70px;
+	z-index: 21;
 	@media(max-width:1660px) {
 		right: 20px;
 	}
@@ -1329,7 +1392,7 @@ h4 {
 	}
 	flex-direction: row;
 	align-items: center;
-	@media(max-width:1150px) {
+	@media(max-width:1650px) {
 		align-items: center;
 		.wrap {
 			width: 100%;
@@ -1349,12 +1412,14 @@ h4 {
 		#circle {
 			width: 300px;
 			height: 300px;
-			transform: none;
 			margin: 0 20px;
 			margin-right: 40px;
 			img {
 				width: 80px;
 			}
+		}
+		#shader {
+			width: 100%;
 		}
 	}
 	@media(max-width:900px) {
@@ -1364,12 +1429,26 @@ h4 {
 		}
 		#circle {
 			order: 1;
+			transform: translateY(100px);
 		}
 		#copyblock {
 			order: 2;
+			p {
+				font-size: 20px;
+				line-height: 1.3;
+			}
+		}
+		.wrap {
+			margin-bottom: 20px;
 		}
 	}
 	@media(max-width:600px) {
+		#circle {
+			transform: none;
+		}
+		#shader {
+			height: 40vh;
+		}
 		h1 {
 			padding: 0;
 			margin-bottom: 5px;
@@ -1377,6 +1456,13 @@ h4 {
 		}
 		p {
 			font-size: 10px !important;
+		}
+		#copyblock {
+			p {
+				font-size: 12px;
+				line-height: 1;
+
+			}
 		}
 	}
 }
@@ -1393,7 +1479,7 @@ h4 {
 	padding-top: 40px;
 }
 #shader {
-	width: 100%;
+	width: 45%;
 	@media(max-width:1150px) {
 	}
 	@media(max-width:900px) {
@@ -1406,6 +1492,7 @@ h4 {
 		display: flex;
 		justify-content: center;
 		background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+		height: 50vh;
 	}
 }
 #blocktext {
@@ -2069,6 +2156,15 @@ h4 {
 	position: relative;
 	z-index: 11;
 }
+#preload {
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	background: black;
+	z-index: 10000;
+	transition: all 0.5s ease;
+}
 </style>
+
 
 

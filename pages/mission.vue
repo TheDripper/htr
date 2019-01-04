@@ -1,5 +1,7 @@
 <template>
 <div id=frame>
+<div id=preload>
+</div>
 	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper">
 		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
 		</div>
@@ -36,6 +38,7 @@
 </template>
 
 <script>
+const imagesloaded = require('imagesloaded')
 const serialize = require('form-serialize')
 const nomode = ()=>{
 	document.querySelector('#modal').style.opacity = '0'
@@ -426,7 +429,22 @@ export default {
 				id: 'contact',
 				name: 'Contact'
 			}
-		]
+		] // PRELOAD
+		let loaded = []
+		//allslides.forEach(slide=>{
+		//	let img = new Image()
+		//	img.src = slide.id+".png"
+		//	console.log(img)
+		//	if(slide.subs) {
+		//		slide.subs.forEach(sub=>{
+		//			let img = new Image()
+		//			img.onload = ()=>{loaded.push(img.src)}
+		//			img.src = sub.id+".png"
+		//			console.log(img)
+		//		})
+		//	}
+		//})
+		//console.log('done')
 		let id = window.location.pathname.split('/').filter(dir=>{
 			return dir != ''
 		})
@@ -440,12 +458,20 @@ export default {
 			document.querySelector('nav').dataset.id = id
 			this.$store.commit('setCur',pagedex)
 			await loadSlide(this.$store.state.id,this.$store,false)
+			if(id=='home') {
+				await loadSlide('mission',this.$store,false)
+			}
 		} else {
 			this.$store.commit('setCur',0)
 			$store.commit('addSlide',index)
 			//loadSlide('index',this.$store,false)
 		}
 		this.$store.commit('loadAll',allslides);
+		let viewer = document.querySelector('#viewer')
+		imagesloaded(viewer,function(){
+			document.querySelector('#preload').style.opacity = '0'
+			document.querySelector('#preload').style.pointerEvents = 'none'
+		})
 		}
 	},
 	methods: {
@@ -2130,5 +2156,15 @@ h4 {
 	position: relative;
 	z-index: 11;
 }
+#preload {
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	background: black;
+	z-index: 10000;
+	transition: all 0.5s ease;
+}
 </style>
+
+
 

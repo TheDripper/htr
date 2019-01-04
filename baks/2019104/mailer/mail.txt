@@ -1,0 +1,1 @@
+{"type":"http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/","title":"API Key Invalid","status":401,"detail":"API key has been disabled","instance":"ab00a979-18cb-4567-be2a-a35cfc97a843"}
