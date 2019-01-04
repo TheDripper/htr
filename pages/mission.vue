@@ -17,7 +17,7 @@
 </a>
 </div>
 	<ul class=subdots>
-	<li v-for="(sub,index) in slide.subs" @click=tab($event,true) :data-slide="slide.id" :data-subdex="index">{{ sub.name }}<span class=subdot></span></li>
+	<li v-for="(sub,index) in slide.subs" :data-slide="slide.id" ><a @click=tab($event,true) :data-subdex="index">{{ sub.name }}<span class=subdot :data-subdex="index"></span></a></li>
 	</ul>
 </li>
 </ul>
@@ -107,9 +107,18 @@ const up = (store) => {
 		curMarg += 100;
 		sub.style.marginTop = curMarg + 'vh'
 		store.commit('lowDex')
+	} else {
+		document.querySelector('.open').style.transform="translateY(100%)"
+		document.querySelector('.open').firstChild.style.marginTop = '0'
+		document.querySelector('.open').classList.remove('open')
+		store.commit('vert')
+		document.querySelector('#back').style.opacity='0'
+		document.querySelector('#back').style.pointerEvents='none'
+		document.querySelector('#next').style.opacity='0'
+		document.querySelector('#next').style.pointerEvents='none'
 	}
-	document.querySelector('#next').style.opacity='0'
-	document.querySelector('#next').style.pointerEvents='none'
+	//document.querySelector('#next').style.opacity='0'
+	//document.querySelector('#next').style.pointerEvents='none'
 	setTimeout(()=>{
 		store.commit('choke')
 	},1100)
@@ -200,6 +209,8 @@ const vert = function(id,store,subdex) {
 		if(sub.parentNode.id==id) {
 			sub.classList.add('open')
 			sub.style.transform = "translateY(0%)"
+			document.querySelector('#next').style.opacity='1'
+			document.querySelector('#next').style.pointerEvents='auto'
 				store.commit('setDex',subdex);
 				console.log('DEX'+subdex);
 				let newMarg = Number(subdex) * -100 + 'vh'
@@ -443,6 +454,7 @@ export default {
 
 		tab: async function(e,sub) {
 			e.preventDefault();
+			console.log(e.target);
 			if(this.$store.state.vert)
 				this.$store.commit('vert')
 			let id = e.target.closest('.tab').dataset.slide
@@ -478,17 +490,45 @@ export default {
 			}
 		},
 		novert: function(e,showNext) {
-			document.querySelector('.open').style.transform="translateY(100%)"
-			document.querySelector('.open').firstChild.style.marginTop = '0'
-			document.querySelector('.open').classList.remove('open')
-			this.$store.commit('vert')
-			document.querySelector('#back').style.opacity='0'
-			document.querySelector('#back').style.pointerEvents='none'
-			document.querySelector('#next').style.opacity='0'
-			document.querySelector('#next').style.pointerEvents='none'
+			//this.$store.commit('vert')
+			let vuestance = this
 			if(showNext) {
-				this.$store.commit('choke')
-				next(this.$store)
+				vuestance.$store.commit('choke')
+				let sub = document.querySelector('.open').firstChild
+				var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
+				if(curMarg > ((sub.children.length - 1) * -100)) {
+					curMarg -= 100;
+					sub.style.marginTop = curMarg + 'vh'
+					vuestance.$store.commit('hiDex')
+				} else {
+					next(vuestance.$store)
+					document.querySelector('.open').style.transform="translateY(100%)"
+					document.querySelector('.open').firstChild.style.marginTop = '0'
+					document.querySelector('.open').classList.remove('open')
+					vuestance.$store.commit('vert')
+					document.querySelector('#back').style.opacity='0'
+					document.querySelector('#back').style.pointerEvents='none'
+					document.querySelector('#next').style.opacity='0'
+					document.querySelector('#next').style.pointerEvents='none'
+				}
+			} else {
+				up(this.$store)
+				//let sub = document.querySelector('.open').firstChild
+				//var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
+				//console.log(curMarg)
+				//if(curMarg < 0) {
+				//	console.log('up')
+				//	curMarg += 100;
+				//	sub.style.marginTop = curMarg + 'vh'
+				//	vuestance.$store.commit('lowDex')
+				//	document.querySelector('#back').style.opacity='0'
+				//	document.querySelector('#back').style.pointerEvents='none'
+				//	document.querySelector('#next').style.opacity='0'
+				//	document.querySelector('#next').style.pointerEvents='none'
+				//} else {
+				//	up(vuestance.$store)
+				//	vuestance.$store.commit('vert')
+				//}
 			}
 		},
 		mob: function(e) {
@@ -568,9 +608,9 @@ export default {
 }
 #closeshade {
 	position: fixed;
-	top: 10px;
-	right: 10px;
-	width: 27px;
+	top: 30px;
+	right: 15px;
+	width: 17px;
 }
 #lime {
 	background: lime;
@@ -803,7 +843,7 @@ export default {
  display:block;
  width: 1px;
  margin-top:16px;
- background: #feffff;
+ background: #ECE5C9;
  left: 90%;
 }
 
@@ -823,7 +863,7 @@ content:none;
  display:block;
  width: 1px;
  margin-bottom:5.3vh;
- background: #ffffff;
+ background: #ECE5C9;
  left: 90%;
 }
 #dots > li:nth-child(2) .subdot:after {
@@ -834,7 +874,7 @@ content:none;
  display:block;
  width: 1px;
  margin-top:5.5vh;
- background: #ffffff;
+ background: #ECE5C9;
  left: 90%;
 }
 
@@ -1326,42 +1366,65 @@ h4 {
 			width: 50%;
 		}
 	}
-	align-items: flex-start;
-	@media(max-width:1400px) {
-		padding-left: 20px;
-	}
-	@media(max-width:1150px) {
-		flex-direction: column;
+	flex-direction: row;
+	align-items: center;
+	@media(max-width:1650px) {
 		align-items: center;
 		.wrap {
 			width: 100%;
 			align-items: center;
 		}
+		h1 {
+			font-size: 26px;
+		}
+		p {
+			line-height: 1;
+		}
 		h4, h1, p {
 			width: 100%;
+			padding-right: 10px;
+			max-width: none;
 		}
 		#circle {
 			width: 300px;
 			height: 300px;
-			transform: none;
-			margin-left: 20px;
+			margin: 0 20px;
+			margin-right: 40px;
 			img {
 				width: 80px;
 			}
 		}
+		#shader {
+			width: 100%;
+		}
 	}
 	@media(max-width:900px) {
+		flex-direction: column;
 		.bot {
 			flex-direction: column;
 		}
 		#circle {
 			order: 1;
+			transform: translateY(100px);
 		}
 		#copyblock {
 			order: 2;
+			p {
+				font-size: 20px;
+				line-height: 1.3;
+			}
+		}
+		.wrap {
+			margin-bottom: 20px;
 		}
 	}
 	@media(max-width:600px) {
+		#circle {
+			transform: none;
+		}
+		#shader {
+			height: 40vh;
+		}
 		h1 {
 			padding: 0;
 			margin-bottom: 5px;
@@ -1369,6 +1432,13 @@ h4 {
 		}
 		p {
 			font-size: 10px !important;
+		}
+		#copyblock {
+			p {
+				font-size: 12px;
+				line-height: 1;
+
+			}
 		}
 	}
 }
@@ -1385,9 +1455,8 @@ h4 {
 	padding-top: 40px;
 }
 #shader {
-	width: 40%;
+	width: 45%;
 	@media(max-width:1150px) {
-		width: 50%;
 	}
 	@media(max-width:900px) {
 		opacity: 0;
@@ -1399,8 +1468,7 @@ h4 {
 		display: flex;
 		justify-content: center;
 		background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-		padding: 5vh;
-		padding-bottom: 20vh;
+		height: 50vh;
 	}
 }
 #blocktext {
@@ -1417,7 +1485,6 @@ h4 {
 	display: flex;
 	align-items: center;
 	#circle {
-		transform: translateY(-30%)
 	}
 }
 #photos {
@@ -2060,6 +2127,10 @@ h4 {
 	#storyswitch div {
 		height: 40px;
 	}
+}
+.subwrap {
+	position: relative;
+	z-index: 11;
 }
 </style>
 

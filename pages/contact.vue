@@ -17,7 +17,7 @@
 </a>
 </div>
 	<ul class=subdots>
-	<li v-for="(sub,index) in slide.subs" @click=tab($event,true) :data-slide="slide.id" :data-subdex="index">{{ sub.name }}<span class=subdot></span></li>
+	<li v-for="(sub,index) in slide.subs" :data-slide="slide.id" ><a @click=tab($event,true) :data-subdex="index">{{ sub.name }}<span class=subdot :data-subdex="index"></span></a></li>
 	</ul>
 </li>
 </ul>
@@ -58,7 +58,7 @@ function cleanOrder(store) {
 
 function goto(id,store) {
 	let view = document.querySelector('#viewer')
-	let targ = null 
+	let targ = null
 	for(var i=0; i<view.childNodes.length; i++) {
 		if(view.childNodes[i].id==id)
 			targ = i
@@ -66,7 +66,7 @@ function goto(id,store) {
 	//store.commit('setCur',dex)
 	let first = document.querySelector('.slide')
 	let newMarg = targ * -100
-	first.style.marginLeft = newMarg + 'vw' 
+	first.style.marginLeft = newMarg + 'vw'
 	if(id=='home')
 		window.history.pushState(null,'','/dist/')
 	else
@@ -189,7 +189,7 @@ const loadSlide = async function(id,store,isPrev) {
 		}
 		if(isPrev)
 			store.commit('addPrev',newSlide)
-		else 
+		else
 			store.commit('addSlide',newSlide)
 	}
 	cleanOrder(store)
@@ -347,7 +347,7 @@ export default {
 	},
 	async created() {
 		if(process.browser) {
-		
+
 		let vuestance = this
 		document.addEventListener('wheel',function(e){
 			if(e.target.closest('#story')) {
@@ -440,9 +440,10 @@ export default {
 		}
 	},
 	methods: {
-		
+
 		tab: async function(e,sub) {
 			e.preventDefault();
+			console.log(e.target);
 			if(this.$store.state.vert)
 				this.$store.commit('vert')
 			let id = e.target.closest('.tab').dataset.slide
@@ -568,9 +569,9 @@ export default {
 }
 #closeshade {
 	position: fixed;
-	top: 10px;
+	top: 20px;
 	right: 10px;
-	width: 27px;
+	width: 17px;
 }
 #lime {
 	background: lime;
@@ -803,7 +804,7 @@ export default {
  display:block;
  width: 1px;
  margin-top:16px;
- background: #feffff;
+ background: #ECE5C9;
  left: 90%;
 }
 
@@ -822,8 +823,8 @@ content:none;
  bottom: 0;
  display:block;
  width: 1px;
- margin-bottom:26px;
- background: #ffffff;
+ margin-bottom:5.3vh;
+ background: #ECE5C9;
  left: 90%;
 }
 #dots > li:nth-child(2) .subdot:after {
@@ -833,10 +834,9 @@ content:none;
  bottom: 0;
  display:block;
  width: 1px;
- margin-top:26px;
- background: #ffffff;
+ margin-top:5.5vh;
+ background: #ECE5C9;
  left: 90%;
-
 }
 
 [data-id=impact][data-open=true] {
@@ -921,7 +921,7 @@ nav{
 h4 {
 	text-transform: uppercase;
 	font-family: "flamaSemi";
-} 
+}
 .slide button {
 }
 .subs {
@@ -1006,7 +1006,7 @@ h4 {
 	bottom: 40px;
 	left: 50%;
 	transform: translateX(-50%);
-	font-family: "heart" !important;	
+	font-family: "heart" !important;
 	color: #ECE5C9;
 	font-size: 40px;
 	cursor: pointer;
@@ -1121,7 +1121,7 @@ h4 {
 		font-size: 12px;
 		margin-bottom: 40px;
 	}
-	
+
 	#home p {
 		font-size: 15px;
 	}
@@ -1327,31 +1327,38 @@ h4 {
 			width: 50%;
 		}
 	}
-	align-items: flex-start;
-	@media(max-width:1400px) {
-		padding-left: 20px;
-	}
+	flex-direction: row;
+	align-items: center;
 	@media(max-width:1150px) {
-		flex-direction: column;
 		align-items: center;
 		.wrap {
 			width: 100%;
 			align-items: center;
 		}
+		h1 {
+			font-size: 26px;
+		}
+		p {
+			line-height: 1;
+		}
 		h4, h1, p {
 			width: 100%;
+			padding-right: 10px;
+			max-width: none;
 		}
 		#circle {
 			width: 300px;
 			height: 300px;
 			transform: none;
-			margin-left: 20px;
+			margin: 0 20px;
+			margin-right: 40px;
 			img {
 				width: 80px;
 			}
 		}
 	}
 	@media(max-width:900px) {
+		flex-direction: column;
 		.bot {
 			flex-direction: column;
 		}
@@ -1386,9 +1393,8 @@ h4 {
 	padding-top: 40px;
 }
 #shader {
-	width: 40%;
+	width: 100%;
 	@media(max-width:1150px) {
-		width: 50%;
 	}
 	@media(max-width:900px) {
 		opacity: 0;
@@ -1400,8 +1406,6 @@ h4 {
 		display: flex;
 		justify-content: center;
 		background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-		padding: 5vh;
-		padding-bottom: 20vh;
 	}
 }
 #blocktext {
@@ -1418,7 +1422,6 @@ h4 {
 	display: flex;
 	align-items: center;
 	#circle {
-		transform: translateY(-30%)
 	}
 }
 #photos {
@@ -1530,7 +1533,7 @@ h4 {
 		#map {
 			margin-bottom: 40px;
 			width: 70% !important;
-		}	
+		}
 		.wrap {
 			align-self: flex-start;
 			width: 40%;
@@ -1596,7 +1599,7 @@ h4 {
 	}
 }
 #collage {
-	display: flex; 
+	display: flex;
 	justify-content: flex-end;
 	align-items: flex-end;
 	height: 60vh;
@@ -1751,7 +1754,7 @@ h4 {
 }
 
 #diff h2 {
-		font-family: "heart" !important;	
+		font-family: "heart" !important;
 		color: #ECE5C9;
 		font-size: 40px;
 		cursor: pointer;
@@ -1865,7 +1868,7 @@ h4 {
 			width: 100%;
 			display: none;
 		}
-		
+
 	}
 	@media(max-width: 1360px) {
 		#formcont {
@@ -1934,7 +1937,7 @@ h4 {
 				width: 100%;
 				padding-bottom: 0;
 			}
-			
+
 			h4 {
 				display: flex;
 			}
@@ -2062,5 +2065,10 @@ h4 {
 		height: 40px;
 	}
 }
+.subwrap {
+	position: relative;
+	z-index: 11;
+}
 </style>
+
 

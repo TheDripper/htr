@@ -17,7 +17,7 @@
 </a>
 </div>
 	<ul class=subdots>
-	<li v-for="(sub,index) in slide.subs" @click=tab($event,true) :data-slide="slide.id" :data-subdex="index">{{ sub.name }}<span class=subdot></span></li>
+	<li v-for="(sub,index) in slide.subs" :data-slide="slide.id" ><a @click=tab($event,true) :data-subdex="index">{{ sub.name }}<span class=subdot :data-subdex="index"></span></a></li>
 	</ul>
 </li>
 </ul>
@@ -443,6 +443,7 @@ export default {
 
 		tab: async function(e,sub) {
 			e.preventDefault();
+			console.log(e.target);
 			if(this.$store.state.vert)
 				this.$store.commit('vert')
 			let id = e.target.closest('.tab').dataset.slide
@@ -568,9 +569,9 @@ export default {
 }
 #closeshade {
 	position: fixed;
-	top: 10px;
+	top: 20px;
 	right: 10px;
-	width: 27px;
+	width: 17px;
 }
 #lime {
 	background: lime;
@@ -795,7 +796,7 @@ export default {
 // display:none;
 //}
 
-#dots li:before {
+#dots > li:before {
  content: '';
  position: absolute;
  top: 0;
@@ -803,7 +804,7 @@ export default {
  display:block;
  width: 1px;
  margin-top:16px;
- background: #feffff;
+ background: #ECE5C9;
  left: 90%;
 }
 
@@ -811,7 +812,7 @@ export default {
  display:none;
 }
 
-#dots li.active:nth-child(2):before {
+#dots > li.active:nth-child(2):before {
 content:none;
 }
 
@@ -823,7 +824,7 @@ content:none;
  display:block;
  width: 1px;
  margin-bottom:5.3vh;
- background: #ffffff;
+ background: #ECE5C9;
  left: 90%;
 }
 #dots > li:nth-child(2) .subdot:after {
@@ -834,7 +835,7 @@ content:none;
  display:block;
  width: 1px;
  margin-top:5.5vh;
- background: #ffffff;
+ background: #ECE5C9;
  left: 90%;
 }
 
@@ -1326,31 +1327,38 @@ h4 {
 			width: 50%;
 		}
 	}
-	align-items: flex-start;
-	@media(max-width:1400px) {
-		padding-left: 20px;
-	}
+	flex-direction: row;
+	align-items: center;
 	@media(max-width:1150px) {
-		flex-direction: column;
 		align-items: center;
 		.wrap {
 			width: 100%;
 			align-items: center;
 		}
+		h1 {
+			font-size: 26px;
+		}
+		p {
+			line-height: 1;
+		}
 		h4, h1, p {
 			width: 100%;
+			padding-right: 10px;
+			max-width: none;
 		}
 		#circle {
 			width: 300px;
 			height: 300px;
 			transform: none;
-			margin-left: 20px;
+			margin: 0 20px;
+			margin-right: 40px;
 			img {
 				width: 80px;
 			}
 		}
 	}
 	@media(max-width:900px) {
+		flex-direction: column;
 		.bot {
 			flex-direction: column;
 		}
@@ -1385,9 +1393,8 @@ h4 {
 	padding-top: 40px;
 }
 #shader {
-	width: 40%;
+	width: 100%;
 	@media(max-width:1150px) {
-		width: 50%;
 	}
 	@media(max-width:900px) {
 		opacity: 0;
@@ -1399,8 +1406,6 @@ h4 {
 		display: flex;
 		justify-content: center;
 		background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-		padding: 5vh;
-		padding-bottom: 20vh;
 	}
 }
 #blocktext {
@@ -1417,7 +1422,6 @@ h4 {
 	display: flex;
 	align-items: center;
 	#circle {
-		transform: translateY(-30%)
 	}
 }
 #photos {
@@ -2061,4 +2065,10 @@ h4 {
 		height: 40px;
 	}
 }
+.subwrap {
+	position: relative;
+	z-index: 11;
+}
 </style>
+
+
