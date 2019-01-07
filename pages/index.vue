@@ -1,6 +1,8 @@
 <template>
 <div id=frame>
+<a href=/dist/><img src=/dist/logo.svg id=logo /></a>
 <div id=preload>
+<div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 </div>
 	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper">
 		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
@@ -155,13 +157,17 @@ const prev = (store) => {
 		store.commit('prev')
 		let prevdex = Number(store.state.current)
 		let prevID = store.state.allslides[prevdex].id
+		let title = store.state.allslides[prevdex].name
 		store.commit('setID',prevID)
 		if(!document.querySelector('#'+prevID))
 			loadSlide(prevID,store,true)
-		if(prevID=='home')
+		if(prevID=='home') {
 			window.history.pushState(null,'','/dist/')
-		else
+			document.title = "Haiti Takes Root"
+		} else {
 			window.history.pushState(null,'','/dist/'+prevID+'/')
+			document.title = "Haiti Takes Root | "+title
+		}
 	}
 	setTimeout(()=>{
 		store.commit('choke')
@@ -180,14 +186,14 @@ const next = async (store) => {
 		store.commit('next')
 		let nextdex = Number(store.state.current)
 		let nextID = store.state.allslides[nextdex].id
-		console.log(nextID)
+		let title = store.state.allslides[nextdex].name
+		document.title = "Haiti Takes Root | "+title
 		store.commit('setID',nextID)
 		window.history.pushState(null,'','/dist/'+nextID+'/')
 		loadSlide(nextID,store,false)
 	}
 	setTimeout(()=>{
 		store.commit('nochoke')
-		console.log('breathe')
 	},800)
 }
 const loadSlide = async function(id,store,isPrev) {
@@ -216,7 +222,6 @@ const vert = function(id,store,subdex) {
 			document.querySelector('#next').style.opacity='1'
 			document.querySelector('#next').style.pointerEvents='auto'
 				store.commit('setDex',subdex);
-				console.log('DEX'+subdex);
 				let newMarg = Number(subdex) * -100 + 'vh'
 				sub.firstChild.style.marginTop = newMarg
 		}
@@ -308,7 +313,6 @@ export default {
 					pape.addEventListener('click',async (e)=>{
 						let mark = await axios('/dist/'+e.target.id+'.html')
 						mark = mark.data
-						console.log(mark)
 						document.querySelector('#modal').innerHTML = mark
 						document.querySelector('#modal').style.opacity = '1'
 						document.querySelector('#modal').style.pointerEvents = 'auto'
@@ -358,6 +362,17 @@ export default {
 					}
 				})
 			}
+			let youwrap = document.querySelector('#youwrap')
+			if(youwrap) {
+				youwrap.addEventListener('click',e=>{
+					document.querySelector('#youshade').style.background = 'black'
+					document.querySelector('#you').src = 'https://www.youtube.com/embed/HtgFx72dj9M?autoplay=1'
+					setTimeout(()=>{
+						document.querySelector('#youshade').style.display = 'none'
+					},3000)
+					document.querySelector('#you').style.pointerEvents = 'auto'
+				})
+			}
 		}
 	},
 	async created() {
@@ -367,7 +382,6 @@ export default {
 		document.addEventListener('wheel',function(e){
 			if(!vuestance.$store.state.vert) {
 				e.preventDefault();
-				console.log(vuestance.$store.state.choke)
 				var view = document.querySelector('#viewer');
 				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
 					vuestance.$store.commit('choke')
@@ -440,11 +454,9 @@ export default {
 		//			let img = new Image()
 		//			img.onload = ()=>{loaded.push(img.src)}
 		//			img.src = sub.id+".png"
-		//			console.log(img)
 		//		})
 		//	}
 		//})
-		//console.log('done')
 		let id = window.location.pathname.split('/').filter(dir=>{
 			return dir != ''
 		})
@@ -458,8 +470,12 @@ export default {
 			document.querySelector('nav').dataset.id = id
 			this.$store.commit('setCur',pagedex)
 			await loadSlide(this.$store.state.id,this.$store,false)
+			let vuestance = this
 			if(id=='home') {
 				await loadSlide('mission',this.$store,false)
+			} else {
+				let title = allslides[pagedex].name
+				document.title = "Haiti Takes Root | "+title
 			}
 		} else {
 			this.$store.commit('setCur',0)
@@ -469,7 +485,6 @@ export default {
 		this.$store.commit('loadAll',allslides);
 		let viewer = document.querySelector('#viewer')
 		imagesloaded(viewer,{background:'.slide'},function(){
-			console.log(document.images)
 			document.querySelector('#preload').style.opacity = '0'
 			document.querySelector('#preload').style.pointerEvents = 'none'
 		})
@@ -479,13 +494,15 @@ export default {
 
 		tab: async function(e,sub) {
 			e.preventDefault();
-			console.log(e.target);
 			if(this.$store.state.vert)
 				this.$store.commit('vert')
 			let id = e.target.closest('.tab').dataset.slide
 			let pages = this.$store.state.pages
 			this.$store.commit('setID',id)
 			this.$store.commit('setCur',pages[id])
+			let curdex = pages[id]
+			let title = this.$store.state.allslides[curdex].name
+			document.title = "Haiti Takes Root | "+title
 			if(!document.querySelector('#'+id))
 				await loadSlide(this.$store.state.id,this.$store,false)
 			setTimeout(()=>{
@@ -503,8 +520,12 @@ export default {
 				document.querySelector('.open').classList.remove('open')
 			}
 			let subs = document.querySelectorAll('.subs')
+			let vuestance = this
 			if(sub) {
 				let subdex = e.target.dataset.subdex
+				//console.log('SUB'+vuestance.$store.state.allslides[curdex].subs[subdex].name)
+				let title = vuestance.$store.state.allslides[curdex].subs[subdex].name
+				document.title = "Haiti Takes Root | "+title
 				vert(id,this.$store,subdex)
 				//for(var i=0; i<subs.length; i++) {
 				//	if(subs[i].parentNode.id==id) {
@@ -518,8 +539,9 @@ export default {
 			let vuestance = this
 			if(showNext) {
 				let sub = document.querySelector('.open').firstChild
+				let open = document.querySelector('.open')
 				var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
-				if(curMarg > ((sub.children.length - 1) * -100)) {
+				if(curMarg > ((open.children.length - 1) * -100)) {
 					curMarg -= 100;
 					sub.style.marginTop = curMarg + 'vh'
 					vuestance.$store.commit('hiDex')
@@ -528,7 +550,6 @@ export default {
 					document.querySelector('.open').style.transform="translateY(100%)"
 					document.querySelector('.open').firstChild.style.marginTop = '0'
 					document.querySelector('.open').classList.remove('open')
-					console.log('vert')
 					vuestance.$store.commit('vert')
 					document.querySelector('#back').style.opacity='0'
 					document.querySelector('#back').style.pointerEvents='none'
@@ -2129,9 +2150,9 @@ h4 {
 }
 @media(max-height:780px) {
 	#logo {
-		top: 5px;
-		left: 5px;
-		width: 50px;
+		top: 10px;
+		left: 10px;
+		width: 80px;
 	}
 	#ex {
 		top: 15px;
@@ -2164,7 +2185,96 @@ h4 {
 	background: black;
 	z-index: 10000;
 	transition: all 0.5s ease;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
+.lds-grid {
+  display: inline-block;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+.lds-grid div {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #ECE5C9;
+  animation: lds-grid 1.2s linear infinite;
+}
+.lds-grid div:nth-child(1) {
+  top: 6px;
+  left: 6px;
+  animation-delay: 0s;
+}
+.lds-grid div:nth-child(2) {
+  top: 6px;
+  left: 26px;
+  animation-delay: -0.4s;
+}
+.lds-grid div:nth-child(3) {
+  top: 6px;
+  left: 45px;
+  animation-delay: -0.8s;
+}
+.lds-grid div:nth-child(4) {
+  top: 26px;
+  left: 6px;
+  animation-delay: -0.4s;
+}
+.lds-grid div:nth-child(5) {
+  top: 26px;
+  left: 26px;
+  animation-delay: -0.8s;
+}
+.lds-grid div:nth-child(6) {
+  top: 26px;
+  left: 45px;
+  animation-delay: -1.2s;
+}
+.lds-grid div:nth-child(7) {
+  top: 45px;
+  left: 6px;
+  animation-delay: -0.8s;
+}
+.lds-grid div:nth-child(8) {
+  top: 45px;
+  left: 26px;
+  animation-delay: -1.2s;
+}
+.lds-grid div:nth-child(9) {
+  top: 45px;
+  left: 45px;
+  animation-delay: -1.6s;
+}
+@keyframes lds-grid {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+iframe {
+}
+#youwrap {
+	position: relative;
+}
+#youshade {
+	width: 100%;
+	height: 100%;
+	background: transparent;
+	transition: all 3s ease;
+	position: absolute;
+}
+
 </style>
+
+
+
+
+
 
 
