@@ -5,9 +5,9 @@ module.exports = {
   //env: {
   //      baseUrl: 'http://localhost:3000'
   //},
-  router: {
-          base: '/dist/'
-  },
+  //router: {
+  //        base: '/dist/'
+  //},
   generate: {
 	  minify: false
   },
@@ -30,11 +30,11 @@ module.exports = {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      { rel: 'stylesheet', type:'text/css', href:'/dist/global.css' }
+      { rel: 'stylesheet', type:'text/css', href:'/global.css' }
     ],
     script: [
       { src: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js' },
-      { src: '/dist/mailer.js' } 
+      { src: '/mailer.js' } 
     ]
   },
 

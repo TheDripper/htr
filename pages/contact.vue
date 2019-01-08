@@ -1,21 +1,21 @@
 <template>
 <div id=frame>
-<a href=/dist/><img src=/dist/logo.svg id=logo /></a>
 <div id=preload>
 <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 </div>
-	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper">
-		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/dist/' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
+	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper" :data-current="$store.state.id">
+		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
 		</div>
 	</div>
-	<div id=back @click=novert($event,false)><img src=/dist/back.svg />BACK</div>
-	<div id=next @click=novert($event,true)><img src=/dist/next.svg />NEXT</div>
-<h4 id=ex @click="mob">Explore <img id=burger src=~/assets/burger.svg /></h4>
+	<div id=back @click=novert($event,false)><img src=/back.svg />BACK</div>
+	<div id=next @click=novert($event,true)><img src=/next.svg />NEXT</div>
+<h4 id=ex @click="mob" :data-current="$store.state.id">Explore <img id=burger src=~/assets/burger.svg /></h4>
+<a href=/ :data-current="$store.state.id"><img src=/logo.svg id=logo /></a>
 <nav :data-id="$store.state.id" :data-open="$store.state.vert" :data-cursub="$store.state.subdex">
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
 <div class=wrap>
-<a @click=tab($event,false) :href="'/dist/'+slide.id+'/'" :data-dex="index">{{ slide.id }}
+<a @click=tab($event,false) :href="'/'+slide.id+'/'" :data-dex="index">{{ slide.id }}
 <span class=dot>
 </span>
 </a>
@@ -32,7 +32,7 @@
 <li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" @click=tab($event,false) :data-slide="slide.id" class=tab>{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
-<img id=close src=/dist/close.svg @click="nomob" />
+<img id=close src=/close.svg @click="nomob" />
 </div>
 <div id=modal>
 </div>
@@ -73,9 +73,9 @@ function goto(id,store) {
 	let newMarg = targ * -100
 	first.style.marginLeft = newMarg + 'vw'
 	if(id=='home')
-		window.history.pushState(null,'','/dist/')
+		window.history.pushState(null,'','/')
 	else
-		window.history.pushState(null,'','/dist/'+id+'/')
+		window.history.pushState(null,'','/'+id+'/')
 }
 
 const axios = require('axios')
@@ -106,15 +106,16 @@ const throttle = (func, limit) => {
   }
 }
 const up = (store) => {
-	let sub = document.querySelector('.open').firstChild
+	let sub = document.querySelector('.open')
 	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
-	if(curMarg < 0) {
+	if(curMarg < 0 || window.innerWidth < 600) {
 		curMarg += 100;
 		sub.style.marginTop = curMarg + 'vh'
 		store.commit('lowDex')
 	} else {
 		document.querySelector('.open').style.transform="translateY(100%)"
 		document.querySelector('.open').firstChild.style.marginTop = '0'
+		document.querySelector('.open').parentNode.classList.remove('scroller')
 		document.querySelector('.open').classList.remove('open')
 		store.commit('vert')
 		document.querySelector('#back').style.opacity='0'
@@ -129,8 +130,9 @@ const up = (store) => {
 	},1100)
 }
 const down = (store) => {
-	let sub = document.querySelector('.open').firstChild
+	let sub = document.querySelector('.open')
 	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
+	console.log(curMarg)
 	if(curMarg > ((sub.children.length - 1) * -100)) {
 		curMarg -= 100;
 		sub.style.marginTop = curMarg + 'vh'
@@ -162,10 +164,10 @@ const prev = (store) => {
 		if(!document.querySelector('#'+prevID))
 			loadSlide(prevID,store,true)
 		if(prevID=='home') {
-			window.history.pushState(null,'','/dist/')
+			window.history.pushState(null,'','/')
 			document.title = "Haiti Takes Root"
 		} else {
-			window.history.pushState(null,'','/dist/'+prevID+'/')
+			window.history.pushState(null,'','/'+prevID+'/')
 			document.title = "Haiti Takes Root | "+title
 		}
 	}
@@ -189,7 +191,7 @@ const next = async (store) => {
 		let title = store.state.allslides[nextdex].name
 		document.title = "Haiti Takes Root | "+title
 		store.commit('setID',nextID)
-		window.history.pushState(null,'','/dist/'+nextID+'/')
+		window.history.pushState(null,'','/'+nextID+'/')
 		loadSlide(nextID,store,false)
 	}
 	setTimeout(()=>{
@@ -198,7 +200,7 @@ const next = async (store) => {
 }
 const loadSlide = async function(id,store,isPrev) {
 	if(!document.querySelector('#'+id)) {
-		let nextMark = await axios(window.location.origin+'/dist/'+id+'.html')
+		let nextMark = await axios(window.location.origin+'/'+id+'.html')
 		let order = Number(store.state.pages[id])
 		let newSlide = {
 			id: id,
@@ -218,6 +220,7 @@ const vert = function(id,store,subdex) {
 	document.querySelectorAll('.subs').forEach(sub=>{
 		if(sub.parentNode.id==id) {
 			sub.classList.add('open')
+			sub.parentNode.classList.add('scroller')
 			sub.style.transform = "translateY(0%)"
 			document.querySelector('#next').style.opacity='1'
 			document.querySelector('#next').style.pointerEvents='auto'
@@ -233,7 +236,7 @@ const vert = function(id,store,subdex) {
 const spinner = function(e){
 	document.getElementById('circle').dataset.cur=e.target.id
 	document.getElementById('blocktext').textContent = e.target.dataset.copy
-	document.getElementById('green').src = '/dist/green'+e.target.id+'.png'
+	document.getElementById('green').src = '/green'+e.target.id+'.png'
 	document.querySelector('.big').classList.remove('big')
 	e.target.classList.add('big')
 	if(window.innerWidth < 900) {
@@ -303,7 +306,7 @@ export default {
 					butt.addEventListener('click',function(e){
 						document.querySelector('.timeon').classList.remove('timeon')
 						e.target.classList.add('timeon')
-						document.querySelector('#mapmage').src = '/dist/impact_trees_'+e.target.dataset.view+'.svg'
+						document.querySelector('#mapmage').src = '/impact_trees_'+e.target.dataset.view+'.svg'
 					})
 				})
 			}
@@ -311,7 +314,7 @@ export default {
 			if(bindpape) {
 				bindpape.forEach(pape=>{
 					pape.addEventListener('click',async (e)=>{
-						let mark = await axios('/dist/'+e.target.id+'.html')
+						let mark = await axios('/'+e.target.id+'.html')
 						mark = mark.data
 						document.querySelector('#modal').innerHTML = mark
 						document.querySelector('#modal').style.opacity = '1'
@@ -357,7 +360,7 @@ export default {
 							formcont.dataset.off='false'
 						},2000)
 						let formdata = serialize(formcont)
-						let res = await axios.post('/dist/mailer.php',formdata)
+						let res = await axios.post('/mailer.php',formdata)
 						formcont.innerHTML="<h2 id=thanks>Thank you for connecting!</h2>"
 					}
 				})
@@ -393,17 +396,18 @@ export default {
 					return;
 				}
 			} else {
-				e.preventDefault();
-				if (e.deltaY > 0 && !vuestance.$store.state.choke) {
-					vuestance.$store.commit('choke')
-					down(vuestance.$store)
-				} else if (e.deltaY < 0 && !vuestance.$store.state.choke) {
-					vuestance.$store.commit('choke')
-					up(vuestance.$store)
-				} else {
-					return
+				if(window.innerWidth > 600) {
+					e.preventDefault();
+					if (e.deltaY > 0 && !vuestance.$store.state.choke) {
+						vuestance.$store.commit('choke')
+						down(vuestance.$store)
+					} else if (e.deltaY < 0 && !vuestance.$store.state.choke) {
+						vuestance.$store.commit('choke')
+						up(vuestance.$store)
+					} else {
+						return
+					}
 				}
-
 			}
 		})
 		let allslides = [
@@ -460,8 +464,9 @@ export default {
 		let id = window.location.pathname.split('/').filter(dir=>{
 			return dir != ''
 		})
+		console.log('id'+id)
 		id = id[id.length-1]
-		if(id=='dist')
+		if(!id)
 			id='home'
 		let pages = this.$store.state.pages
 		if(id) {
@@ -517,6 +522,7 @@ export default {
 			if(document.querySelector('.open')) {
 				document.querySelector('.open').style.transform = 'translateY(100%)'
 				document.querySelector('.open').firstChild.style.marginTop = '0'
+				document.querySelector('.open').parentNode.classList.remove('scroller')
 				document.querySelector('.open').classList.remove('open')
 			}
 			let subs = document.querySelectorAll('.subs')
@@ -525,8 +531,10 @@ export default {
 				let subdex = e.target.dataset.subdex
 				//console.log('SUB'+vuestance.$store.state.allslides[curdex].subs[subdex].name)
 				let title = vuestance.$store.state.allslides[curdex].subs[subdex].name
+				let subid = vuestance.$store.state.allslides[curdex].subs[subdex].id
 				document.title = "Haiti Takes Root | "+title
 				vert(id,this.$store,subdex)
+				vuestance.$store.commit('setID',subid)
 				//for(var i=0; i<subs.length; i++) {
 				//	if(subs[i].parentNode.id==id) {
 				//		subs[i].style.transform='translate(0)'
@@ -537,8 +545,24 @@ export default {
 		},
 		novert: function(e,showNext) {
 			let vuestance = this
+			if(window.innerWidth < 600) {
+				document.querySelector('.open').style.transform="translateY(100%)"
+				document.querySelector('.open').firstChild.style.marginTop = '0'
+				document.querySelector('.open').parentNode.scrollTop = 0
+				document.querySelector('.open').parentNode.classList.remove('scroller')
+				document.querySelector('.open').classList.remove('open')
+				vuestance.$store.commit('vert')
+				document.querySelector('#back').style.opacity='0'
+				document.querySelector('#back').style.pointerEvents='none'
+				document.querySelector('#next').style.opacity='0'
+				document.querySelector('#next').style.pointerEvents='none'
+				if(showNext) {
+					next(vuestance.$store)
+				} else {
+				}
+			} else {
 			if(showNext) {
-				let sub = document.querySelector('.open').firstChild
+				let sub = document.querySelector('.open')
 				let open = document.querySelector('.open')
 				var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
 				if(curMarg > ((open.children.length - 1) * -100)) {
@@ -549,6 +573,7 @@ export default {
 					next(vuestance.$store)
 					document.querySelector('.open').style.transform="translateY(100%)"
 					document.querySelector('.open').firstChild.style.marginTop = '0'
+					document.querySelector('.open').parentNode.classList.remove('scroller')
 					document.querySelector('.open').classList.remove('open')
 					vuestance.$store.commit('vert')
 					document.querySelector('#back').style.opacity='0'
@@ -575,6 +600,7 @@ export default {
 				//	vuestance.$store.commit('vert')
 				//}
 			}
+			}
 		},
 		mob: function(e) {
 			document.querySelector('#explore').style.opacity='1';
@@ -597,13 +623,13 @@ export default {
 					prev(this.$store)
 				}
 			} else {
-				if(e=='top') {
-					this.$store.commit('choke')
-					down(this.$store)
-				} else if (e=='bottom') {
-					this.$store.commit('choke')
-					up(this.$store)
-				}
+				//if(e=='top') {
+				//	this.$store.commit('choke')
+				//	down(this.$store)
+				//} else if (e=='bottom') {
+				//	this.$store.commit('choke')
+				//	up(this.$store)
+				//}
 			}
 		}
 
@@ -1218,7 +1244,7 @@ h4 {
 	transition: all 0.3s ease;
 }
 #dot {
-	background-image: url('/dist/dot.png');
+	background-image: url('/dot.png');
 	width: 318px;
 	height: 216px;
 	background-size: cover;
@@ -1276,7 +1302,7 @@ h4 {
 	position: absolute;
 	right: 15%;
 	max-width: 100%;
-	background-image: url('/dist/circleback.svg');
+	background-image: url('/circleback.svg');
 	background-size: 90%;
 	background-position: center;
 	background-repeat: no-repeat;
@@ -1489,7 +1515,7 @@ h4 {
 	}
 }
 #copyblock {
-	background: url('/dist/copyblock.png');
+	background: url('/copyblock.png');
 	background-size: cover;
 	padding: 20px;
 	padding-bottom: 25px;
@@ -1697,7 +1723,7 @@ h4 {
 #fivestory {
 }
 .paper {
-	background-image: url('/dist/paper.png');
+	background-image: url('/paper.png');
 	padding: 12px 10px;
 	transition: all 0.2s ease;
 	cursor: pointer;
@@ -1876,7 +1902,7 @@ h4 {
 }
 @font-face {
 	font-family: "heart";
-	src: url('/dist/heartone.ttf')
+	src: url('/heartone.ttf')
 }
 .slide {
 	h1, h4, p {
@@ -2101,7 +2127,7 @@ h4 {
 	z-index: 9999;
 }
 #impact_stories {
-	background-image:url('/dist/leaf.png'),linear-gradient(to top, #d8cfb7, #d8cfb7) !important;
+	background-image:url('/leaf.png'),linear-gradient(to top, #d8cfb7, #d8cfb7) !important;
 }
 .cls-9 {
 	cursor: pointer;
@@ -2269,8 +2295,14 @@ iframe {
 	transition: all 3s ease;
 	position: absolute;
 }
+@media(max-width:600px) {
+	.scroller {
+		overflow-y: scroll;
+	}
+}
 
 </style>
+
 
 
 
