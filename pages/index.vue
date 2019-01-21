@@ -7,9 +7,9 @@
 		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
 		</div>
 	</div>
-	<div id=back @click=novert($event,false)><img src=/back.svg />BACK</div>
-	<div id=next @click=novert($event,true)><img src=/next.svg />NEXT</div>
-<h4 id=ex @click="mob" :data-current="$store.state.id">Explore <img id=burger src=~/assets/burger.svg /></h4>
+	<div id=back @click=novert($event,false)><img src=/back.svg />précédent</div>
+	<div id=next @click=novert($event,true)><img src=/next.svg />suivant</div>
+<h4 id=ex @click="mob" :data-current="$store.state.id">Explorer <img id=burger src=~/assets/burger.svg /></h4>
 <a href=/ :data-current="$store.state.id"><img src=/logo.svg id=logo /></a>
 <nav :data-id="$store.state.id" :data-open="$store.state.vert" :data-cursub="$store.state.subdex">
 <ul id=dots>
@@ -165,10 +165,10 @@ const prev = (store) => {
 			loadSlide(prevID,store,true)
 		if(prevID=='home') {
 			window.history.pushState(null,'','/')
-			document.title = "Haiti Takes Root"
+			document.title = "Haiti Prend Racine"
 		} else {
 			window.history.pushState(null,'','/'+prevID+'/')
-			document.title = "Haiti Takes Root | "+title
+			document.title = "Haiti Prend Racine | "+title
 		}
 	}
 	setTimeout(()=>{
@@ -189,7 +189,7 @@ const next = async (store) => {
 		let nextdex = Number(store.state.current)
 		let nextID = store.state.allslides[nextdex].id
 		let title = store.state.allslides[nextdex].name
-		document.title = "Haiti Takes Root | "+title
+		document.title = "Haiti Prend Racine | "+title
 		store.commit('setID',nextID)
 		window.history.pushState(null,'','/'+nextID+'/')
 		loadSlide(nextID,store,false)
@@ -413,7 +413,7 @@ export default {
 		let allslides = [
 			{
 				id: 'home',
-				name: "Home",
+				name: "Accueil",
 			},
 			{
 				id: 'mission',
@@ -480,7 +480,7 @@ export default {
 				await loadSlide('mission',this.$store,false)
 			} else {
 				let title = allslides[pagedex].name
-				document.title = "Haiti Takes Root | "+title
+				document.title = "Haiti Prend Racine | "+title
 			}
 		} else {
 			this.$store.commit('setCur',0)
@@ -507,7 +507,7 @@ export default {
 			this.$store.commit('setCur',pages[id])
 			let curdex = pages[id]
 			let title = this.$store.state.allslides[curdex].name
-			document.title = "Haiti Takes Root | "+title
+			document.title = "Haiti Prend Racine | "+title
 			if(!document.querySelector('#'+id))
 				await loadSlide(this.$store.state.id,this.$store,false)
 			setTimeout(()=>{
@@ -532,7 +532,7 @@ export default {
 				//console.log('SUB'+vuestance.$store.state.allslides[curdex].subs[subdex].name)
 				let title = vuestance.$store.state.allslides[curdex].subs[subdex].name
 				let subid = vuestance.$store.state.allslides[curdex].subs[subdex].id
-				document.title = "Haiti Takes Root | "+title
+				document.title = "Haiti Prend Racine | "+title
 				vert(id,this.$store,subdex)
 				vuestance.$store.commit('setID',subid)
 				//for(var i=0; i<subs.length; i++) {
@@ -1072,6 +1072,7 @@ h4 {
 	cursor: pointer;
 	display: flex;
 	align-items: center;
+	text-transform: uppercase;
 	img {
 		width: 40px;
 		margin-right: 10px;
@@ -1086,7 +1087,7 @@ h4 {
 	color: #ECE5D1;
 	position: fixed;
 	bottom: 10px;
-	left: 130px;
+	left: 170px;
 	opacity: 0;
 	transition: all 0.3s ease;
 	font-family: "flamaSemi";
@@ -1095,6 +1096,7 @@ h4 {
 	cursor: pointer;
 	display: flex;
 	align-items: center;
+	text-transform: uppercase;
 	img {
 		width: 40px;
 		margin-right: 10px;
@@ -2302,10 +2304,3 @@ iframe {
 }
 
 </style>
-
-
-
-
-
-
-
