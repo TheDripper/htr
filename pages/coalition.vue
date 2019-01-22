@@ -2195,6 +2195,17 @@ h4 {
 		margin-top: 0 !important;
 		margin-bottom: 20px
 	}
+	@media(max-width:1660px) {
+		width: 100vw;
+		.wrap {
+			padding-right: 20px;
+		}
+	}
+	@media(max-width:950px) {
+		flex-direction: column;
+		height: 100vh;
+		overflow: scroll;
+	}
 }
 @media(max-height:780px) {
 	#logo {

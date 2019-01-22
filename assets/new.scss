@@ -94,3 +94,80 @@
 		width: 300px;
 	}
 }
+#coalition_board {
+	flex-direction: row;
+	@media(max-width:900px) {
+		flex-direction: column;
+		#board {
+			height: 40vh;
+			width: 60%
+		}
+		.wrap {
+			align-self: flex-start;
+			transform: translateY(-20px);
+			h1 {
+				font-size: 24px;
+			}
+			h2 {
+				font-size: 14px;
+			}
+
+		}
+	}
+}
+#boardone {
+	z-index: 2;
+	position: absolute;
+    	top: 0;
+    	left: 0;
+    	width: 30%;
+}
+#boardthree {
+    	position: absolute;
+    	left: 50%;
+    	top: 50%;
+    	transform: translate(-50%,-69%);
+    	width: 70%;
+}
+#boardfive {
+	flex: 40%;
+	z-index: 10;
+    width: 10%;
+    position: absolute;
+    width: 70%;
+    bottom: 0;
+    left: 0;
+}
+#boardfour {
+	flex: 50%;
+    width: 50%;
+    transform: translate(25%,30%);
+    position: absolute;
+}
+#boardtwo {
+	flex: 20%;
+	width: 60%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translateY(-50%);
+}
+#board {
+	display: flex;
+	justify-content: flex-end;
+	align-items: flex-end;
+	height: 60vh;
+	position: relative;
+	flex-wrap: wrap;
+	width: 80%;
+	max-width: 600px;
+
+}
+.curs {
+    font-family: "heart" !important;
+    color: #ECE5C9;
+    font-size: 40px;
+    cursor: pointer;
+}
+#story {
+}
