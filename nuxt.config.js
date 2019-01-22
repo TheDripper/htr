@@ -21,7 +21,7 @@ module.exports = {
   ** Headers of the page
   */
   head: {
-    title: 'Haiti Prend Racine',
+    title: 'Haiti Takes Root',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -31,12 +31,12 @@ module.exports = {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       { rel: 'stylesheet', type:'text/css', href:'/global.css' },
-      { rel: 'stylesheet', type:'text/css', href:'http://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css' }
+      { rel: 'stylesheet', type:'text/css', href:'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css' }
     ],
     script: [
       { src: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js' },
       { src: '/mailer.js' },
-      { src: 'http://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js' }
+      { src: 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js' }
     ]
   },
 

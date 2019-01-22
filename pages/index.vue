@@ -15,7 +15,7 @@
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
 <div class=wrap>
-<a @click=tab($event,false) :href="'/'+slide.id+'/'" :data-dex="index">{{ slide.id }}
+<a @click=tab($event,false) :href="'/'+slide.id+'/'" :data-dex="index">{{ slide.name }}
 <span class=dot>
 </span>
 </a>
@@ -165,10 +165,10 @@ const prev = (store) => {
 			loadSlide(prevID,store,true)
 		if(prevID=='home') {
 			window.history.pushState(null,'','/')
-			document.title = "Haiti Prend Racine"
+			document.title = "Haiti Takes Root"
 		} else {
 			window.history.pushState(null,'','/'+prevID+'/')
-			document.title = "Haiti Prend Racine | "+title
+			document.title = "Haiti Takes Root | "+title
 		}
 	}
 	setTimeout(()=>{
@@ -189,7 +189,7 @@ const next = async (store) => {
 		let nextdex = Number(store.state.current)
 		let nextID = store.state.allslides[nextdex].id
 		let title = store.state.allslides[nextdex].name
-		document.title = "Haiti Prend Racine | "+title
+		document.title = "Haiti Takes Root | "+title
 		store.commit('setID',nextID)
 		window.history.pushState(null,'','/'+nextID+'/')
 		loadSlide(nextID,store,false)
@@ -219,6 +219,7 @@ const loadSlide = async function(id,store,isPrev) {
 const vert = function(id,store,subdex) {
 	document.querySelectorAll('.subs').forEach(sub=>{
 		if(sub.parentNode.id==id) {
+			console.log(sub.firstChild)
 			sub.classList.add('open')
 			sub.parentNode.classList.add('scroller')
 			sub.style.transform = "translateY(0%)"
@@ -376,6 +377,26 @@ export default {
 					document.querySelector('#you').style.pointerEvents = 'auto'
 				})
 			}
+			var slickopts = {
+				"prevArrow": "<span class=prev><</span>",
+				"nextArrow": "<span class=next>></span>",
+			}
+			if($('.sli').not('.slick-initialized').length)
+				$('.sli').not('.slick-initialized').slick({
+					"prevArrow": "<img src=/prev.svg / class=prevrow />",
+					"nextArrow": "<img src=/nextrow.svg / class=nextrow />"
+				});
+
+			if($('.slimob').not('.slick-initialized').length && $(window).width() < 1000)
+				$('.slimob').not('.slick-initialized').slick(slickopts);
+			window.addEventListener('resize',()=>{
+				if($('.slimob').not('.slick-initialized').length && $(window).width() < 1000)
+					$('.slimob').not('.slick-initialized').slick(slickopts);
+				else if ($('.slimob.slick-initialized').length && $(window).width() > 1000)
+					$('.slimob.slick-initialized').slick('unslick')
+
+
+			})
 		}
 	},
 	async created() {
@@ -413,7 +434,7 @@ export default {
 		let allslides = [
 			{
 				id: 'home',
-				name: "Accueil",
+				name: "Home",
 			},
 			{
 				id: 'mission',
@@ -443,6 +464,32 @@ export default {
 				//	}
 				//]
 			},
+			//{
+			//	"id": "coalition",
+			//	"name": "Coalition" ,
+			//	subs: [
+			//	 	{
+			//	 	       "id":"coaltion_who",
+			//	 	       "name":"Our Coalition"
+			//	 	},
+			//		{
+			//	 	       "id":"coaltion_board",
+			//	 	       "name":"Board of Advisors"
+			//		},
+			//		{
+			//	 	       "id":"coaltion_testimonials",
+			//	 	       "name":"Supporter Testimonials"
+			//		}
+			//	]
+			//},
+			//{
+			//	"id": "activities",
+			//	"name": "Activities"
+			//},
+			//{
+			//	"id": "news_events",
+			//	"name": "News + Events"
+			//},
 			{
 				id: 'contact',
 				name: 'Contact'
@@ -480,7 +527,7 @@ export default {
 				await loadSlide('mission',this.$store,false)
 			} else {
 				let title = allslides[pagedex].name
-				document.title = "Haiti Prend Racine | "+title
+				document.title = "Haiti Takes Root | "+title
 			}
 		} else {
 			this.$store.commit('setCur',0)
@@ -507,7 +554,7 @@ export default {
 			this.$store.commit('setCur',pages[id])
 			let curdex = pages[id]
 			let title = this.$store.state.allslides[curdex].name
-			document.title = "Haiti Prend Racine | "+title
+			document.title = "Haiti Takes Root | "+title
 			if(!document.querySelector('#'+id))
 				await loadSlide(this.$store.state.id,this.$store,false)
 			setTimeout(()=>{
@@ -532,7 +579,7 @@ export default {
 				//console.log('SUB'+vuestance.$store.state.allslides[curdex].subs[subdex].name)
 				let title = vuestance.$store.state.allslides[curdex].subs[subdex].name
 				let subid = vuestance.$store.state.allslides[curdex].subs[subdex].id
-				document.title = "Haiti Prend Racine | "+title
+				document.title = "Haiti Takes Root | "+title
 				vert(id,this.$store,subdex)
 				vuestance.$store.commit('setID',subid)
 				//for(var i=0; i<subs.length; i++) {
@@ -612,6 +659,7 @@ export default {
 		},
 		swiper: function(e) {
 			if(!this.$store.state.vert) {
+				console.log('novert')
 				var view = document.querySelector('#viewer');
 				var slide = view.firstChild;
 				var count = view.dataset.count;
@@ -906,7 +954,7 @@ export default {
 // display:none;
 //}
 
-#dots > li:before {
+#dots > li:before { //NAVLINES
  content: '';
  position: absolute;
  top: 0;
@@ -926,7 +974,7 @@ export default {
 content:none;
 }
 
-#dots > li:nth-child(2) .subdot:before {
+#dots > li:nth-child(2) .subdot:before { //NAVLINES
  content: '';
  position: absolute;
  top: 0;
@@ -1225,7 +1273,7 @@ h4 {
 		max-width: 80%;
 	}
 	.slide * {
-		max-width: 100% !important;
+		//max-width: 100% !important;
 	}
 	.slide h1 {
 		margin-bottom: 10px;
@@ -2164,6 +2212,10 @@ h4 {
 		flex-shrink: 0;
 		background-size: cover;
 		margin-right: 40px;
+		max-width: 100%;
+		@media(max-width:950px) {
+			margin: 0 auto;
+		}
 	}
 	h1, h4, p {
 		color: #373930;
@@ -2174,6 +2226,17 @@ h4 {
 	h4 {
 		margin-top: 0 !important;
 		margin-bottom: 20px
+	}
+	@media(max-width:1660px) {
+		width: 100vw;
+		.wrap {
+			padding-right: 20px;
+		}
+	}
+	@media(max-width:950px) {
+		flex-direction: column;
+		height: 100vh;
+		overflow: scroll;
 	}
 }
 @media(max-height:780px) {
@@ -2304,3 +2367,4 @@ iframe {
 }
 
 </style>
+
