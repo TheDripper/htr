@@ -2,12 +2,12 @@ const pkg = require('./package')
 
 module.exports = {
   mode: 'universal',
-  //env: {
-  //      baseUrl: 'http://localhost:3000'
-  //},
-  //router: {
-  //        base: '/fr/'
-  //},
+  env: {
+        baseUrl: 'http://localhost:3000/stage'
+  },
+  router: {
+          base: '/stage/'
+  },
   generate: {
 	  minify: false
   },
@@ -30,7 +30,7 @@ module.exports = {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      { rel: 'stylesheet', type:'text/css', href:'/global.css' },
+      { rel: 'stylesheet', type:'text/css', href:'global.css' },
       { rel: 'stylesheet', type:'text/css', href:'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css' }
     ],
     script: [

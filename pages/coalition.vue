@@ -10,7 +10,7 @@
 	<div id=back @click=novert($event,false)><img src=/back.svg />précédent</div>
 	<div id=next @click=novert($event,true)><img src=/next.svg />suivant</div>
 <h4 id=ex @click="mob" :data-current="$store.state.id">Explorer <img id=burger src=~/assets/burger.svg /></h4>
-<a href=/ :data-current="$store.state.id"><img src=/logo.svg id=logo /></a>
+<a href=/stage :data-current="$store.state.id"><img src=/logo.svg id=logo /></a>
 <nav :data-id="$store.state.id" :data-open="$store.state.vert" :data-cursub="$store.state.subdex">
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
@@ -46,6 +46,8 @@ const nomode = ()=>{
 	document.querySelector('#modal').style.opacity = '0'
 	document.querySelector('#modal').style.pointerEvents = 'none'
 }
+//const baseURL = 'http://haititakesroot.org/stage'
+const baseURL = 'http://localhost:3000/stage'
 function cleanOrder(store) {
 	let viewer = document.querySelector('#viewer').childNodes
 	let slides = store.state.slides
@@ -200,7 +202,7 @@ const next = async (store) => {
 }
 const loadSlide = async function(id,store,isPrev) {
 	if(!document.querySelector('#'+id)) {
-		let nextMark = await axios(window.location.origin+'/'+id+'.html')
+		let nextMark = await axios(baseURL+'/'+id+'.html')
 		let order = Number(store.state.pages[id])
 		let newSlide = {
 			id: id,
@@ -513,8 +515,9 @@ export default {
 		})
 		console.log('id'+id)
 		id = id[id.length-1]
-		if(!id)
+		if(id=='stage')
 			id='home'
+		console.log('id'+id)
 		let pages = this.$store.state.pages
 		if(id) {
 			let pagedex = pages[id]
@@ -793,10 +796,10 @@ export default {
 }
 #dots > li {
 	display: flex;
-	align-items: flex-end;
+	align-items: center;
 	flex-direction: column;
 	position: relative;
-	height: calc(12vh + 2px);
+	height: calc(22vh + 2px);
 	flex-shrink: 0;
 	background-size: 14px;
 	background-position: 100% 2px;
@@ -874,14 +877,6 @@ export default {
     		padding: 0;
 		transition: all 0.2s ease;
 		transform: translateX(21px);
-		padding: 20px;
-		@media(max-height: 780px) {
-			padding-top: 10px;
-			padding-bottom: 5px;
-			a {
-				font-size: 10px !important;
-			}
-		}
 		li {
 			position: relative;
 			color: #ECE5C9;
@@ -972,7 +967,6 @@ export default {
  margin-top:16px;
  background: #ECE5C9;
  left: 90%;
- display: none;
 }
 
 #dots li:last-child:before {
@@ -993,7 +987,6 @@ content:none;
  margin-bottom:5.3vh;
  background: #ECE5C9;
  left: 90%;
- display: none;
 }
 #dots > li:nth-child(2) .subdot:after {
  content: '';
@@ -2377,3 +2370,5 @@ iframe {
 }
 
 </style>
+
+

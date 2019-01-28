@@ -4,13 +4,13 @@
 <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 </div>
 	<div id=viewer :data-count="$store.state.slides.length" v-touch:swipe="swiper" :data-current="$store.state.id">
-		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(/' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
+		<div class="slide" v-for="slide in $store.state.slides" :id="slide.id" :data-slide="slide.img" :style="{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(' +slide.img+ ')' }" v-html="slide.mark" :data-dex="$store.state.pages[slide.id]">
 		</div>
 	</div>
-	<div id=back @click=novert($event,false)><img src=/back.svg />précédent</div>
-	<div id=next @click=novert($event,true)><img src=/next.svg />suivant</div>
+	<div id=back @click=novert($event,false)><img src=back.svg />back</div>
+	<div id=next @click=novert($event,true)><img src=next.svg />next</div>
 <h4 id=ex @click="mob" :data-current="$store.state.id">Explorer <img id=burger src=~/assets/burger.svg /></h4>
-<a href=/ :data-current="$store.state.id"><img src=/logo.svg id=logo /></a>
+<a href=/ :data-current="$store.state.id"><img src=logo.svg id=logo /></a>
 <nav :data-id="$store.state.id" :data-open="$store.state.vert" :data-cursub="$store.state.subdex">
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
@@ -32,7 +32,7 @@
 <li v-for="(slide,index) in $store.state.allslides"><a :class="{'active':index===$store.state.current}" @click=tab($event,false) :data-slide="slide.id" class=tab>{{ slide.name }}</a></li>
 </ul>
 <img id=flower src=~/assets/flower.svg />
-<img id=close src=/close.svg @click="nomob" />
+<img id=close src=close.svg @click="nomob" />
 </div>
 <div id=modal>
 </div>
@@ -46,6 +46,8 @@ const nomode = ()=>{
 	document.querySelector('#modal').style.opacity = '0'
 	document.querySelector('#modal').style.pointerEvents = 'none'
 }
+const baseURL = 'http://haititakesroot.org/stage'
+const basePush = '/stage'
 function cleanOrder(store) {
 	let viewer = document.querySelector('#viewer').childNodes
 	let slides = store.state.slides
@@ -73,9 +75,9 @@ function goto(id,store) {
 	let newMarg = targ * -100
 	first.style.marginLeft = newMarg + 'vw'
 	if(id=='home')
-		window.history.pushState(null,'','/')
+		window.history.pushState(null,'',basePush+'/')
 	else
-		window.history.pushState(null,'','/'+id+'/')
+		window.history.pushState(null,'',basePush+'/'+id+'/')
 }
 
 const axios = require('axios')
@@ -164,10 +166,10 @@ const prev = (store) => {
 		if(!document.querySelector('#'+prevID))
 			loadSlide(prevID,store,true)
 		if(prevID=='home') {
-			window.history.pushState(null,'','/')
+			window.history.pushState(null,'',basePush+'/')
 			document.title = "Haiti Takes Root"
 		} else {
-			window.history.pushState(null,'','/'+prevID+'/')
+			window.history.pushState(null,'',basePush+'/'+prevID+'/')
 			document.title = "Haiti Takes Root | "+title
 		}
 	}
@@ -191,7 +193,7 @@ const next = async (store) => {
 		let title = store.state.allslides[nextdex].name
 		document.title = "Haiti Takes Root | "+title
 		store.commit('setID',nextID)
-		window.history.pushState(null,'','/'+nextID+'/')
+		window.history.pushState(null,'',basePush+'/'+nextID+'/')
 		loadSlide(nextID,store,false)
 	}
 	setTimeout(()=>{
@@ -199,8 +201,9 @@ const next = async (store) => {
 	},800)
 }
 const loadSlide = async function(id,store,isPrev) {
+	console.log(this)
 	if(!document.querySelector('#'+id)) {
-		let nextMark = await axios(window.location.origin+'/'+id+'.html')
+		let nextMark = await axios(baseURL+'/'+id+'.html')
 		let order = Number(store.state.pages[id])
 		let newSlide = {
 			id: id,
@@ -237,7 +240,7 @@ const vert = function(id,store,subdex) {
 const spinner = function(e){
 	document.getElementById('circle').dataset.cur=e.target.id
 	document.getElementById('blocktext').textContent = e.target.dataset.copy
-	document.getElementById('green').src = '/green'+e.target.id+'.png'
+	document.getElementById('green').src = 'green'+e.target.id+'.png'
 	document.querySelector('.big').classList.remove('big')
 	e.target.classList.add('big')
 	if(window.innerWidth < 900) {
@@ -307,7 +310,7 @@ export default {
 					butt.addEventListener('click',function(e){
 						document.querySelector('.timeon').classList.remove('timeon')
 						e.target.classList.add('timeon')
-						document.querySelector('#mapmage').src = '/impact_trees_'+e.target.dataset.view+'.svg'
+						document.querySelector('#mapmage').src = 'impact_trees_'+e.target.dataset.view+'.svg'
 					})
 				})
 			}
@@ -383,8 +386,8 @@ export default {
 			}
 			if($('.sli').not('.slick-initialized').length)
 				$('.sli').not('.slick-initialized').slick({
-					"prevArrow": "<img src=/prev.svg / class=prevrow />",
-					"nextArrow": "<img src=/nextrow.svg / class=nextrow />"
+					"prevArrow": "<img src=prev.svg / class=prevrow />",
+					"nextArrow": "<img src=nextrow.svg / class=nextrow />"
 				});
 
 			if($('.slimob').not('.slick-initialized').length && $(window).width() < 1000)
@@ -513,7 +516,7 @@ export default {
 		})
 		console.log('id'+id)
 		id = id[id.length-1]
-		if(!id)
+		if(!id || id=='stage')
 			id='home'
 		let pages = this.$store.state.pages
 		if(id) {
@@ -1294,7 +1297,7 @@ h4 {
 	transition: all 0.3s ease;
 }
 #dot {
-	background-image: url('/dot.png');
+	background-image: url('~/assets/dot.png');
 	width: 318px;
 	height: 216px;
 	background-size: cover;
@@ -1352,7 +1355,7 @@ h4 {
 	position: absolute;
 	right: 15%;
 	max-width: 100%;
-	background-image: url('/circleback.svg');
+	background-image: url('~/assets/circleback.svg');
 	background-size: 90%;
 	background-position: center;
 	background-repeat: no-repeat;
@@ -1565,7 +1568,7 @@ h4 {
 	}
 }
 #copyblock {
-	background: url('/copyblock.png');
+	background: url('~/assets/copyblock.png');
 	background-size: cover;
 	padding: 20px;
 	padding-bottom: 25px;
@@ -1773,7 +1776,7 @@ h4 {
 #fivestory {
 }
 .paper {
-	background-image: url('/paper.png');
+	background-image: url('~/assets/paper.png');
 	padding: 12px 10px;
 	transition: all 0.2s ease;
 	cursor: pointer;
@@ -1952,7 +1955,7 @@ h4 {
 }
 @font-face {
 	font-family: "heart";
-	src: url('/heartone.ttf')
+	src: url('~/assets/heartone.ttf')
 }
 .slide {
 	h1, h4, p {
@@ -2177,7 +2180,7 @@ h4 {
 	z-index: 9999;
 }
 #impact_stories {
-	background-image:url('/leaf.png'),linear-gradient(to top, #d8cfb7, #d8cfb7) !important;
+	background-image:url('~/assets/leaf.png'),linear-gradient(to top, #d8cfb7, #d8cfb7) !important;
 }
 .cls-9 {
 	cursor: pointer;
@@ -2367,5 +2370,7 @@ iframe {
 }
 
 </style>
+
+
 
 
