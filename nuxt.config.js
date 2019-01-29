@@ -9,7 +9,15 @@ module.exports = {
           base: '/stage/'
   },
   generate: {
-	  minify: false
+	  minify: false,
+	  routes: [
+	    '/',
+	    '/mission/',
+	    '/impact/',
+	    '/coalition/',
+	    '/activities/',
+	    '/contact/'
+	  ]
   },
   html: {
 	  minify: {
