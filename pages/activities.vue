@@ -9,7 +9,7 @@
 	</div>
 	<div id=back @click=novert($event,false)><img src=back.svg />back</div>
 	<div id=next @click=novert($event,true)><img src=next.svg />next</div>
-<h4 id=ex @click="mob" :data-current="$store.state.id">Explorer <img id=burger src=~/assets/burger.svg /></h4>
+<h4 id=ex @click="mob" :data-current="$store.state.id">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <a href=/ :data-current="$store.state.id"><img src=logo.svg id=logo /></a>
 <nav :data-id="$store.state.id" :data-open="$store.state.vert" :data-cursub="$store.state.subdex">
 <ul id=dots>
@@ -46,7 +46,7 @@ const nomode = ()=>{
 	document.querySelector('#modal').style.opacity = '0'
 	document.querySelector('#modal').style.pointerEvents = 'none'
 }
-const baseURL = 'http://localhost:3000/stage'
+const baseURL = 'http://haititakesroot.org/stage'
 const basePush = '/stage'
 function cleanOrder(store) {
 	let viewer = document.querySelector('#viewer').childNodes
@@ -533,10 +533,10 @@ export default {
 				"id": "activities",
 				"name": "Activities"
 			},
-			{
-				"id": "news_events",
-				"name": "News + Events"
-			},
+			//{
+			//	"id": "news_events",
+			//	"name": "News + Events"
+			//},
 			{
 				id: 'contact',
 				name: 'Contact'
@@ -2421,6 +2421,8 @@ iframe {
 }
 
 </style>
+
+
 
 
 

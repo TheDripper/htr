@@ -9,7 +9,7 @@
 	</div>
 	<div id=back @click=novert($event,false)><img src=back.svg />back</div>
 	<div id=next @click=novert($event,true)><img src=next.svg />next</div>
-<h4 id=ex @click="mob" :data-current="$store.state.id">Explorer <img id=burger src=~/assets/burger.svg /></h4>
+<h4 id=ex @click="mob" :data-current="$store.state.id">Explore <img id=burger src=~/assets/burger.svg /></h4>
 <a href=/ :data-current="$store.state.id"><img src=logo.svg id=logo /></a>
 <nav :data-id="$store.state.id" :data-open="$store.state.vert" :data-cursub="$store.state.subdex">
 <ul id=dots>
@@ -46,6 +46,7 @@ const nomode = ()=>{
 	document.querySelector('#modal').style.opacity = '0'
 	document.querySelector('#modal').style.pointerEvents = 'none'
 }
+// const baseURL = 'http://haititakesroot.org/stage'
 const baseURL = 'http://localhost:3000/stage'
 const basePush = '/stage'
 function cleanOrder(store) {
@@ -109,21 +110,29 @@ const throttle = (func, limit) => {
 }
 const up = (store) => {
 	let sub = document.querySelector('.open')
+	if(store.state.proj)
+		sub = sub.querySelector('.openproj')
 	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
 	if(curMarg < 0 || window.innerWidth < 600) {
 		curMarg += 100;
 		sub.style.marginTop = curMarg + 'vh'
 		store.commit('lowDex')
 	} else {
-		document.querySelector('.open').style.transform="translateY(100%)"
-		document.querySelector('.open').firstChild.style.marginTop = '0'
-		document.querySelector('.open').parentNode.classList.remove('scroller')
-		document.querySelector('.open').classList.remove('open')
-		store.commit('vert')
-		document.querySelector('#back').style.opacity='0'
-		document.querySelector('#back').style.pointerEvents='none'
-		document.querySelector('#next').style.opacity='0'
-		document.querySelector('#next').style.pointerEvents='none'
+		sub.style.transform="translateY(100%)"
+		console.log(sub.firstChild)
+		sub.firstChild.style.marginTop = '0'
+		sub.parentNode.classList.remove('scroller')
+		if(sub.classList.contains('openproj')) {
+			sub.classList.remove('openproj')
+			store.commit('proj')
+		} else {
+			sub.classList.remove('open')
+			store.commit('vert')
+			document.querySelector('#back').style.opacity='0'
+			document.querySelector('#back').style.pointerEvents='none'
+			document.querySelector('#next').style.opacity='0'
+			document.querySelector('#next').style.pointerEvents='none'
+		}
 	}
 	//document.querySelector('#next').style.opacity='0'
 	//document.querySelector('#next').style.pointerEvents='none'
@@ -133,6 +142,9 @@ const up = (store) => {
 }
 const down = (store) => {
 	let sub = document.querySelector('.open')
+	console.log(store.state)
+	if(store.state.proj)
+		sub = sub.querySelector('.openproj')
 	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
 	console.log(curMarg)
 	if(curMarg > ((sub.children.length - 1) * -100)) {
@@ -201,7 +213,6 @@ const next = async (store) => {
 	},800)
 }
 const loadSlide = async function(id,store,isPrev) {
-	console.log(this)
 	if(!document.querySelector('#'+id)) {
 		let nextMark = await axios(baseURL+'/'+id+'.html')
 		let order = Number(store.state.pages[id])
@@ -222,7 +233,6 @@ const loadSlide = async function(id,store,isPrev) {
 const vert = function(id,store,subdex) {
 	document.querySelectorAll('.subs').forEach(sub=>{
 		if(sub.parentNode.id==id) {
-			console.log(sub.firstChild)
 			sub.classList.add('open')
 			sub.parentNode.classList.add('scroller')
 			sub.style.transform = "translateY(0%)"
@@ -384,11 +394,46 @@ export default {
 				"prevArrow": "<span class=prev><</span>",
 				"nextArrow": "<span class=next>></span>",
 			}
-			if($('.sli').not('.slick-initialized').length)
+			if($('.sli').not('.slick-initialized').length) {
 				$('.sli').not('.slick-initialized').slick({
 					"prevArrow": "<img src=prev.svg / class=prevrow />",
 					"nextArrow": "<img src=nextrow.svg / class=nextrow />"
 				});
+			}
+			if($('.slicent').not('.slick-initialized').length) {
+				$('.slicent').not('.slick-initialized').slick({
+					centerMode: true,
+  					slidesToShow: 3,
+					variableWidth: true,
+					"prevArrow": "<img src=prev.svg / class=prevgal />",
+					"nextArrow": "<img src=nextrow.svg / class=nextgal />"
+				});
+			}
+			let bindbox = document.querySelector('.bindbox')
+			if(bindbox) {
+				bindbox.addEventListener('click',e=>{
+					let proj = e.target.dataset.targ
+					console.log(proj)
+					document.querySelector(proj).style.opacity = '1'
+					document.querySelector(proj).style.pointerEvents = 'auto'
+					document.querySelector(proj).style.transform = 'translateY(0)'
+					document.querySelector(proj).classList.add('openproj')
+					store.commit('proj')
+				})
+				bindbox.classList.remove('bindbox')
+			}
+			let bindallproj = document.querySelector('.bindallproj')
+			if(bindallproj) {
+				bindallproj.addEventListener('click',e=>{
+					let proj = e.target.closest('.sub').querySelector('.projmode')
+					proj.style.opacity = '0'
+					proj.style.pointerEvents = 'none'
+					store.commit('proj')
+				})
+				bindallproj.classList.remove('bindallproj')
+			}
+
+			
 
 			if($('.slimob').not('.slick-initialized').length && $(window).width() < 1000)
 				$('.slimob').not('.slick-initialized').slick(slickopts);
@@ -467,28 +512,28 @@ export default {
 				//	}
 				//]
 			},
-			//{
-			//	"id": "coalition",
-			//	"name": "Coalition" ,
-			//	subs: [
-			//	 	{
-			//	 	       "id":"coaltion_who",
-			//	 	       "name":"Our Coalition"
-			//	 	},
-			//		{
-			//	 	       "id":"coaltion_board",
-			//	 	       "name":"Board of Advisors"
-			//		},
-			//		{
-			//	 	       "id":"coaltion_testimonials",
-			//	 	       "name":"Supporter Testimonials"
-			//		}
-			//	]
-			//},
-			//{
-			//	"id": "activities",
-			//	"name": "Activities"
-			//},
+			{
+				"id": "coalition",
+				"name": "Coalition" ,
+				subs: [
+				 	{
+				 	       "id":"coaltion_who",
+				 	       "name":"Our Coalition"
+				 	},
+					{
+				 	       "id":"coaltion_board",
+				 	       "name":"Board of Advisors"
+					},
+					{
+				 	       "id":"coaltion_testimonials",
+				 	       "name":"Supporter Testimonials"
+					}
+				]
+			},
+			{
+				"id": "activities",
+				"name": "Activities"
+			},
 			//{
 			//	"id": "news_events",
 			//	"name": "News + Events"
@@ -511,11 +556,14 @@ export default {
 		//		})
 		//	}
 		//})
-		let id = window.location.pathname.split('/').filter(dir=>{
-			return dir != ''
-		})
-		console.log('id'+id)
-		id = id[id.length-1]
+		//let id = window.location.pathname.split('/').filter(dir=>{
+		//	return dir != ''
+		//})
+		//id = id.replace(/stage,/g,'');
+		//console.log(window.location.href.substr(window.location.href.lastIndexOf('/') + 1));
+		var pageURL = window.location.href.replace(/\/$/, "");;
+		var id = pageURL.substr(pageURL.lastIndexOf('/') + 1);
+		console.log(id)
 		if(!id || id=='stage')
 			id='home'
 		let pages = this.$store.state.pages
@@ -595,12 +643,15 @@ export default {
 		},
 		novert: function(e,showNext) {
 			let vuestance = this
+			let open = document.querySelector('.open')
+			if(vuestance.$store.state.proj)
+				open = open.querySelector('.openproj')
 			if(window.innerWidth < 600) {
-				document.querySelector('.open').style.transform="translateY(100%)"
-				document.querySelector('.open').firstChild.style.marginTop = '0'
-				document.querySelector('.open').parentNode.scrollTop = 0
-				document.querySelector('.open').parentNode.classList.remove('scroller')
-				document.querySelector('.open').classList.remove('open')
+				open.style.transform="translateY(100%)"
+				open.firstChild.style.marginTop = '0'
+				open.parentNode.scrollTop = 0
+				open.parentNode.classList.remove('scroller')
+				open.classList.remove('open')
 				vuestance.$store.commit('vert')
 				document.querySelector('#back').style.opacity='0'
 				document.querySelector('#back').style.pointerEvents='none'
@@ -612,19 +663,17 @@ export default {
 				}
 			} else {
 			if(showNext) {
-				let sub = document.querySelector('.open')
-				let open = document.querySelector('.open')
-				var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
+				var curMarg = Number(open.style.marginTop.replace(/\D/g,'')) * -1
 				if(curMarg > ((open.children.length - 1) * -100)) {
 					curMarg -= 100;
-					sub.style.marginTop = curMarg + 'vh'
+					open.style.marginTop = curMarg + 'vh'
 					vuestance.$store.commit('hiDex')
 				} else {
 					next(vuestance.$store)
-					document.querySelector('.open').style.transform="translateY(100%)"
-					document.querySelector('.open').firstChild.style.marginTop = '0'
-					document.querySelector('.open').parentNode.classList.remove('scroller')
-					document.querySelector('.open').classList.remove('open')
+					open.style.transform="translateY(100%)"
+					open.firstChild.style.marginTop = '0'
+					open.parentNode.classList.remove('scroller')
+					open.classList.remove('open')
 					vuestance.$store.commit('vert')
 					document.querySelector('#back').style.opacity='0'
 					document.querySelector('#back').style.pointerEvents='none'
@@ -747,7 +796,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-end;
-	height: 66vh;
+	height: 77vh;
 	justify-content: space-between;
 	padding-right: 65px;
 	.wrap {
@@ -799,11 +848,11 @@ export default {
 	align-items: center;
 	flex-direction: column;
 	position: relative;
-	height: calc(22vh + 2px);
 	flex-shrink: 0;
 	background-size: 14px;
 	background-position: 100% 2px;
 	background-repeat: no-repeat;
+	height: 11vh;
 	&:not(:first-child) {
 	}
 
@@ -877,6 +926,8 @@ export default {
     		padding: 0;
 		transition: all 0.2s ease;
 		transform: translateX(21px);
+		height: 100%;
+		display: none;
 		li {
 			position: relative;
 			color: #ECE5C9;
@@ -886,7 +937,6 @@ export default {
 			align-items: center;
 			cursor: pointer;
 			margin: 0;
-			height: 11vh;
 			&:hover {
 				.subdot {
   					animation: subpulse 1s infinite;
@@ -922,6 +972,7 @@ export default {
 		.subdots {
 			opacity: 1;
 			pointer-events: auto;
+			display: flex;
 		}
 		.wrap {
 			background-size: 14px;
@@ -967,6 +1018,7 @@ export default {
  margin-top:16px;
  background: #ECE5C9;
  left: 90%;
+ display: none;
 }
 
 #dots li:last-child:before {
@@ -1985,6 +2037,15 @@ h4 {
 #impact {
 	order: 3;
 }
+#coalition {
+	order: 4;
+}
+#activities {
+	order: 4;
+}
+#contact {
+	order: 5;
+}
 #downcont {
 	position: relative;
 	width: 100%;
@@ -2370,6 +2431,9 @@ iframe {
 }
 
 </style>
+
+
+
 
 
 

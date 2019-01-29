@@ -20,8 +20,7 @@ const createStore = () => {
 	"impact": 2,
 	"coalition": 3,
 	"activities": 4, 
-	"news_events": 5,
-	"contact": 6
+	"contact": 5
       }
     }),
     mutations: {
