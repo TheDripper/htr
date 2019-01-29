@@ -17,10 +17,10 @@ const createStore = () => {
 	"home": 0,
 	"mission": 1,
 	"impact": 2,
-	//"coalition": 3,
-	//"activities": 4, 
-	//"news_events": 5,
-	"contact": 3
+	"coalition": 3,
+	"activities": 4, 
+	"news_events": 5,
+	"contact": 6
       }
     }),
     mutations: {

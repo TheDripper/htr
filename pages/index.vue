@@ -46,7 +46,7 @@ const nomode = ()=>{
 	document.querySelector('#modal').style.opacity = '0'
 	document.querySelector('#modal').style.pointerEvents = 'none'
 }
-const baseURL = 'http://haititakesroot.org/stage'
+const baseURL = 'http://localhost:3000/stage'
 const basePush = '/stage'
 function cleanOrder(store) {
 	let viewer = document.querySelector('#viewer').childNodes
