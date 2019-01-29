@@ -117,15 +117,21 @@ const up = (store) => {
 		sub.style.marginTop = curMarg + 'vh'
 		store.commit('lowDex')
 	} else {
-		document.querySelector('.open').style.transform="translateY(100%)"
-		document.querySelector('.open').firstChild.style.marginTop = '0'
-		document.querySelector('.open').parentNode.classList.remove('scroller')
-		document.querySelector('.open').classList.remove('open')
-		store.commit('vert')
-		document.querySelector('#back').style.opacity='0'
-		document.querySelector('#back').style.pointerEvents='none'
-		document.querySelector('#next').style.opacity='0'
-		document.querySelector('#next').style.pointerEvents='none'
+		sub.style.transform="translateY(100%)"
+		console.log(sub.firstChild)
+		sub.firstChild.style.marginTop = '0'
+		sub.parentNode.classList.remove('scroller')
+		if(sub.classList.contains('openproj')) {
+			sub.classList.remove('openproj')
+			store.commit('proj')
+		} else {
+			sub.classList.remove('open')
+			store.commit('vert')
+			document.querySelector('#back').style.opacity='0'
+			document.querySelector('#back').style.pointerEvents='none'
+			document.querySelector('#next').style.opacity='0'
+			document.querySelector('#next').style.pointerEvents='none'
+		}
 	}
 	//document.querySelector('#next').style.opacity='0'
 	//document.querySelector('#next').style.pointerEvents='none'
@@ -409,6 +415,7 @@ export default {
 					console.log(proj)
 					document.querySelector(proj).style.opacity = '1'
 					document.querySelector(proj).style.pointerEvents = 'auto'
+					document.querySelector(proj).style.transform = 'translateY(0)'
 					document.querySelector(proj).classList.add('openproj')
 					store.commit('proj')
 				})
@@ -635,12 +642,15 @@ export default {
 		},
 		novert: function(e,showNext) {
 			let vuestance = this
+			let open = document.querySelector('.open')
+			if(vuestance.$store.state.proj)
+				open = open.querySelector('.openproj')
 			if(window.innerWidth < 600) {
-				document.querySelector('.open').style.transform="translateY(100%)"
-				document.querySelector('.open').firstChild.style.marginTop = '0'
-				document.querySelector('.open').parentNode.scrollTop = 0
-				document.querySelector('.open').parentNode.classList.remove('scroller')
-				document.querySelector('.open').classList.remove('open')
+				open.style.transform="translateY(100%)"
+				open.firstChild.style.marginTop = '0'
+				open.parentNode.scrollTop = 0
+				open.parentNode.classList.remove('scroller')
+				open.classList.remove('open')
 				vuestance.$store.commit('vert')
 				document.querySelector('#back').style.opacity='0'
 				document.querySelector('#back').style.pointerEvents='none'
@@ -652,19 +662,17 @@ export default {
 				}
 			} else {
 			if(showNext) {
-				let sub = document.querySelector('.open')
-				let open = document.querySelector('.open')
-				var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
+				var curMarg = Number(open.style.marginTop.replace(/\D/g,'')) * -1
 				if(curMarg > ((open.children.length - 1) * -100)) {
 					curMarg -= 100;
-					sub.style.marginTop = curMarg + 'vh'
+					open.style.marginTop = curMarg + 'vh'
 					vuestance.$store.commit('hiDex')
 				} else {
 					next(vuestance.$store)
-					document.querySelector('.open').style.transform="translateY(100%)"
-					document.querySelector('.open').firstChild.style.marginTop = '0'
-					document.querySelector('.open').parentNode.classList.remove('scroller')
-					document.querySelector('.open').classList.remove('open')
+					open.style.transform="translateY(100%)"
+					open.firstChild.style.marginTop = '0'
+					open.parentNode.classList.remove('scroller')
+					open.classList.remove('open')
 					vuestance.$store.commit('vert')
 					document.querySelector('#back').style.opacity='0'
 					document.querySelector('#back').style.pointerEvents='none'
