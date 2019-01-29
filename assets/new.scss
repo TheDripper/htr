@@ -316,11 +316,6 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    display: flex;
-    background-image: url('coalition_about.png');
-    background-color: black;
-    justify-content: center;
-    align-items: center;
     opacity: 0;
     pointer-events: none;
     transition: all 0.3s ease;
@@ -358,4 +353,17 @@
 	top: 0;
 	left: 20vw;
 	z-index: 55;
+}
+.projslide {
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+#proj1 {
+	.projslide {
+		background-color: black;
+	}
 }

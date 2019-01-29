@@ -5,6 +5,7 @@ const createStore = () => {
     state: () => ({
       current: 0,
       vert: false,
+      proj: false,
       choke: false,
       slides: [],
       allslides: [],
@@ -32,6 +33,9 @@ const createStore = () => {
       },
       vert (state) {
         state.vert ? state.vert = false : state.vert = true
+      },
+      proj (state) {
+        state.proj ? state.proj = false : state.proj = true
       },
       loadSlides(state,data) {
 	state.slides = data	

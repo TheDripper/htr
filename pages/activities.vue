@@ -109,6 +109,8 @@ const throttle = (func, limit) => {
 }
 const up = (store) => {
 	let sub = document.querySelector('.open')
+	if(store.state.proj)
+		sub = sub.querySelector('.openproj')
 	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
 	if(curMarg < 0 || window.innerWidth < 600) {
 		curMarg += 100;
@@ -133,6 +135,9 @@ const up = (store) => {
 }
 const down = (store) => {
 	let sub = document.querySelector('.open')
+	console.log(store.state)
+	if(store.state.proj)
+		sub = sub.querySelector('.openproj')
 	var curMarg = Number(sub.style.marginTop.replace(/\D/g,'')) * -1
 	console.log(curMarg)
 	if(curMarg > ((sub.children.length - 1) * -100)) {
@@ -404,15 +409,18 @@ export default {
 					console.log(proj)
 					document.querySelector(proj).style.opacity = '1'
 					document.querySelector(proj).style.pointerEvents = 'auto'
+					document.querySelector(proj).classList.add('openproj')
+					store.commit('proj')
 				})
 				bindbox.classList.remove('bindbox')
 			}
 			let bindallproj = document.querySelector('.bindallproj')
 			if(bindallproj) {
 				bindallproj.addEventListener('click',e=>{
-					let proj = e.target.parentNode.parentNode.querySelector('.projmode')
+					let proj = e.target.closest('.sub').querySelector('.projmode')
 					proj.style.opacity = '0'
 					proj.style.pointerEvents = 'none'
+					store.commit('proj')
 				})
 				bindallproj.classList.remove('bindallproj')
 			}
