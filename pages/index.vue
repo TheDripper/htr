@@ -10,7 +10,7 @@
 	<div id=back @click=novert($event,false)><img src=back.svg />back</div>
 	<div id=next @click=novert($event,true)><img src=next.svg />next</div>
 <h4 id=ex @click="mob" :data-current="$store.state.id">Explore <img id=burger src=~/assets/burger.svg /></h4>
-<a href=/ :data-current="$store.state.id"><img src=logo.svg id=logo /></a>
+<a href=/stage :data-current="$store.state.id"><img src=logo.svg id=logo /></a>
 <nav :data-id="$store.state.id" :data-open="$store.state.vert" :data-cursub="$store.state.subdex">
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
@@ -46,8 +46,8 @@ const nomode = ()=>{
 	document.querySelector('#modal').style.opacity = '0'
 	document.querySelector('#modal').style.pointerEvents = 'none'
 }
-// const baseURL = 'http://haititakesroot.org/stage'
-const baseURL = 'http://localhost:3000/stage'
+const baseURL = 'http://haititakesroot.org/stage'
+// const baseURL = 'http://localhost:3000/stage'
 const basePush = '/stage'
 function cleanOrder(store) {
 	let viewer = document.querySelector('#viewer').childNodes
