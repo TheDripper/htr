@@ -405,4 +405,32 @@
 }
 #coalition_structure {
 	background: #D9D8D7;
+	position: relative;
+	.cls-5 {
+		transition: all 0.3s ease;
+		position: relative;
+	}
+	.cls-5:hover  {
+		fill: #A8CE38;
+		stroke: white;
+		stroke-width: 3px;
+	}
+	.blurb {
+		position: absolute; 
+		top: 0;
+		left: 0;
+		color: #373930;
+	}
+	#tooltip {
+		position: absolute;
+		top: 0;
+		left: 0;
+		transition: all 0.3s ease;
+		h4 {
+			color: #373930;
+		}
+		p {
+			color: #373930;
+		}
+	}
 }
