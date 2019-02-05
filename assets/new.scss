@@ -16,9 +16,8 @@
 		width: 80vw;
 		display: flex;
 		justify-content: center;
-		align-items: stretch;
+		align-items: center;
 		position: relative;
-		max-height: 70vh;
 		li {
 			padding: 20px;
 			width: 20%;
@@ -30,11 +29,10 @@
 			transition: all 0.3s ease;
 			border: 3px solid transparent;
 			box-sizing: border-box;
-			max-height: 70vh;
+			min-height: 550px;
 			h2 {
 				font-size: 30px;
 				text-align: center;
-				margin-bottom: 20px;
 			}
 			a {
 				margin-top: 20px;
@@ -48,9 +46,17 @@
 				align-items: center;
 				opacity: 0;
 				pointer-events: none;
+				position: absolute;
 				transition: all 0.3s ease;
 				padding: 10px 0;
 				
+			}
+			p {
+				margin-top: 0;
+				text-align: center;
+				max-width: none !important;
+				margin: 20px 0;
+				color: #4a4a4a;
 			}
 			img {
 			}
@@ -60,6 +66,7 @@
 				a {
 					opacity: 1;
 					pointer-events: auto;
+					position: relative;
 				}
 			}
 		}
@@ -406,6 +413,15 @@
 #coalition_structure {
 	background: #D9D8D7;
 	position: relative;
+	flex-direction: row;
+	svg {
+		width: 700px;
+		align-self: flex-end;
+		max-height: 90vh;
+	}
+	h1, h4, p {
+		color: #373930;
+	}
 	.cls-5 {
 		transition: all 0.3s ease;
 		position: relative;
@@ -423,14 +439,73 @@
 	}
 	#tooltip {
 		position: absolute;
-		top: 0;
-		left: 0;
+		bottom: 10vh;
+		left: 10vw;
 		transition: all 0.3s ease;
 		h4 {
 			color: #373930;
 		}
 		p {
-			color: #373930;
+			color: #427350;
 		}
+	}
+	.wrap {
+		width: 45%;
+	}
+	@media(max-width:1000px) {
+		flex-direction: column;		
+		.wrap {
+			width: 100%;
+			margin-top: auto;
+		}
+		svg {
+			align-self: center;
+			margin-top: 40px;
+			max-height: 60vh;
+		}
+	}
+	@media(max-width:600px) {
+		h1 {
+			font-size: 22px;
+		}
+		p {
+			font-size: 12px;
+			line-height: 1.3;
+		}
+		svg {
+			margin-top: 10px;
+		}
+	}
+}
+#home-hero-video {
+	position: absolute;
+	width: 100%;
+	height: auto;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}
+.vidwrap {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+.vidshader {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.5);
+	top: 0;
+	left: 0;
+	z-index: 2;
+}
+#home {
+	h1, h4 {
+		z-index: 3;
+	}
+	#diff {
+		z-index: 3;
 	}
 }

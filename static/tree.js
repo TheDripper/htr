@@ -1,7 +1,7 @@
 (function($){
 	$(document).ready(function(){
 		$('.cls-5').mouseenter(function(e){
-			if($(this).attr('data-head')) {
+			if($(this).attr('data-head').length) {
 				var newtop = Number($(this).offset().top) + 200;
 				var newleft = Number($(this).offset().left);
 				var newhead = $(this).attr('data-head');

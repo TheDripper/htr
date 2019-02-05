@@ -10,7 +10,7 @@
 	<div id=back @click=novert($event,false)><img src=back.svg />back</div>
 	<div id=next @click=novert($event,true)><img src=next.svg />next</div>
 <h4 id=ex @click="mob" :data-current="$store.state.id">Explore <img id=burger src=~/assets/burger.svg /></h4>
-<a href=/ :data-current="$store.state.id"><img src=logo.svg id=logo /></a>
+<a href=/stage :data-current="$store.state.id"><img src=logo.svg id=logo /></a>
 <nav :data-id="$store.state.id" :data-open="$store.state.vert" :data-cursub="$store.state.subdex">
 <ul id=dots>
 <li v-for="(slide,index) in $store.state.allslides" :class="{'active':index===$store.state.current}" class=tab :data-slide="slide.id">
@@ -46,10 +46,9 @@ const nomode = ()=>{
 	document.querySelector('#modal').style.opacity = '0'
 	document.querySelector('#modal').style.pointerEvents = 'none'
 }
-const baseURL = 'http://haititakesroot.org/stage'
-//const baseURL = 'http://localhost:3000/stage'
-//const basePush = ''
-const basePush = '/stage'
+//const baseURL = 'http://haititakesroot.org/stage'
+const baseURL = 'http://localhost:3000'
+const basePush = ''
 function cleanOrder(store) {
 	let viewer = document.querySelector('#viewer').childNodes
 	let slides = store.state.slides
@@ -217,14 +216,10 @@ const loadSlide = async function(id,store,isPrev) {
 	if(!document.querySelector('#'+id)) {
 		let nextMark = await axios(baseURL+'/'+id+'.html')
 		let order = Number(store.state.pages[id])
-		let img = id+'.png' // STATIC MOD FOR PUSH
-		//if(id=='home')
-		//	img = id + '.mov'
-		console.log(img)
 		let newSlide = {
 			id: id,
 			mark: nextMark.data,
-			img: img,
+			img: id+'.png',
 			order: order
 		}
 		if(isPrev)
@@ -450,27 +445,6 @@ export default {
 
 
 			})
-			if($('#tooltip').length) {
-				$('.cls-5').mouseenter(function(e){
-					console.log('test');
-					if($(this).attr('data-head')) {
-						var newtop = Number($(this).offset().top) + 200;
-						var newleft = Number($(this).offset().left);
-						var newhead = $(this).attr('data-head');
-						var newblurb = $(this).attr('data-blurb');
-						$('#tooltip').css('top',newtop + 'px');
-						$('#tooltip').css('left',newleft + 'px');
-						$('#tooltip').css('opacity','1');
-						$('#tooltip').css('pointerEvents','auto');
-						$('#tooltip').find('h4').text(newhead);
-						$('#tooltip').find('p').text(newblurb);
-					}
-				});
-				$('.cls-5').mouseleave(function(e){
-					$('#tooltip').css('opacity','0');
-					$('#tooltip').css('pointerEvents','none');
-				});
-			}
 		}
 	},
 	async created() {
@@ -538,32 +512,32 @@ export default {
 				//	}
 				//]
 			},
-			{
-				"id": "coalition",
-				"name": "Coalition" ,
-				subs: [
-				 	{
-				 	       "id":"coaltion_who",
-				 	       "name":"Our Coalition"
-				 	},
-					{
-				 	       "id":"coaltion_board",
-				 	       "name":"Board of Advisors"
-					},
-					{
-				 	       "id":"coaltion_testimonials",
-				 	       "name":"Supporter Testimonials"
-					}
-				]
-			},
-			{
-				"id": "activities",
-				"name": "Activities"
-			},
-			{
-				"id": "news_events",
-				"name": "News + Events"
-			},
+			//{
+			//	"id": "coalition",
+			//	"name": "Coalition" ,
+			//	subs: [
+			//	 	{
+			//	 	       "id":"coaltion_who",
+			//	 	       "name":"Our Coalition"
+			//	 	},
+			//		{
+			//	 	       "id":"coaltion_board",
+			//	 	       "name":"Board of Advisors"
+			//		},
+			//		{
+			//	 	       "id":"coaltion_testimonials",
+			//	 	       "name":"Supporter Testimonials"
+			//		}
+			//	]
+			//},
+			//{
+			//	"id": "activities",
+			//	"name": "Activities"
+			//},
+			//{
+			//	"id": "news_events",
+			//	"name": "News + Events"
+			//},
 			{
 				id: 'contact',
 				name: 'Contact'
@@ -825,8 +799,7 @@ export default {
 	flex-direction: column;
 	align-items: flex-end;
 	height: 77vh;
-	//height: 66vh;
-	//justify-content: space-between;
+	justify-content: space-between;
 	padding-right: 65px;
 	.wrap {
 		display: flex;
@@ -874,14 +847,13 @@ export default {
 }
 #dots > li {
 	display: flex;
-	align-items: flex-end;
+	align-items: center;
 	flex-direction: column;
 	position: relative;
 	flex-shrink: 0;
 	background-size: 14px;
 	background-position: 100% 2px;
 	background-repeat: no-repeat;
-	height: calc(22vh + 2px);
 	height: 11vh;
 	&:not(:first-child) {
 	}
@@ -957,6 +929,7 @@ export default {
 		transition: all 0.2s ease;
 		transform: translateX(21px);
 		height: 100%;
+		display: none;
 		li {
 			position: relative;
 			color: #ECE5C9;
@@ -966,7 +939,6 @@ export default {
 			align-items: center;
 			cursor: pointer;
 			margin: 0;
-			height: 11vh;
 			&:hover {
 				.subdot {
   					animation: subpulse 1s infinite;
@@ -1069,7 +1041,6 @@ content:none;
  margin-bottom:5.3vh;
  background: #ECE5C9;
  left: 90%;
- display: none;
 }
 #dots > li:nth-child(2) .subdot:after {
  content: '';
@@ -1121,7 +1092,7 @@ nav{
 	top: 50%;
 	transform: translateY(-50%);
 	z-index: 40;
-	//margin-top: 5.5vh;
+	margin-top: 5.5vh;
 }
 
 .slide h1 {
